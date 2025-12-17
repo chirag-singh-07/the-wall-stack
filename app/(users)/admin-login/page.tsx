@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
+import { signIn } from "@/lib/auth-client"
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -26,12 +28,30 @@ export default function AdminLoginPage() {
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    // Simulate login
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsLoading(false)
-    router.push("/admin")
+    try {
+      e.preventDefault()
+      setIsLoading(true)
+      const res = await signIn.email({
+        email: formData.email,
+        password: formData.password,
+      })
+
+      if(res.error) {
+        toast.error(res.error.message || "Login failed. Please check your credentials and try again.");
+        setIsLoading(false)
+        return
+      }
+
+
+       toast.success("Welcome back, Manish! ( Chal Dakh le New Orders )");
+      setIsLoading(false)
+      router.push("/admin")
+    } catch (error) {
+      console.error("Login error:", error)
+      setIsLoading(false)
+      // Handle error (e.g., show notification)
+      toast.error("Login failed. Please check your credentials and try again.")
+    }
   }
 
   return (
