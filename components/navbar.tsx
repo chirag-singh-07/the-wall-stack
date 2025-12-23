@@ -10,7 +10,6 @@ import { authClient, signOut } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -54,7 +53,7 @@ export function Navbar() {
       <div className="container mx-auto px-4 md:px-6">
         <nav className="flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold tracking-tight">
-            POSTER.
+            THE WALL STACK
           </Link>
 
           {/* Desktop Links */}

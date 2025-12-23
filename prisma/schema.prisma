@@ -21,6 +21,9 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   role          String    @default("USER")
+  banned        Boolean   @default(false)
+  banReason     String?
+  banExpires    DateTime?
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
@@ -78,8 +81,56 @@ model Verification {
 }
 
 
+
 enum Role {
   USER
   ADMIN
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  status      String   @default("active") // "active", "inactive"
+  posters     Poster[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("category")
+}
+
+model Collection {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  image       String?
+  status      String   @default("draft") // "active", "draft"
+  posters     Poster[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("collection")
+}
+
+model Poster {
+  id           String      @id @default(cuid())
+  title        String
+  slug         String      @unique
+  description  String?
+  price        Float
+  stock        Int         @default(0)
+  image        String      @default("/placeholder.svg")
+  images       String[]    @default([])
+  category     Category?   @relation(fields: [categoryId], references: [id])
+  categoryId   String?
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+  collectionId String?
+  status       String      @default("draft") // "active", "draft", "archived"
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@map("poster")
 }
 

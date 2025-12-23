@@ -1,75 +1,90 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect, use } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import { AdminHeader } from "@/components/admin/admin-header"
-import { useAdminStore } from "@/lib/admin-store"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Upload, X } from "lucide-react"
+import { useState, useEffect, use } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { AdminHeader } from "@/components/admin/admin-header";
+import { ArrowLeft, Upload, X, Loader2 } from "lucide-react";
+import {
+  getCollectionById,
+  updateCollection,
+} from "@/actions/admin/poster-actions";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export default function EditCollectionPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
-  const router = useRouter()
-  const { collections, updateCollection } = useAdminStore()
-  const [isLoading, setIsLoading] = useState(false)
-
-  const collection = collections.find((c) => c.id === id)
+export default function EditCollectionPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     image: "",
     status: "draft" as "active" | "draft",
-  })
+  });
 
   useEffect(() => {
-    if (collection) {
-      setFormData({
-        title: collection.title,
-        description: collection.description,
-        image: collection.image,
-        status: collection.status,
-      })
-    }
-  }, [collection])
+    const fetchData = async () => {
+      setIsFetching(true);
+      const res = await getCollectionById(id);
+      if (res.success && res.data) {
+        setFormData({
+          title: res?.data?.title || "",
+          description: res?.data?.description || "",
+          image: res?.data?.image || "",
+          status: res?.data?.status as any,
+        });
+      } else {
+        toast.error(res.error || "Collection not found");
+        router.push("/admin/collections");
+      }
+      setIsFetching(false);
+    };
+    fetchData();
+  }, [id, router]);
 
-  if (!collection) {
+  if (isFetching) {
     return (
-      <div className="min-h-screen">
-        <AdminHeader title="Edit Collection" />
-        <div className="p-6">
-          <p>Collection not found</p>
-          <Button asChild className="mt-4">
-            <Link href="/admin/collections">Back to Collections</Link>
-          </Button>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    const res = await updateCollection(id, formData);
 
-    updateCollection(id, {
-      title: formData.title,
-      description: formData.description,
-      image: formData.image,
-      status: formData.status,
-    })
+    if (res.success) {
+      toast.success("Collection updated");
+      router.push("/admin/collections");
+    } else {
+      toast.error(res.error || "Failed to update collection");
+    }
 
-    router.push("/admin/collections")
-  }
+    setIsLoading(false);
+  };
 
   return (
     <div className="min-h-screen">
@@ -91,7 +106,12 @@ export default function EditCollectionPage({ params }: { params: Promise<{ id: s
               <div className="relative h-40 w-64 overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted">
                 {formData.image ? (
                   <>
-                    <Image src={formData.image || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
+                    <Image
+                      src={formData.image || "/placeholder.svg"}
+                      alt="Preview"
+                      fill
+                      className="object-cover"
+                    />
                     <Button
                       type="button"
                       variant="secondary"
@@ -114,10 +134,14 @@ export default function EditCollectionPage({ params }: { params: Promise<{ id: s
                   type="url"
                   placeholder="Or paste image URL..."
                   value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, image: e.target.value })
+                  }
                   className="w-64"
                 />
-                <p className="text-xs text-muted-foreground">Recommended: 1200x800px, JPG or PNG</p>
+                <p className="text-xs text-muted-foreground">
+                  Recommended: 1200x800px, JPG or PNG
+                </p>
               </div>
             </div>
           </div>
@@ -128,7 +152,9 @@ export default function EditCollectionPage({ params }: { params: Promise<{ id: s
             <Input
               id="title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               required
             />
           </div>
@@ -138,7 +164,9 @@ export default function EditCollectionPage({ params }: { params: Promise<{ id: s
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               rows={4}
             />
           </div>
@@ -147,7 +175,9 @@ export default function EditCollectionPage({ params }: { params: Promise<{ id: s
             <Label htmlFor="status">Status</Label>
             <Select
               value={formData.status}
-              onValueChange={(value: "active" | "draft") => setFormData({ ...formData, status: value })}
+              onValueChange={(value: "active" | "draft") =>
+                setFormData({ ...formData, status: value })
+              }
             >
               <SelectTrigger id="status" className="w-48">
                 <SelectValue />
@@ -171,5 +201,5 @@ export default function EditCollectionPage({ params }: { params: Promise<{ id: s
         </form>
       </div>
     </div>
-  )
+  );
 }

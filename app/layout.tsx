@@ -9,7 +9,7 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "POSTER. | Premium Wall Art & Posters",
+  title: "THE WALL STACK | Premium Wall Art & Posters",
   description:
     "Discover premium posters crafted for design enthusiasts. Transform any space with our curated collection of minimal, abstract, and typography art prints.",
   keywords: [
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "home decor",
   ],
   openGraph: {
-    title: "POSTER. | Premium Wall Art & Posters",
+    title: "THE WALL STACK | Premium Wall Art & Posters",
     description:
       "Discover premium posters crafted for design enthusiasts. Transform any space with our curated collection.",
     type: "website",

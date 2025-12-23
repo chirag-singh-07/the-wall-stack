@@ -1,5 +1,5 @@
-import Link from "next/link"
-import { Instagram, Twitter, Facebook, Shield } from "lucide-react"
+import Link from "next/link";
+import { Instagram, Twitter, Facebook, Shield } from "lucide-react";
 
 const footerLinks = {
   shop: [
@@ -20,7 +20,7 @@ const footerLinks = {
     { label: "Returns", href: "#" },
     { label: "Contact", href: "#" },
   ],
-}
+};
 
 export function Footer() {
   return (
@@ -29,21 +29,31 @@ export function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
           <div className="lg:col-span-2">
             <Link href="/" className="text-2xl font-bold tracking-tight">
-              POSTER.
+              THE WALL STACK
             </Link>
             <p className="mt-4 text-background/60 max-w-sm">
-              Premium posters for design lovers. Art that transforms your space and tells your story.
+              Premium posters for design lovers. Art that transforms your space
+              and tells your story.
             </p>
             <div className="flex gap-4 mt-6">
-              <Link href="#" className="text-background/60 hover:text-background transition-colors">
+              <Link
+                href="#"
+                className="text-background/60 hover:text-background transition-colors"
+              >
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
               </Link>
-              <Link href="#" className="text-background/60 hover:text-background transition-colors">
+              <Link
+                href="#"
+                className="text-background/60 hover:text-background transition-colors"
+              >
                 <Twitter className="h-5 w-5" />
                 <span className="sr-only">Twitter</span>
               </Link>
-              <Link href="#" className="text-background/60 hover:text-background transition-colors">
+              <Link
+                href="#"
+                className="text-background/60 hover:text-background transition-colors"
+              >
                 <Facebook className="h-5 w-5" />
                 <span className="sr-only">Facebook</span>
               </Link>
@@ -55,7 +65,10 @@ export function Footer() {
             <ul className="space-y-3">
               {footerLinks.shop.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-background/60 hover:text-background transition-colors text-sm">
+                  <Link
+                    href={link.href}
+                    className="text-background/60 hover:text-background transition-colors text-sm"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -68,7 +81,10 @@ export function Footer() {
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-background/60 hover:text-background transition-colors text-sm">
+                  <Link
+                    href={link.href}
+                    className="text-background/60 hover:text-background transition-colors text-sm"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -81,7 +97,10 @@ export function Footer() {
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-background/60 hover:text-background transition-colors text-sm">
+                  <Link
+                    href={link.href}
+                    className="text-background/60 hover:text-background transition-colors text-sm"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -91,7 +110,10 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-background/60">
-          <p>&copy; {new Date().getFullYear()} POSTER. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} THE WALL STACK. All rights
+            reserved.
+          </p>
           <div className="flex gap-6">
             <Link href="#" className="hover:text-background transition-colors">
               Privacy Policy
@@ -110,5 +132,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

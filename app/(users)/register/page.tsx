@@ -1,75 +1,89 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Loader2, Check, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
-import { signUp } from "@/lib/auth-client"
-import { toast } from "sonner"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  ArrowRight,
+  Loader2,
+  Check,
+  X,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import { signUp } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 const passwordRequirements = [
   { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
   { label: "Contains uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
   { label: "Contains lowercase letter", test: (p: string) => /[a-z]/.test(p) },
   { label: "Contains a number", test: (p: string) => /\d/.test(p) },
-]
+];
 
 export default function RegisterPage() {
-  const router = useRouter()
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const [currentStep, setCurrentStep] = useState(1)
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
-  })
-  const [focusedField, setFocusedField] = useState<string | null>(null)
-  const [agreedToTerms, setAgreedToTerms] = useState(false)
+  });
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (currentStep < 2) {
-    setCurrentStep(2)
-    return
-  }
+    if (currentStep < 2) {
+      setCurrentStep(2);
+      return;
+    }
 
-  if (formData.password !== formData.confirmPassword) return
+    if (formData.password !== formData.confirmPassword) return;
 
-  setIsLoading(true)
+    setIsLoading(true);
 
-  const res = await signUp.email({
-    email: formData.email,
-    password: formData.password,
-    name: formData.name,
-  })
+    const res = await signUp.email({
+      email: formData.email,
+      password: formData.password,
+      name: formData.name,
+    });
 
-  setIsLoading(false)
+    setIsLoading(false);
 
-  if (res.error) {
-    toast.error(res.error.message || "An error occurred during registration")
-    return
-  }
+    if (res.error) {
+      toast.error(res.error.message || "An error occurred during registration");
+      return;
+    }
 
-  toast.success("Registration successful! Please check your email to verify your account.")
-  router.push("/verify-email") // or "/login"
-}
+    toast.success(
+      "Registration successful! Please check your email to verify your account."
+    );
+    router.push("/verify-email"); // or "/login"
+  };
 
-  const passwordStrength = passwordRequirements.filter((req) => req.test(formData.password)).length
+  const passwordStrength = passwordRequirements.filter((req) =>
+    req.test(formData.password)
+  ).length;
 
   return (
     <div className="min-h-screen flex">
@@ -89,13 +103,13 @@ const handleSubmit = async (e: React.FormEvent) => {
         <div
           className={cn(
             "w-full max-w-md space-y-8 relative z-10 transition-all duration-700",
-            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           )}
         >
           {/* Logo for mobile */}
           <div className="lg:hidden text-center mb-8">
             <Link href="/" className="text-3xl font-bold tracking-tight">
-              POSTER.
+              THE WALL STACK
             </Link>
           </div>
 
@@ -106,7 +120,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <div
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300",
-                    currentStep >= step ? "bg-foreground text-background" : "bg-muted text-muted-foreground",
+                    currentStep >= step
+                      ? "bg-foreground text-background"
+                      : "bg-muted text-muted-foreground"
                   )}
                 >
                   {currentStep > step ? <Check className="h-5 w-5" /> : step}
@@ -115,7 +131,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <div
                     className={cn(
                       "w-16 h-0.5 mx-2 transition-colors duration-300",
-                      currentStep > step ? "bg-foreground" : "bg-muted",
+                      currentStep > step ? "bg-foreground" : "bg-muted"
                     )}
                   />
                 )}
@@ -126,7 +142,9 @@ const handleSubmit = async (e: React.FormEvent) => {
           {/* Header */}
           <div className="space-y-2 text-center">
             <h1 className="text-3xl font-bold tracking-tight">
-              {currentStep === 1 ? "Create your account" : "Secure your account"}
+              {currentStep === 1
+                ? "Create your account"
+                : "Secure your account"}
             </h1>
             <p className="text-muted-foreground">
               {currentStep === 1
@@ -148,7 +166,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <User
                       className={cn(
                         "absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors duration-200",
-                        focusedField === "name" ? "text-foreground" : "text-muted-foreground",
+                        focusedField === "name"
+                          ? "text-foreground"
+                          : "text-muted-foreground"
                       )}
                     />
                     <Input
@@ -157,10 +177,14 @@ const handleSubmit = async (e: React.FormEvent) => {
                       placeholder="John Doe"
                       className={cn(
                         "pl-10 h-12 transition-all duration-200 border-2",
-                        focusedField === "name" ? "border-foreground" : "border-input",
+                        focusedField === "name"
+                          ? "border-foreground"
+                          : "border-input"
                       )}
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
                       onFocus={() => setFocusedField("name")}
                       onBlur={() => setFocusedField(null)}
                       required
@@ -168,7 +192,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <div
                       className={cn(
                         "absolute bottom-0 left-0 h-0.5 bg-foreground transition-all duration-300",
-                        focusedField === "name" ? "w-full" : "w-0",
+                        focusedField === "name" ? "w-full" : "w-0"
                       )}
                     />
                   </div>
@@ -183,7 +207,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <Mail
                       className={cn(
                         "absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors duration-200",
-                        focusedField === "email" ? "text-foreground" : "text-muted-foreground",
+                        focusedField === "email"
+                          ? "text-foreground"
+                          : "text-muted-foreground"
                       )}
                     />
                     <Input
@@ -192,10 +218,14 @@ const handleSubmit = async (e: React.FormEvent) => {
                       placeholder="name@example.com"
                       className={cn(
                         "pl-10 h-12 transition-all duration-200 border-2",
-                        focusedField === "email" ? "border-foreground" : "border-input",
+                        focusedField === "email"
+                          ? "border-foreground"
+                          : "border-input"
                       )}
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
                       onFocus={() => setFocusedField("email")}
                       onBlur={() => setFocusedField(null)}
                       required
@@ -203,7 +233,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <div
                       className={cn(
                         "absolute bottom-0 left-0 h-0.5 bg-foreground transition-all duration-300",
-                        focusedField === "email" ? "w-full" : "w-0",
+                        focusedField === "email" ? "w-full" : "w-0"
                       )}
                     />
                   </div>
@@ -216,7 +246,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                       <div className="w-full border-t border-border" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">Or sign up with</span>
+                      <span className="bg-background px-2 text-muted-foreground">
+                        Or sign up with
+                      </span>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -247,7 +279,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                           d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                         />
                       </svg>
-                      <span className="relative z-10 group-hover:text-background transition-colors">Google</span>
+                      <span className="relative z-10 group-hover:text-background transition-colors">
+                        Google
+                      </span>
                     </Button>
                     <Button
                       type="button"
@@ -262,7 +296,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                       >
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                       </svg>
-                      <span className="relative z-10 group-hover:text-background transition-colors">GitHub</span>
+                      <span className="relative z-10 group-hover:text-background transition-colors">
+                        GitHub
+                      </span>
                     </Button>
                   </div>
                 </div>
@@ -278,7 +314,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <Lock
                       className={cn(
                         "absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors duration-200",
-                        focusedField === "password" ? "text-foreground" : "text-muted-foreground",
+                        focusedField === "password"
+                          ? "text-foreground"
+                          : "text-muted-foreground"
                       )}
                     />
                     <Input
@@ -287,10 +325,14 @@ const handleSubmit = async (e: React.FormEvent) => {
                       placeholder="Create a password"
                       className={cn(
                         "pl-10 pr-10 h-12 transition-all duration-200 border-2",
-                        focusedField === "password" ? "border-foreground" : "border-input",
+                        focusedField === "password"
+                          ? "border-foreground"
+                          : "border-input"
                       )}
                       value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
                       onFocus={() => setFocusedField("password")}
                       onBlur={() => setFocusedField(null)}
                       required
@@ -300,7 +342,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
                     </button>
                   </div>
 
@@ -312,7 +358,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                           key={i}
                           className={cn(
                             "h-1 flex-1 rounded-full transition-all duration-300",
-                            i < passwordStrength ? "bg-foreground" : "bg-muted",
+                            i < passwordStrength ? "bg-foreground" : "bg-muted"
                           )}
                         />
                       ))}
@@ -323,10 +369,16 @@ const handleSubmit = async (e: React.FormEvent) => {
                           key={i}
                           className={cn(
                             "flex items-center gap-1.5 text-xs transition-colors duration-200",
-                            req.test(formData.password) ? "text-foreground" : "text-muted-foreground",
+                            req.test(formData.password)
+                              ? "text-foreground"
+                              : "text-muted-foreground"
                           )}
                         >
-                          {req.test(formData.password) ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                          {req.test(formData.password) ? (
+                            <Check className="h-3 w-3" />
+                          ) : (
+                            <X className="h-3 w-3" />
+                          )}
                           {req.label}
                         </div>
                       ))}
@@ -336,14 +388,19 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                 {/* Confirm Password Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                  <Label
+                    htmlFor="confirmPassword"
+                    className="text-sm font-medium"
+                  >
                     Confirm Password
                   </Label>
                   <div className="relative">
                     <Lock
                       className={cn(
                         "absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors duration-200",
-                        focusedField === "confirmPassword" ? "text-foreground" : "text-muted-foreground",
+                        focusedField === "confirmPassword"
+                          ? "text-foreground"
+                          : "text-muted-foreground"
                       )}
                     />
                     <Input
@@ -352,30 +409,44 @@ const handleSubmit = async (e: React.FormEvent) => {
                       placeholder="Confirm your password"
                       className={cn(
                         "pl-10 pr-10 h-12 transition-all duration-200 border-2",
-                        focusedField === "confirmPassword" ? "border-foreground" : "border-input",
+                        focusedField === "confirmPassword"
+                          ? "border-foreground"
+                          : "border-input",
                         formData.confirmPassword &&
                           formData.password !== formData.confirmPassword &&
-                          "border-destructive",
+                          "border-destructive"
                       )}
                       value={formData.confirmPassword}
-                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          confirmPassword: e.target.value,
+                        })
+                      }
                       onFocus={() => setFocusedField("confirmPassword")}
                       onBlur={() => setFocusedField(null)}
                       required
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
                     </button>
                   </div>
-                  {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                    <p className="text-xs text-destructive animate-in fade-in slide-in-from-top-1">
-                      Passwords do not match
-                    </p>
-                  )}
+                  {formData.confirmPassword &&
+                    formData.password !== formData.confirmPassword && (
+                      <p className="text-xs text-destructive animate-in fade-in slide-in-from-top-1">
+                        Passwords do not match
+                      </p>
+                    )}
                 </div>
 
                 {/* Terms Checkbox */}
@@ -385,18 +456,28 @@ const handleSubmit = async (e: React.FormEvent) => {
                     onClick={() => setAgreedToTerms(!agreedToTerms)}
                     className={cn(
                       "w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 mt-0.5",
-                      agreedToTerms ? "bg-foreground border-foreground" : "border-input hover:border-foreground",
+                      agreedToTerms
+                        ? "bg-foreground border-foreground"
+                        : "border-input hover:border-foreground"
                     )}
                   >
-                    {agreedToTerms && <Check className="h-3 w-3 text-background" />}
+                    {agreedToTerms && (
+                      <Check className="h-3 w-3 text-background" />
+                    )}
                   </button>
                   <p className="text-sm text-muted-foreground">
                     I agree to the{" "}
-                    <Link href="/terms" className="text-foreground hover:underline">
+                    <Link
+                      href="/terms"
+                      className="text-foreground hover:underline"
+                    >
                       Terms of Service
                     </Link>{" "}
                     and{" "}
-                    <Link href="/privacy" className="text-foreground hover:underline">
+                    <Link
+                      href="/privacy"
+                      className="text-foreground hover:underline"
+                    >
                       Privacy Policy
                     </Link>
                   </p>
@@ -422,19 +503,23 @@ const handleSubmit = async (e: React.FormEvent) => {
                 disabled={
                   isLoading ||
                   (currentStep === 2 &&
-                    (!agreedToTerms || formData.password !== formData.confirmPassword || passwordStrength < 4))
+                    (!agreedToTerms ||
+                      formData.password !== formData.confirmPassword ||
+                      passwordStrength < 4))
                 }
               >
                 <span
                   className={cn(
                     "flex items-center justify-center gap-2 transition-all duration-300",
-                    isLoading ? "opacity-0" : "opacity-100",
+                    isLoading ? "opacity-0" : "opacity-100"
                   )}
                 >
                   {currentStep === 1 ? "Continue" : "Create Account"}
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </span>
-                {isLoading && <Loader2 className="absolute h-5 w-5 animate-spin" />}
+                {isLoading && (
+                  <Loader2 className="absolute h-5 w-5 animate-spin" />
+                )}
               </Button>
             </div>
           </form>
@@ -442,7 +527,10 @@ const handleSubmit = async (e: React.FormEvent) => {
           {/* Login Link */}
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-foreground hover:underline underline-offset-4">
+            <Link
+              href="/login"
+              className="font-medium text-foreground hover:underline underline-offset-4"
+            >
               Sign in
             </Link>
           </p>
@@ -470,7 +558,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               key={i}
               className={cn(
                 "absolute h-px bg-background/10 transition-all duration-1000",
-                mounted ? "opacity-100" : "opacity-0",
+                mounted ? "opacity-100" : "opacity-0"
               )}
               style={{
                 width: "200%",
@@ -488,7 +576,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           <div
             className={cn(
               "relative transition-all duration-1000 delay-300",
-              mounted ? "opacity-100 rotate-0" : "opacity-0 rotate-12",
+              mounted ? "opacity-100 rotate-0" : "opacity-0 rotate-12"
             )}
             style={{ transformStyle: "preserve-3d" }}
           >
@@ -499,14 +587,22 @@ const handleSubmit = async (e: React.FormEvent) => {
                 style={{
                   width: "300px",
                   height: "400px",
-                  transform: `translateZ(${i * -30}px) translateX(${i * 20}px) translateY(${i * 15}px) rotateY(${i * 5}deg)`,
+                  transform: `translateZ(${i * -30}px) translateX(${
+                    i * 20
+                  }px) translateY(${i * 15}px) rotateY(${i * 5}deg)`,
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-muted to-background" />
+                <div className="absolute inset-0 bg-linear-to-br from-muted to-background" />
                 <div className="absolute inset-6 border border-border rounded-lg" />
                 <div className="absolute bottom-6 left-6 right-6">
-                  <div className="h-2 bg-muted rounded mb-2" style={{ width: `${60 + i * 10}%` }} />
-                  <div className="h-2 bg-muted rounded" style={{ width: `${40 + i * 5}%` }} />
+                  <div
+                    className="h-2 bg-muted rounded mb-2"
+                    style={{ width: `${60 + i * 10}%` }}
+                  />
+                  <div
+                    className="h-2 bg-muted rounded"
+                    style={{ width: `${40 + i * 5}%` }}
+                  />
                 </div>
               </div>
             ))}
@@ -517,13 +613,15 @@ const handleSubmit = async (e: React.FormEvent) => {
         <div
           className={cn(
             "absolute top-1/4 right-1/4 w-20 h-20 border-2 border-background/20 transition-all duration-1000 delay-500",
-            mounted ? "scale-100 opacity-100 rotate-45" : "scale-0 opacity-0 rotate-0",
+            mounted
+              ? "scale-100 opacity-100 rotate-45"
+              : "scale-0 opacity-0 rotate-0"
           )}
         />
         <div
           className={cn(
             "absolute bottom-1/4 left-1/4 w-16 h-16 bg-background/10 rounded-full transition-all duration-1000 delay-700",
-            mounted ? "scale-100 opacity-100" : "scale-0 opacity-0",
+            mounted ? "scale-100 opacity-100" : "scale-0 opacity-0"
           )}
         />
 
@@ -531,13 +629,15 @@ const handleSubmit = async (e: React.FormEvent) => {
         <div
           className={cn(
             "absolute bottom-12 right-12 text-right transition-all duration-700 delay-300",
-            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}
         >
-          <h2 className="text-background text-4xl font-bold tracking-tight">POSTER.</h2>
+          <h2 className="text-background text-4xl font-bold tracking-tight">
+            THE WALL STACK
+          </h2>
           <p className="text-background/60 mt-2">Join 50,000+ art lovers</p>
         </div>
       </div>
     </div>
-  )
+  );
 }

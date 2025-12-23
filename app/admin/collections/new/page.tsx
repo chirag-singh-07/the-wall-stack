@@ -1,48 +1,56 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import { AdminHeader } from "@/components/admin/admin-header"
-import { useAdminStore } from "@/lib/admin-store"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Upload, X } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { AdminHeader } from "@/components/admin/admin-header";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowLeft, Upload, X } from "lucide-react";
+import { createCollection } from "@/actions/admin/poster-actions";
+import { toast } from "sonner";
 
 export default function NewCollectionPage() {
-  const router = useRouter()
-  const { addCollection } = useAdminStore()
-  const [isLoading, setIsLoading] = useState(false)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     status: "draft" as "active" | "draft",
-  })
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    addCollection({
-      title: formData.title,
-      description: formData.description,
+    const res = await createCollection({
+      ...formData,
       image: imagePreview || "/poster-art.jpg",
-      productCount: 0,
-      status: formData.status,
-    })
+    });
 
-    router.push("/admin/collections")
-  }
+    if (res.success) {
+      toast.success("Collection created");
+      router.push("/admin/collections");
+    } else {
+      toast.error(res.error || "Failed to create collection");
+    }
+
+    setIsLoading(false);
+  };
 
   return (
     <div className="min-h-screen">
@@ -64,7 +72,12 @@ export default function NewCollectionPage() {
               <div className="relative h-40 w-64 overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted">
                 {imagePreview ? (
                   <>
-                    <Image src={imagePreview || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
+                    <Image
+                      src={imagePreview || "/placeholder.svg"}
+                      alt="Preview"
+                      fill
+                      className="object-cover"
+                    />
                     <Button
                       type="button"
                       variant="secondary"
@@ -89,7 +102,9 @@ export default function NewCollectionPage() {
                   onChange={(e) => setImagePreview(e.target.value)}
                   className="w-64"
                 />
-                <p className="text-xs text-muted-foreground">Recommended: 1200x800px, JPG or PNG</p>
+                <p className="text-xs text-muted-foreground">
+                  Recommended: 1200x800px, JPG or PNG
+                </p>
               </div>
             </div>
           </div>
@@ -100,7 +115,9 @@ export default function NewCollectionPage() {
             <Input
               id="title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               placeholder="e.g. Minimal Collection"
               required
             />
@@ -111,7 +128,9 @@ export default function NewCollectionPage() {
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               placeholder="Describe this collection..."
               rows={4}
             />
@@ -121,7 +140,9 @@ export default function NewCollectionPage() {
             <Label htmlFor="status">Status</Label>
             <Select
               value={formData.status}
-              onValueChange={(value: "active" | "draft") => setFormData({ ...formData, status: value })}
+              onValueChange={(value: "active" | "draft") =>
+                setFormData({ ...formData, status: value })
+              }
             >
               <SelectTrigger id="status" className="w-48">
                 <SelectValue />
@@ -145,5 +166,5 @@ export default function NewCollectionPage() {
         </form>
       </div>
     </div>
-  )
+  );
 }

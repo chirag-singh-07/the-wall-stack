@@ -1,28 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Search, SlidersHorizontal, X, Grid3X3, LayoutGrid } from "lucide-react"
-import { collections, priceRanges, sortOptions } from "@/lib/products"
-import { cn } from "@/lib/utils"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Search,
+  SlidersHorizontal,
+  X,
+  Grid3X3,
+  LayoutGrid,
+} from "lucide-react";
+import { collections, priceRanges, sortOptions } from "@/lib/products";
+import { cn } from "@/lib/utils";
 
 interface ShopFiltersProps {
-  searchQuery: string
-  onSearchChange: (value: string) => void
-  selectedCategories: string[]
-  onCategoryChange: (categories: string[]) => void
-  selectedPriceRanges: number[]
-  onPriceRangeChange: (ranges: number[]) => void
-  sortBy: string
-  onSortChange: (value: string) => void
-  viewMode: "grid" | "large"
-  onViewModeChange: (mode: "grid" | "large") => void
-  totalResults: number
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  selectedCategories: string[];
+  onCategoryChange: (categories: string[]) => void;
+  selectedPriceRanges: number[];
+  onPriceRangeChange: (ranges: number[]) => void;
+  sortBy: string;
+  onSortChange: (value: string) => void;
+  viewMode: "grid" | "large";
+  onViewModeChange: (mode: "grid" | "large") => void;
+  totalResults: number;
+  availableCategories?: any[];
 }
 
 export function ShopFilters({
@@ -37,33 +56,37 @@ export function ShopFilters({
   viewMode,
   onViewModeChange,
   totalResults,
+  availableCategories = collections,
 }: ShopFiltersProps) {
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const handleCategoryToggle = (category: string) => {
-    if (selectedCategories.includes(category)) {
-      onCategoryChange(selectedCategories.filter((c) => c !== category))
+  const handleCategoryToggle = (categoryName: string) => {
+    if (selectedCategories.includes(categoryName)) {
+      onCategoryChange(selectedCategories.filter((c) => c !== categoryName));
     } else {
-      onCategoryChange([...selectedCategories, category])
+      onCategoryChange([...selectedCategories, categoryName]);
     }
-  }
+  };
 
   const handlePriceRangeToggle = (index: number) => {
     if (selectedPriceRanges.includes(index)) {
-      onPriceRangeChange(selectedPriceRanges.filter((r) => r !== index))
+      onPriceRangeChange(selectedPriceRanges.filter((r) => r !== index));
     } else {
-      onPriceRangeChange([...selectedPriceRanges, index])
+      onPriceRangeChange([...selectedPriceRanges, index]);
     }
-  }
+  };
 
   const clearFilters = () => {
-    onSearchChange("")
-    onCategoryChange([])
-    onPriceRangeChange([])
-    onSortChange("featured")
-  }
+    onSearchChange("");
+    onCategoryChange([]);
+    onPriceRangeChange([]);
+    onSortChange("featured");
+  };
 
-  const hasActiveFilters = searchQuery || selectedCategories.length > 0 || selectedPriceRanges.length > 0
+  const hasActiveFilters =
+    searchQuery ||
+    selectedCategories.length > 0 ||
+    selectedPriceRanges.length > 0;
 
   const FilterContent = () => (
     <div className="space-y-6">
@@ -71,21 +94,25 @@ export function ShopFilters({
       <div>
         <Label className="text-sm font-semibold mb-3 block">Categories</Label>
         <div className="space-y-2">
-          {collections.map((collection) => (
-            <div key={collection.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={`category-${collection.id}`}
-                checked={selectedCategories.includes(collection.id)}
-                onCheckedChange={() => handleCategoryToggle(collection.id)}
-              />
-              <label
-                htmlFor={`category-${collection.id}`}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-              >
-                {collection.title}
-              </label>
-            </div>
-          ))}
+          {availableCategories.map((cat) => {
+            const name = cat.name || cat.title;
+            const id = cat.id || name;
+            return (
+              <div key={id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`category-${id}`}
+                  checked={selectedCategories.includes(name)}
+                  onCheckedChange={() => handleCategoryToggle(name)}
+                />
+                <label
+                  htmlFor={`category-${id}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {name}
+                </label>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -112,13 +139,18 @@ export function ShopFilters({
       </div>
 
       {hasActiveFilters && (
-        <Button variant="outline" size="sm" onClick={clearFilters} className="w-full bg-transparent">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={clearFilters}
+          className="w-full bg-transparent"
+        >
           <X className="h-4 w-4 mr-2" />
           Clear All Filters
         </Button>
       )}
     </div>
-  )
+  );
 
   return (
     <div className="space-y-4">
@@ -165,7 +197,9 @@ export function ShopFilters({
               onClick={() => onViewModeChange("grid")}
               className={cn(
                 "p-2 transition-colors",
-                viewMode === "grid" ? "bg-foreground text-background" : "hover:bg-muted",
+                viewMode === "grid"
+                  ? "bg-foreground text-background"
+                  : "hover:bg-muted"
               )}
             >
               <Grid3X3 className="h-4 w-4" />
@@ -174,7 +208,9 @@ export function ShopFilters({
               onClick={() => onViewModeChange("large")}
               className={cn(
                 "p-2 transition-colors",
-                viewMode === "large" ? "bg-foreground text-background" : "hover:bg-muted",
+                viewMode === "large"
+                  ? "bg-foreground text-background"
+                  : "hover:bg-muted"
               )}
             >
               <LayoutGrid className="h-4 w-4" />
@@ -184,7 +220,10 @@ export function ShopFilters({
           {/* Mobile Filter Button */}
           <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" className="lg:hidden bg-muted/50 border-0">
+              <Button
+                variant="outline"
+                className="lg:hidden bg-muted/50 border-0"
+              >
                 <SlidersHorizontal className="h-4 w-4 mr-2" />
                 Filters
                 {hasActiveFilters && (
@@ -209,18 +248,23 @@ export function ShopFilters({
       {/* Results Count and Active Filters */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">
-          Showing <span className="font-medium text-foreground">{totalResults}</span> posters
+          Showing{" "}
+          <span className="font-medium text-foreground">{totalResults}</span>{" "}
+          posters
         </p>
 
         {hasActiveFilters && (
           <div className="flex flex-wrap items-center gap-2">
-            {selectedCategories.map((category) => (
+            {selectedCategories.map((categoryName) => (
               <span
-                key={category}
+                key={categoryName}
                 className="inline-flex items-center gap-1 px-2 py-1 bg-muted rounded-md text-xs font-medium"
               >
-                {collections.find((c) => c.id === category)?.title}
-                <button onClick={() => handleCategoryToggle(category)} className="hover:text-destructive">
+                {categoryName}
+                <button
+                  onClick={() => handleCategoryToggle(categoryName)}
+                  className="hover:text-destructive"
+                >
                   <X className="h-3 w-3" />
                 </button>
               </span>
@@ -231,7 +275,10 @@ export function ShopFilters({
                 className="inline-flex items-center gap-1 px-2 py-1 bg-muted rounded-md text-xs font-medium"
               >
                 {priceRanges[index].label}
-                <button onClick={() => handlePriceRangeToggle(index)} className="hover:text-destructive">
+                <button
+                  onClick={() => handlePriceRangeToggle(index)}
+                  className="hover:text-destructive"
+                >
                   <X className="h-3 w-3" />
                 </button>
               </span>
@@ -241,9 +288,9 @@ export function ShopFilters({
       </div>
 
       {/* Desktop Sidebar Filters (visible on lg screens) */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:block border rounded-xl p-6 bg-card/50">
         <FilterContent />
       </div>
     </div>
-  )
+  );
 }

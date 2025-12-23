@@ -1,107 +1,113 @@
-"use client"
+"use client";
 
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface AdminUser {
-  id: string
-  name: string
-  email: string
-  role: "admin" | "manager" | "staff"
-  avatar?: string
-  joinedDate: string
+  id: string;
+  name: string;
+  email: string;
+  role: "admin" | "manager" | "staff";
+  avatar?: string;
+  joinedDate: string;
 }
 
 export interface Customer {
-  id: string
-  name: string
-  email: string
-  phone: string
-  avatar?: string
-  totalOrders: number
-  totalSpent: number
-  joinedDate: string
-  status: "active" | "inactive"
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  avatar?: string;
+  totalOrders: number;
+  totalSpent: number;
+  joinedDate: string;
+  status: "active" | "inactive";
 }
 
 export interface AdminOrder {
-  id: string
-  customerId: string
-  customerName: string
-  customerEmail: string
-  date: string
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled"
+  id: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  date: string;
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   items: {
-    productId: string
-    title: string
-    image: string
-    size: string
-    quantity: number
-    price: number
-  }[]
-  total: number
+    productId: string;
+    title: string;
+    image: string;
+    size: string;
+    quantity: number;
+    price: number;
+  }[];
+  total: number;
   shippingAddress: {
-    street: string
-    city: string
-    state: string
-    zipCode: string
-    country: string
-  }
-  paymentMethod: string
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  paymentMethod: string;
 }
 
 export interface CustomPosterOrder {
-  id: string
-  customerId: string
-  customerName: string
-  customerEmail: string
-  date: string
-  status: "pending" | "in-progress" | "review" | "approved" | "completed" | "cancelled"
-  description: string
-  size: string
-  budget: number
-  referenceImages?: string[]
-  designNotes?: string
-  finalDesign?: string
+  id: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  date: string;
+  status:
+    | "pending"
+    | "in-progress"
+    | "review"
+    | "approved"
+    | "completed"
+    | "cancelled";
+  description: string;
+  size: string;
+  budget: number;
+  referenceImages?: string[];
+  designNotes?: string;
+  finalDesign?: string;
 }
 
 export interface AdminProduct {
-  id: string
-  title: string
-  price: number
-  category: string
-  image: string
-  description: string
-  stock: number
-  status: "active" | "draft" | "archived"
-  createdAt: string
-  updatedAt: string
+  id: string;
+  title: string;
+  price: number;
+  category: string;
+  image: string;
+  description: string;
+  stock: number;
+  status: "active" | "draft" | "archived";
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AdminCollection {
-  id: string
-  title: string
-  description: string
-  image: string
-  productCount: number
-  status: "active" | "draft"
-  createdAt: string
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  productCount: number;
+  status: "active" | "draft";
+  createdAt: string;
 }
 
 export interface AdminCategory {
-  id: string
-  name: string
-  slug: string
-  description: string
-  productCount: number
-  status: "active" | "inactive"
-  createdAt: string
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  productCount: number;
+  status: "active" | "inactive";
+  createdAt: string;
 }
 
 export interface SalesData {
-  date: string
-  revenue: number
-  orders: number
+  date: string;
+  revenue: number;
+  orders: number;
 }
 
 // Sample data
@@ -156,7 +162,7 @@ const sampleCustomers: Customer[] = [
     joinedDate: "2023-08-22",
     status: "active",
   },
-]
+];
 
 const sampleAdminOrders: AdminOrder[] = [
   {
@@ -275,7 +281,7 @@ const sampleAdminOrders: AdminOrder[] = [
     },
     paymentMethod: "Bank Transfer",
   },
-]
+];
 
 const sampleCustomPosterOrders: CustomPosterOrder[] = [
   {
@@ -329,7 +335,7 @@ const sampleCustomPosterOrders: CustomPosterOrder[] = [
     budget: 350,
     designNotes: "Sent first draft for customer review.",
   },
-]
+];
 
 const sampleProducts: AdminProduct[] = [
   {
@@ -338,7 +344,8 @@ const sampleProducts: AdminProduct[] = [
     price: 49,
     category: "minimal",
     image: "/minimal-geometric-black-white-poster-art.jpg",
-    description: "A masterful blend of geometric precision and artistic expression.",
+    description:
+      "A masterful blend of geometric precision and artistic expression.",
     stock: 45,
     status: "active",
     createdAt: "2024-01-10",
@@ -392,7 +399,7 @@ const sampleProducts: AdminProduct[] = [
     createdAt: "2024-03-01",
     updatedAt: "2024-12-10",
   },
-]
+];
 
 const sampleCollections: AdminCollection[] = [
   {
@@ -422,7 +429,7 @@ const sampleCollections: AdminCollection[] = [
     status: "active",
     createdAt: "2024-01-01",
   },
-]
+];
 
 const sampleCategories: AdminCategory[] = [
   {
@@ -452,7 +459,7 @@ const sampleCategories: AdminCategory[] = [
     status: "active",
     createdAt: "2024-01-01",
   },
-]
+];
 
 const sampleSalesData: SalesData[] = [
   { date: "2024-12-01", revenue: 1250, orders: 18 },
@@ -469,39 +476,46 @@ const sampleSalesData: SalesData[] = [
   { date: "2024-12-12", revenue: 1450, orders: 20 },
   { date: "2024-12-13", revenue: 1920, orders: 27 },
   { date: "2024-12-14", revenue: 2340, orders: 35 },
-]
+];
 
 interface AdminStore {
-  admin: AdminUser | null
-  customers: Customer[]
-  orders: AdminOrder[]
-  customOrders: CustomPosterOrder[]
-  products: AdminProduct[]
-  collections: AdminCollection[]
-  categories: AdminCategory[]
-  salesData: SalesData[]
+  admin: AdminUser | null;
+  customers: Customer[];
+  orders: AdminOrder[];
+  customOrders: CustomPosterOrder[];
+  products: AdminProduct[];
+  collections: AdminCollection[];
+  categories: AdminCategory[];
+  salesData: SalesData[];
 
   // Admin actions
-  updateAdmin: (admin: Partial<AdminUser>) => void
+  updateAdmin: (admin: Partial<AdminUser>) => void;
 
   // Product actions
-  addProduct: (product: Omit<AdminProduct, "id" | "createdAt" | "updatedAt">) => void
-  updateProduct: (id: string, product: Partial<AdminProduct>) => void
-  deleteProduct: (id: string) => void
+  addProduct: (
+    product: Omit<AdminProduct, "id" | "createdAt" | "updatedAt">
+  ) => void;
+  updateProduct: (id: string, product: Partial<AdminProduct>) => void;
+  deleteProduct: (id: string) => void;
 
   // Collection actions
-  addCollection: (collection: Omit<AdminCollection, "id" | "createdAt">) => void
-  updateCollection: (id: string, collection: Partial<AdminCollection>) => void
-  deleteCollection: (id: string) => void
+  addCollection: (
+    collection: Omit<AdminCollection, "id" | "createdAt">
+  ) => void;
+  updateCollection: (id: string, collection: Partial<AdminCollection>) => void;
+  deleteCollection: (id: string) => void;
 
   // Category actions
-  addCategory: (category: Omit<AdminCategory, "id" | "createdAt">) => void
-  updateCategory: (id: string, category: Partial<AdminCategory>) => void
-  deleteCategory: (id: string) => void
+  addCategory: (category: Omit<AdminCategory, "id" | "createdAt">) => void;
+  updateCategory: (id: string, category: Partial<AdminCategory>) => void;
+  deleteCategory: (id: string) => void;
 
   // Order actions
-  updateOrderStatus: (id: string, status: AdminOrder["status"]) => void
-  updateCustomOrderStatus: (id: string, status: CustomPosterOrder["status"]) => void
+  updateOrderStatus: (id: string, status: AdminOrder["status"]) => void;
+  updateCustomOrderStatus: (
+    id: string,
+    status: CustomPosterOrder["status"]
+  ) => void;
 }
 
 export const useAdminStore = create<AdminStore>()(
@@ -510,7 +524,7 @@ export const useAdminStore = create<AdminStore>()(
       admin: {
         id: "admin-1",
         name: "Admin User",
-        email: "admin@postercraft.com",
+        email: "admin@thewallstack.com",
         role: "admin",
         joinedDate: "2023-01-01",
       },
@@ -543,7 +557,13 @@ export const useAdminStore = create<AdminStore>()(
       updateProduct: (id, updates) =>
         set((state) => ({
           products: state.products.map((p) =>
-            p.id === id ? { ...p, ...updates, updatedAt: new Date().toISOString().split("T")[0] } : p,
+            p.id === id
+              ? {
+                  ...p,
+                  ...updates,
+                  updatedAt: new Date().toISOString().split("T")[0],
+                }
+              : p
           ),
         })),
 
@@ -566,7 +586,9 @@ export const useAdminStore = create<AdminStore>()(
 
       updateCollection: (id, updates) =>
         set((state) => ({
-          collections: state.collections.map((c) => (c.id === id ? { ...c, ...updates } : c)),
+          collections: state.collections.map((c) =>
+            c.id === id ? { ...c, ...updates } : c
+          ),
         })),
 
       deleteCollection: (id) =>
@@ -588,7 +610,9 @@ export const useAdminStore = create<AdminStore>()(
 
       updateCategory: (id, updates) =>
         set((state) => ({
-          categories: state.categories.map((c) => (c.id === id ? { ...c, ...updates } : c)),
+          categories: state.categories.map((c) =>
+            c.id === id ? { ...c, ...updates } : c
+          ),
         })),
 
       deleteCategory: (id) =>
@@ -603,11 +627,13 @@ export const useAdminStore = create<AdminStore>()(
 
       updateCustomOrderStatus: (id, status) =>
         set((state) => ({
-          customOrders: state.customOrders.map((o) => (o.id === id ? { ...o, status } : o)),
+          customOrders: state.customOrders.map((o) =>
+            o.id === id ? { ...o, status } : o
+          ),
         })),
     }),
     {
       name: "poster-admin",
-    },
-  ),
-)
+    }
+  )
+);

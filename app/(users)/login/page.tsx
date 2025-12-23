@@ -10,9 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { signIn } from "@/lib/auth-client";
+import { signIn, authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-
 
 export default function LoginPage() {
   const router = useRouter();
@@ -47,13 +46,25 @@ export default function LoginPage() {
 
       toast.success("Login successful!");
 
-      router.push("/shop"); // success redirect
+      // Optional: Give session a moment to commit if needed, or check role from response
+      const sessionRes = await fetchingSession();
+      if (sessionRes?.user?.role?.toUpperCase() === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/shop");
+      }
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Helper to fetch session immediately after login
+  const fetchingSession = async () => {
+    const { data } = await authClient.getSession();
+    return data;
   };
   return (
     <div className="min-h-screen flex">
@@ -119,8 +130,8 @@ export default function LoginPage() {
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}
         >
-          <h2 className="text-background text-4xl font-bold tracking-tight">
-            POSTER.
+          <h2 className="text-background text-4xl font-bold tracking-tight uppercase leading-tight">
+            THE WALL <br /> STACK
           </h2>
           <p className="text-background/60 mt-2">
             Premium wall art for design enthusiasts
@@ -150,7 +161,7 @@ export default function LoginPage() {
           {/* Logo for mobile */}
           <div className="lg:hidden text-center mb-8">
             <Link href="/" className="text-3xl font-bold tracking-tight">
-              POSTER.
+              THE WALL STACK
             </Link>
           </div>
 

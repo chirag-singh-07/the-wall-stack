@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { Mail, CheckCircle, Loader2, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Mail, CheckCircle, Loader2, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function VerifyEmailPage() {
-  const [mounted, setMounted] = useState(false)
-  const [isVerifying, setIsVerifying] = useState(true)
-  const [verified, setVerified] = useState(false)
-  const router = useRouter()
+  const [mounted, setMounted] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(true);
+  const [verified, setVerified] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    setMounted(true)
+    setMounted(true);
 
     // Fake verification delay (replace with Better Auth logic later)
     const timer = setTimeout(() => {
-      setIsVerifying(false)
-      setVerified(true)
-    }, 2500)
+      setIsVerifying(false);
+      setVerified(true);
+    }, 2500);
 
-    return () => clearTimeout(timer)
-  }, [])
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="min-h-screen flex">
@@ -50,7 +50,7 @@ export default function VerifyEmailPage() {
           {/* Logo */}
           <div className="text-center">
             <Link href="/" className="text-3xl font-bold tracking-tight">
-              POSTER.
+              THE WALL STACK
             </Link>
           </div>
 
@@ -88,8 +88,9 @@ export default function VerifyEmailPage() {
 
           {/* Actions */}
           {!isVerifying && (
-            <Button className="w-full h-12 text-base font-medium"
-            onClick={() => router.push("/")}
+            <Button
+              className="w-full h-12 text-base font-medium"
+              onClick={() => router.push("/")}
             >
               Continue to Shopping
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -139,13 +140,11 @@ export default function VerifyEmailPage() {
           )}
         >
           <h2 className="text-background text-4xl font-bold tracking-tight">
-            POSTER.
+            THE WALL STACK
           </h2>
-          <p className="text-background/60 mt-2">
-            Secure. Minimal. Premium.
-          </p>
+          <p className="text-background/60 mt-2">Secure. Minimal. Premium.</p>
         </div>
       </div>
     </div>
-  )
+  );
 }

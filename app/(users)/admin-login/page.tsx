@@ -1,58 +1,79 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2, Shield } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
-import { toast } from "sonner"
-import { signIn } from "@/lib/auth-client"
+import type React from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  Shield,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { signIn, authClient } from "@/lib/auth-client";
 
 export default function AdminLoginPage() {
-  const router = useRouter()
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-  })
-  const [focusedField, setFocusedField] = useState<string | null>(null)
+  });
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     try {
-      e.preventDefault()
-      setIsLoading(true)
+      e.preventDefault();
+      setIsLoading(true);
       const res = await signIn.email({
         email: formData.email,
         password: formData.password,
-      })
+      });
 
-      if(res.error) {
-        toast.error(res.error.message || "Login failed. Please check your credentials and try again.");
-        setIsLoading(false)
-        return
+      if (res.error) {
+        toast.error(
+          res.error.message ||
+            "Login failed. Please check your credentials and try again."
+        );
+        setIsLoading(false);
+        return;
       }
 
+      toast.success("Welcome back, Manish! ( Chal Dakh le New Orders )");
 
-       toast.success("Welcome back, Manish! ( Chal Dakh le New Orders )");
-      setIsLoading(false)
-      router.push("/admin")
+      const sessionRes = await fetchingSession();
+      if (sessionRes?.user?.role?.toUpperCase() === "ADMIN") {
+        router.push("/admin");
+      } else {
+        toast.error("Unauthorized: You do not have admin privileges.");
+        await authClient.signOut();
+        setIsLoading(false);
+      }
     } catch (error) {
-      console.error("Login error:", error)
-      setIsLoading(false)
-      // Handle error (e.g., show notification)
-      toast.error("Login failed. Please check your credentials and try again.")
+      console.error("Login error:", error);
+      setIsLoading(false);
+      toast.error("Login failed. Please check your credentials and try again.");
     }
-  }
+  };
+
+  const fetchingSession = async () => {
+    const { data } = await authClient.getSession();
+    return data;
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -77,20 +98,30 @@ export default function AdminLoginPage() {
             <div
               className={cn(
                 "absolute inset-0 rounded-full bg-background/20 blur-3xl transition-all duration-1000",
-                mounted ? "scale-100 opacity-100" : "scale-0 opacity-0",
+                mounted ? "scale-100 opacity-100" : "scale-0 opacity-0"
               )}
-              style={{ width: "400px", height: "400px", left: "-150px", top: "-150px" }}
+              style={{
+                width: "400px",
+                height: "400px",
+                left: "-150px",
+                top: "-150px",
+              }}
             />
 
             {/* Shield Icon */}
             <div
               className={cn(
                 "relative z-10 transition-all duration-700 delay-200",
-                mounted ? "opacity-100 scale-100 rotate-0" : "opacity-0 scale-50 rotate-180",
+                mounted
+                  ? "opacity-100 scale-100 rotate-0"
+                  : "opacity-0 scale-50 rotate-180"
               )}
             >
               <div className="bg-background rounded-full p-12 shadow-2xl">
-                <Shield className="h-24 w-24 text-foreground" strokeWidth={1.5} />
+                <Shield
+                  className="h-24 w-24 text-foreground"
+                  strokeWidth={1.5}
+                />
               </div>
             </div>
 
@@ -100,16 +131,21 @@ export default function AdminLoginPage() {
                 key={i}
                 className={cn(
                   "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-1000",
-                  mounted ? "opacity-100" : "opacity-0",
+                  mounted ? "opacity-100" : "opacity-0"
                 )}
                 style={{
                   transitionDelay: `${400 + i * 150}ms`,
                 }}
               >
-                <div className="w-40 h-40 animate-[spin_20s_linear_infinite]" style={{ animationDelay: `${-i * 6}s` }}>
+                <div
+                  className="w-40 h-40 animate-[spin_20s_linear_infinite]"
+                  style={{ animationDelay: `${-i * 6}s` }}
+                >
                   <div
                     className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-background rounded-full shadow-lg"
-                    style={{ transform: `rotate(${rotation}deg) translateY(-80px)` }}
+                    style={{
+                      transform: `rotate(${rotation}deg) translateY(-80px)`,
+                    }}
                   />
                 </div>
               </div>
@@ -121,14 +157,18 @@ export default function AdminLoginPage() {
         <div
           className={cn(
             "absolute top-20 left-20 w-32 h-32 border-2 border-background/20 transition-all duration-1000 delay-300",
-            mounted ? "scale-100 opacity-100 rotate-0" : "scale-0 opacity-0 rotate-45",
+            mounted
+              ? "scale-100 opacity-100 rotate-0"
+              : "scale-0 opacity-0 rotate-45"
           )}
           style={{ borderRadius: "30% 70% 70% 30% / 30% 30% 70% 70%" }}
         />
         <div
           className={cn(
             "absolute bottom-32 right-32 w-48 h-48 border-2 border-background/20 transition-all duration-1000 delay-500",
-            mounted ? "scale-100 opacity-100 rotate-0" : "scale-0 opacity-0 -rotate-45",
+            mounted
+              ? "scale-100 opacity-100 rotate-0"
+              : "scale-0 opacity-0 -rotate-45"
           )}
           style={{ borderRadius: "70% 30% 30% 70% / 70% 70% 30% 30%" }}
         />
@@ -137,11 +177,15 @@ export default function AdminLoginPage() {
         <div
           className={cn(
             "absolute bottom-12 left-12 transition-all duration-700 delay-400",
-            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}
         >
-          <h2 className="text-background text-4xl font-bold tracking-tight">POSTER ADMIN</h2>
-          <p className="text-background/70 mt-2 text-lg">Secure administrative access</p>
+          <h2 className="text-background text-4xl font-bold tracking-tight">
+            THE WALL STACK ADMIN
+          </h2>
+          <p className="text-background/70 mt-2 text-lg">
+            Secure administrative access
+          </p>
         </div>
       </div>
 
@@ -161,7 +205,7 @@ export default function AdminLoginPage() {
         <div
           className={cn(
             "w-full max-w-md space-y-8 relative z-10 transition-all duration-700",
-            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           )}
         >
           {/* Logo for mobile */}
@@ -178,10 +222,13 @@ export default function AdminLoginPage() {
               <div className="bg-foreground text-background p-2 rounded-lg">
                 <Shield className="h-6 w-6" />
               </div>
-              <h1 className="text-3xl font-bold tracking-tight">Admin Access</h1>
+              <h1 className="text-3xl font-bold tracking-tight">
+                Admin Access
+              </h1>
             </div>
             <p className="text-muted-foreground">
-              Sign in to your admin account to manage products, orders, and customers
+              Sign in to your admin account to manage products, orders, and
+              customers
             </p>
           </div>
 
@@ -194,7 +241,8 @@ export default function AdminLoginPage() {
               <div className="flex-1 text-sm">
                 <p className="font-medium text-foreground mb-1">Secure Area</p>
                 <p className="text-muted-foreground leading-relaxed">
-                  This area is restricted to authorized personnel only. All access attempts are logged.
+                  This area is restricted to authorized personnel only. All
+                  access attempts are logged.
                 </p>
               </div>
             </div>
@@ -212,19 +260,25 @@ export default function AdminLoginPage() {
                   <Mail
                     className={cn(
                       "absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors duration-200",
-                      focusedField === "email" ? "text-foreground" : "text-muted-foreground",
+                      focusedField === "email"
+                        ? "text-foreground"
+                        : "text-muted-foreground"
                     )}
                   />
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@postercraft.com"
+                    placeholder="admin@thewallstack.com"
                     className={cn(
                       "pl-10 h-12 transition-all duration-200 border-2 bg-background",
-                      focusedField === "email" ? "border-foreground shadow-lg" : "border-input",
+                      focusedField === "email"
+                        ? "border-foreground shadow-lg"
+                        : "border-input"
                     )}
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     onFocus={() => setFocusedField("email")}
                     onBlur={() => setFocusedField(null)}
                     required
@@ -232,7 +286,7 @@ export default function AdminLoginPage() {
                   <div
                     className={cn(
                       "absolute bottom-0 left-0 h-0.5 bg-foreground transition-all duration-300",
-                      focusedField === "email" ? "w-full" : "w-0",
+                      focusedField === "email" ? "w-full" : "w-0"
                     )}
                   />
                 </div>
@@ -247,7 +301,9 @@ export default function AdminLoginPage() {
                   <Lock
                     className={cn(
                       "absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors duration-200",
-                      focusedField === "password" ? "text-foreground" : "text-muted-foreground",
+                      focusedField === "password"
+                        ? "text-foreground"
+                        : "text-muted-foreground"
                     )}
                   />
                   <Input
@@ -256,10 +312,14 @@ export default function AdminLoginPage() {
                     placeholder="Enter your secure password"
                     className={cn(
                       "pl-10 pr-10 h-12 transition-all duration-200 border-2 bg-background",
-                      focusedField === "password" ? "border-foreground shadow-lg" : "border-input",
+                      focusedField === "password"
+                        ? "border-foreground shadow-lg"
+                        : "border-input"
                     )}
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
                     required
@@ -269,12 +329,16 @@ export default function AdminLoginPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                   <div
                     className={cn(
                       "absolute bottom-0 left-0 h-0.5 bg-foreground transition-all duration-300",
-                      focusedField === "password" ? "w-full" : "w-0",
+                      focusedField === "password" ? "w-full" : "w-0"
                     )}
                   />
                 </div>
@@ -290,7 +354,7 @@ export default function AdminLoginPage() {
               <span
                 className={cn(
                   "flex items-center justify-center gap-2 transition-all duration-300",
-                  isLoading ? "opacity-0" : "opacity-100",
+                  isLoading ? "opacity-0" : "opacity-100"
                 )}
               >
                 <Shield className="h-4 w-4" />
@@ -320,5 +384,5 @@ export default function AdminLoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

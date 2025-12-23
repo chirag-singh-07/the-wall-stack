@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { cn } from "@/lib/utils"
-import { Plus, Minus } from "lucide-react"
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
+import { Plus, Minus } from "lucide-react";
 
 const faqs = [
   {
@@ -30,18 +30,21 @@ const faqs = [
     answer:
       "Posters are sold unframed to keep shipping costs down and allow you to choose a frame that matches your space. We recommend simple black or white frames for the best effect.",
   },
-]
+];
 
 export function FAQSection() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [openIndex, setOpenIndex] = useState<number | null>(0)
-  const sectionRef = useRef<HTMLElement>(null)
+  const [isVisible, setIsVisible] = useState(false);
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), { threshold: 0.2 })
-    if (sectionRef.current) observer.observe(sectionRef.current)
-    return () => observer.disconnect()
-  }, [])
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.2 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section ref={sectionRef} className="py-24 md:py-32">
@@ -50,17 +53,24 @@ export function FAQSection() {
           <div
             className={cn(
               "transition-all duration-700",
-              isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8",
+              isVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 -translate-x-8"
             )}
           >
-            <span className="text-sm font-medium tracking-widest text-muted-foreground uppercase">FAQ</span>
+            <span className="text-sm font-medium tracking-widest text-muted-foreground uppercase">
+              FAQ
+            </span>
             <h2 className="mt-4 text-4xl md:text-5xl font-bold tracking-tight text-balance">
               Questions? We've got answers.
             </h2>
             <p className="mt-6 text-muted-foreground text-lg">
               Can't find what you're looking for? Reach out to our team at{" "}
-              <a href="mailto:hello@postercraft.com" className="underline underline-offset-4">
-                hello@postercraft.com
+              <a
+                href="mailto:hello@thewallstack.com"
+                className="underline underline-offset-4"
+              >
+                hello@thewallstack.com
               </a>
             </p>
           </div>
@@ -68,30 +78,45 @@ export function FAQSection() {
           <div
             className={cn(
               "space-y-4 transition-all duration-700 delay-200",
-              isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8",
+              isVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 translate-x-8"
             )}
           >
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className={cn("border-b border-border transition-all duration-300", index === 0 && "border-t")}
+                className={cn(
+                  "border-b border-border transition-all duration-300",
+                  index === 0 && "border-t"
+                )}
               >
                 <button
-                  onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                  onClick={() =>
+                    setOpenIndex(openIndex === index ? null : index)
+                  }
                   className="w-full py-6 flex items-center justify-between text-left group"
                 >
-                  <span className="font-medium text-lg pr-8">{faq.question}</span>
-                  <span className="flex-shrink-0 h-8 w-8 rounded-full border border-border flex items-center justify-center group-hover:bg-foreground group-hover:text-background transition-colors">
-                    {openIndex === index ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  <span className="font-medium text-lg pr-8">
+                    {faq.question}
+                  </span>
+                  <span className="shrink-0 h-8 w-8 rounded-full border border-border flex items-center justify-center group-hover:bg-foreground group-hover:text-background transition-colors">
+                    {openIndex === index ? (
+                      <Minus className="h-4 w-4" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
                   </span>
                 </button>
                 <div
                   className={cn(
                     "overflow-hidden transition-all duration-500",
-                    openIndex === index ? "max-h-48 pb-6" : "max-h-0",
+                    openIndex === index ? "max-h-48 pb-6" : "max-h-0"
                   )}
                 >
-                  <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {faq.answer}
+                  </p>
                 </div>
               </div>
             ))}
@@ -99,5 +124,5 @@ export function FAQSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
