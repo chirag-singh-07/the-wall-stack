@@ -1,79 +1,79 @@
 export interface Product {
-  id: string
-  title: string
-  price: number
-  category: string
-  image: string
-  description?: string
-  sizes?: { name: string; price: number }[]
-  details?: string[]
+  id: string;
+  title: string;
+  price: number;
+  category: string;
+  image: string;
+  description?: string;
+  sizes?: { name: string; price: number }[];
+  details?: string[];
 }
 
 export interface Collection {
-  id: string
-  title: string
-  description: string
-  image: string
+  id: string;
+  title: string;
+  description: string;
+  image: string;
 }
 
 export const products: Product[] = [
   {
     id: "1",
     title: "Geometric Harmony",
-    price: 49,
+    price: 499,
     category: "minimal",
     image: "/minimal-geometric-black-white-poster-art.jpg",
   },
   {
     id: "2",
     title: "Abstract Flow",
-    price: 59,
+    price: 599,
     category: "abstract",
     image: "/abstract-fluid-black-white-poster-art.jpg",
   },
   {
     id: "3",
     title: "Bold Statement",
-    price: 45,
+    price: 449,
     category: "typography",
     image: "/typography-bold-black-white-poster-art.jpg",
   },
   {
     id: "4",
     title: "Silent Lines",
-    price: 55,
+    price: 549,
     category: "minimal",
     image: "/minimal-lines-black-white-poster-art.jpg",
   },
   {
     id: "5",
     title: "Chaos Theory",
-    price: 65,
+    price: 649,
     category: "abstract",
     image: "/abstract-chaotic-black-white-poster-art.jpg",
   },
   {
     id: "6",
     title: "Type Specimen",
-    price: 52,
+    price: 529,
     category: "typography",
     image: "/typography-specimen-black-white-poster-art.jpg",
   },
   {
     id: "7",
     title: "Void Space",
-    price: 48,
+    price: 479,
     category: "minimal",
     image: "/minimal-void-space-black-white-poster-art.jpg",
   },
   {
     id: "8",
     title: "Motion Blur",
-    price: 58,
+    price: 579,
     category: "abstract",
     image: "/abstract-motion-blur-black-white-poster-art.jpg",
   },
-]
+];
 
 export const collections: Collection[] = [
   {
@@ -94,7 +94,7 @@ export const collections: Collection[] = [
     description: "Words as art, letters as design",
     image: "/typography-collection-black-white-poster-art.jpg",
   },
-]
+];
 
 export const allProducts: Product[] = [
   ...products,
@@ -154,14 +154,14 @@ export const allProducts: Product[] = [
     category: "abstract",
     image: "/abstract-smoke-black-white-poster-art.jpg",
   },
-]
+];
 
 export const priceRanges = [
-  { label: "Under $50", min: 0, max: 50 },
-  { label: "$50 - $60", min: 50, max: 60 },
-  { label: "$60 - $70", min: 60, max: 70 },
-  { label: "Over $70", min: 70, max: 999 },
-]
+  { label: "Under ₹500", min: 0, max: 499 },
+  { label: "₹500 - ₹1000", min: 500, max: 1000 },
+  { label: "₹1000 - ₹2000", min: 1000, max: 2000 },
+  { label: "Over ₹2000", min: 2000, max: 99999 },
+];
 
 export const sortOptions = [
   { value: "featured", label: "Featured" },
@@ -169,17 +169,20 @@ export const sortOptions = [
   { value: "price-desc", label: "Price: High to Low" },
   { value: "name-asc", label: "Name: A to Z" },
   { value: "name-desc", label: "Name: Z to A" },
-]
+];
 
-export const productDetails: Record<string, Omit<Product, "id" | "title" | "price" | "category" | "image">> = {
+export const productDetails: Record<
+  string,
+  Omit<Product, "id" | "title" | "price" | "category" | "image">
+> = {
   "1": {
     description:
       "A masterful blend of geometric precision and artistic expression. This poster features carefully balanced shapes that create visual harmony, perfect for modern spaces seeking a touch of sophisticated minimalism.",
     sizes: [
-      { name: "A4 (21×30cm)", price: 29 },
-      { name: "A3 (30×42cm)", price: 49 },
-      { name: "A2 (42×59cm)", price: 79 },
-      { name: "A1 (59×84cm)", price: 119 },
+      { name: "A4 (21×30cm)", price: 299 },
+      { name: "A3 (30×42cm)", price: 499 },
+      { name: "A2 (42×59cm)", price: 799 },
+      { name: "A1 (59×84cm)", price: 1199 },
     ],
     details: [
       "Premium 250gsm matte art paper",
@@ -192,10 +195,10 @@ export const productDetails: Record<string, Omit<Product, "id" | "title" | "pric
     description:
       "Fluid organic forms dance across the canvas in this captivating abstract piece. The interplay of light and shadow creates depth and movement, making it a stunning centerpiece for any contemporary interior.",
     sizes: [
-      { name: "A4 (21×30cm)", price: 39 },
-      { name: "A3 (30×42cm)", price: 59 },
-      { name: "A2 (42×59cm)", price: 89 },
-      { name: "A1 (59×84cm)", price: 129 },
+      { name: "A4 (21×30cm)", price: 399 },
+      { name: "A3 (30×42cm)", price: 599 },
+      { name: "A2 (42×59cm)", price: 899 },
+      { name: "A1 (59×84cm)", price: 1299 },
     ],
     details: [
       "Premium 250gsm matte art paper",
@@ -208,10 +211,10 @@ export const productDetails: Record<string, Omit<Product, "id" | "title" | "pric
     description:
       "Bold typography meets artistic expression in this striking poster. Each letter has been carefully crafted to create visual impact while maintaining readability and artistic integrity.",
     sizes: [
-      { name: "A4 (21×30cm)", price: 25 },
-      { name: "A3 (30×42cm)", price: 45 },
-      { name: "A2 (42×59cm)", price: 75 },
-      { name: "A1 (59×84cm)", price: 115 },
+      { name: "A4 (21×30cm)", price: 249 },
+      { name: "A3 (30×42cm)", price: 449 },
+      { name: "A2 (42×59cm)", price: 749 },
+      { name: "A1 (59×84cm)", price: 1149 },
     ],
     details: [
       "Premium 250gsm matte art paper",
@@ -220,13 +223,17 @@ export const productDetails: Record<string, Omit<Product, "id" | "title" | "pric
       "Typography collection piece",
     ],
   },
-}
+};
 
-export function getProductWithDetails(
-  id: string,
-): (Product & { description: string; sizes: { name: string; price: number }[]; details: string[] }) | null {
-  const product = allProducts.find((p) => p.id === id)
-  if (!product) return null
+export function getProductWithDetails(id: string):
+  | (Product & {
+      description: string;
+      sizes: { name: string; price: number }[];
+      details: string[];
+    })
+  | null {
+  const product = allProducts.find((p) => p.id === id);
+  if (!product) return null;
 
   const details = productDetails[id] || {
     description:
@@ -243,19 +250,30 @@ export function getProductWithDetails(
       "Ships in protective tube",
       "Handcrafted in studio",
     ],
-  }
+  };
 
-  return { ...product, ...details }
+  const finalDetails = {
+    description:
+      details.description || product.description || "No description available.",
+    sizes: details.sizes || [],
+    details: details.details || [],
+  };
+
+  return { ...product, ...finalDetails };
 }
 
-export function getRecommendedProducts(currentId: string, category: string, limit = 4): Product[] {
+export function getRecommendedProducts(
+  currentId: string,
+  category: string,
+  limit = 4
+): Product[] {
   return allProducts
     .filter((p) => p.id !== currentId)
     .sort((a, b) => {
       // Prioritize same category
-      if (a.category === category && b.category !== category) return -1
-      if (b.category === category && a.category !== category) return 1
-      return 0
+      if (a.category === category && b.category !== category) return -1;
+      if (b.category === category && a.category !== category) return 1;
+      return 0;
     })
-    .slice(0, limit)
+    .slice(0, limit);
 }

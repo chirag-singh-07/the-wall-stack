@@ -1,39 +1,40 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { products } from "@/lib/products"
-import { ProductCard } from "@/components/product-card"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-
-const categories = ["All", "Minimal", "Abstract", "Typography"]
+import { useEffect, useRef, useState } from "react";
+import { getFeaturedProducts } from "@/actions/user/product-actions";
 
 export function FeaturedProducts() {
-  const [activeCategory, setActiveCategory] = useState("All")
-  const [isVisible, setIsVisible] = useState(false)
-  const sectionRef = useRef<HTMLElement>(null)
-
-  const filteredProducts =
-    activeCategory === "All"
-      ? products
-      : products.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase())
+  const [posters, setPosters] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    getFeaturedProducts().then((res) => {
+      if (res.success && res.data) {
+        setPosters(res.data);
+      }
+      setLoading(false);
+    });
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsVisible(true)
+          setIsVisible(true);
         }
       },
-      { threshold: 0.1 },
-    )
+      { threshold: 0.1 }
+    );
 
     if (sectionRef.current) {
-      observer.observe(sectionRef.current)
+      observer.observe(sectionRef.current);
     }
 
-    return () => observer.disconnect()
-  }, [])
+    return () => observer.disconnect();
+  }, []);
+
+  if (loading) return null;
+  if (posters.length === 0) return null;
 
   return (
     <section ref={sectionRef} id="shop" className="py-20 md:py-32">
@@ -41,10 +42,12 @@ export function FeaturedProducts() {
         <div
           className={cn(
             "text-center mb-12 transition-all duration-700",
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           )}
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">Featured Posters</h2>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+            Featured Posters
+          </h2>
           <p className="text-muted-foreground max-w-md mx-auto">
             Discover our hand-picked selection of premium wall art
           </p>
@@ -52,34 +55,15 @@ export function FeaturedProducts() {
 
         <div
           className={cn(
-            "flex flex-wrap justify-center gap-2 mb-12 transition-all duration-700 delay-200",
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
-          )}
-        >
-          {categories.map((category) => (
-            <Button
-              key={category}
-              variant={activeCategory === category ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveCategory(category)}
-              className="transition-all duration-200"
-            >
-              {category}
-            </Button>
-          ))}
-        </div>
-
-        <div
-          className={cn(
             "grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 transition-all duration-700 delay-300",
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           )}
         >
-          {filteredProducts.map((product) => (
+          {posters.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

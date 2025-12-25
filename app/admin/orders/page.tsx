@@ -1,244 +1,239 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { AdminHeader } from "@/components/admin/admin-header"
-import { DataTable } from "@/components/admin/data-table"
-import { useAdminStore, type AdminOrder } from "@/lib/admin-store"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Eye, Package } from "lucide-react"
+import { useState, useEffect } from "react";
+import { AdminHeader } from "@/components/admin/admin-header";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { MoreHorizontal, Loader2, Eye, Phone, MapPin } from "lucide-react";
+import { getOrders, updateOrderStatus } from "@/actions/user/checkout-actions";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
-
-const statusStyles: Record<AdminOrder["status"], string> = {
-  pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  processing: "bg-blue-100 text-blue-800 border-blue-200",
-  shipped: "bg-purple-100 text-purple-800 border-purple-200",
-  delivered: "bg-green-100 text-green-800 border-green-200",
-  cancelled: "bg-red-100 text-red-800 border-red-200",
-}
+} from "@/components/ui/dialog";
 
 export default function AdminOrdersPage() {
-  const { orders, updateOrderStatus } = useAdminStore()
-  const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null)
+  const [orders, setOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const columns = [
-    {
-      key: "order",
-      header: "Order",
-      render: (item: AdminOrder) => (
-        <div>
-          <p className="font-medium">{item.id}</p>
-          <p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString()}</p>
-        </div>
-      ),
-    },
-    {
-      key: "customer",
-      header: "Customer",
-      render: (item: AdminOrder) => (
-        <div>
-          <p className="font-medium">{item.customerName}</p>
-          <p className="text-xs text-muted-foreground">{item.customerEmail}</p>
-        </div>
-      ),
-    },
-    {
-      key: "items",
-      header: "Items",
-      render: (item: AdminOrder) => (
-        <div className="flex -space-x-2">
-          {item.items.slice(0, 3).map((orderItem, i) => (
-            <div key={i} className="relative h-8 w-8 overflow-hidden rounded border-2 border-background">
-              <Image src={orderItem.image || "/placeholder.svg"} alt={orderItem.title} fill className="object-cover" />
-            </div>
-          ))}
-          {item.items.length > 3 && (
-            <div className="flex h-8 w-8 items-center justify-center rounded border-2 border-background bg-muted text-xs font-medium">
-              +{item.items.length - 3}
-            </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: "total",
-      header: "Total",
-      render: (item: AdminOrder) => <span className="font-medium">${item.total}</span>,
-    },
-    {
-      key: "payment",
-      header: "Payment",
-      render: (item: AdminOrder) => <span className="text-sm">{item.paymentMethod}</span>,
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (item: AdminOrder) => (
-        <Select value={item.status} onValueChange={(value: AdminOrder["status"]) => updateOrderStatus(item.id, value)}>
-          <SelectTrigger className="w-32 h-8">
-            <Badge variant="outline" className={statusStyles[item.status]}>
-              {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-            </Badge>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="processing">Processing</SelectItem>
-            <SelectItem value="shipped">Shipped</SelectItem>
-            <SelectItem value="delivered">Delivered</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
-      ),
-    },
-    {
-      key: "actions",
-      header: "",
-      className: "text-right",
-      render: (item: AdminOrder) => (
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="icon" onClick={() => setSelectedOrder(item)}>
-              <Eye className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Order Details - {item.id}</DialogTitle>
-              <DialogDescription>View complete order information</DialogDescription>
-            </DialogHeader>
-            <OrderDetails order={item} />
-          </DialogContent>
-        </Dialog>
-      ),
-    },
-  ]
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    const res = await getOrders();
+    if (res.success && res.data) {
+      setOrders(res.data);
+    } else {
+      toast.error("Failed to fetch orders");
+    }
+    setIsLoading(false);
+  };
 
-  // Calculate stats
-  const pendingOrders = orders.filter((o) => o.status === "pending").length
-  const processingOrders = orders.filter((o) => o.status === "processing").length
-  const totalRevenue = orders.reduce((acc, o) => acc + o.total, 0)
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const handleStatusUpdate = async (id: string, status: string) => {
+    const res = await updateOrderStatus(id, status);
+    if (res.success) {
+      toast.success("Order status updated");
+      fetchOrders();
+    } else {
+      toast.error(res.error || "Failed to update status");
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-500/10 text-green-500 hover:bg-green-500/20";
+      case "processing":
+        return "bg-blue-500/10 text-blue-500 hover:bg-blue-500/20";
+      case "cancelled":
+        return "bg-red-500/10 text-red-500 hover:bg-red-500/20";
+      default:
+        return "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20";
+    }
+  };
 
   return (
     <div className="min-h-screen">
-      <AdminHeader title="Orders" />
+      <AdminHeader
+        title="Order Management"
+        description="View and manage customer COD orders"
+      />
 
-      <div className="p-6 space-y-6">
-        {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-4">
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="text-sm text-muted-foreground">Total Orders</p>
-            <p className="text-2xl font-bold">{orders.length}</p>
+      <div className="p-6">
+        {isLoading ? (
+          <div className="flex justify-center p-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="text-sm text-muted-foreground">Pending</p>
-            <p className="text-2xl font-bold text-yellow-600">{pendingOrders}</p>
+        ) : (
+          <div className="rounded-lg border bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order ID</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead>Items</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orders.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="text-center h-24 text-muted-foreground"
+                    >
+                      No orders found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  orders.map((order) => (
+                    <TableRow key={order.id}>
+                      <TableCell className="font-mono text-xs">
+                        {order.id.slice(-6).toUpperCase()}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{order.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {order.email}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1 text-sm">
+                          <div className="flex items-center gap-1">
+                            <Phone className="h-3 w-3 text-muted-foreground" />
+                            {order.phone}
+                          </div>
+                          <div
+                            className="flex items-center gap-1 text-xs text-muted-foreground truncate max-w-[150px]"
+                            title={order.address}
+                          >
+                            <MapPin className="h-3 w-3" />
+                            {order.city}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>${order.total.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 text-xs"
+                            >
+                              {order.items.length} items
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>Order Items</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              {order.items.map((item: any) => (
+                                <div
+                                  key={item.id}
+                                  className="flex justify-between items-center text-sm border-b pb-2"
+                                >
+                                  <div>
+                                    <p className="font-medium">
+                                      {item.poster?.title ||
+                                        item.size + " Poster"}
+                                    </p>
+                                    <p className="text-muted-foreground">
+                                      {item.size} x {item.quantity}
+                                    </p>
+                                  </div>
+                                  <p>
+                                    ${(item.price * item.quantity).toFixed(2)}
+                                  </p>
+                                </div>
+                              ))}
+                              <div className="flex justify-between font-bold pt-2">
+                                <span>Total</span>
+                                <span>${order.total.toFixed(2)}</span>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusColor(order.status)}>
+                          {order.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleStatusUpdate(order.id, "pending")
+                              }
+                            >
+                              Mark Pending
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleStatusUpdate(order.id, "processing")
+                              }
+                            >
+                              Mark Processing
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleStatusUpdate(order.id, "completed")
+                              }
+                            >
+                              Mark Completed
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleStatusUpdate(order.id, "cancelled")
+                              }
+                            >
+                              Mark Cancelled
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="text-sm text-muted-foreground">Processing</p>
-            <p className="text-2xl font-bold text-blue-600">{processingOrders}</p>
-          </div>
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="text-2xl font-bold">${totalRevenue}</p>
-          </div>
-        </div>
-
-        {/* Orders Table */}
-        <DataTable
-          data={orders}
-          columns={columns}
-          searchPlaceholder="Search orders..."
-          searchKey="id"
-          filters={[
-            {
-              key: "status",
-              label: "Status",
-              options: [
-                { value: "pending", label: "Pending" },
-                { value: "processing", label: "Processing" },
-                { value: "shipped", label: "Shipped" },
-                { value: "delivered", label: "Delivered" },
-                { value: "cancelled", label: "Cancelled" },
-              ],
-            },
-          ]}
-        />
+        )}
       </div>
     </div>
-  )
-}
-
-function OrderDetails({ order }: { order: AdminOrder }) {
-  return (
-    <div className="space-y-6">
-      {/* Order Status */}
-      <div className="flex items-center justify-between rounded-lg bg-muted p-4">
-        <div className="flex items-center gap-3">
-          <Package className="h-5 w-5" />
-          <div>
-            <p className="font-medium">Order Status</p>
-            <p className="text-sm text-muted-foreground">{new Date(order.date).toLocaleDateString()}</p>
-          </div>
-        </div>
-        <Badge variant="outline" className={statusStyles[order.status]}>
-          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-        </Badge>
-      </div>
-
-      {/* Customer Info */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-border p-4">
-          <h4 className="font-medium mb-2">Customer</h4>
-          <p className="text-sm">{order.customerName}</p>
-          <p className="text-sm text-muted-foreground">{order.customerEmail}</p>
-        </div>
-        <div className="rounded-lg border border-border p-4">
-          <h4 className="font-medium mb-2">Shipping Address</h4>
-          <p className="text-sm">{order.shippingAddress.street}</p>
-          <p className="text-sm">
-            {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
-          </p>
-          <p className="text-sm">{order.shippingAddress.country}</p>
-        </div>
-      </div>
-
-      {/* Order Items */}
-      <div className="rounded-lg border border-border">
-        <div className="border-b border-border p-4">
-          <h4 className="font-medium">Order Items</h4>
-        </div>
-        <div className="divide-y divide-border">
-          {order.items.map((item, i) => (
-            <div key={i} className="flex items-center gap-4 p-4">
-              <div className="relative h-16 w-16 overflow-hidden rounded bg-muted">
-                <Image src={item.image || "/placeholder.svg"} alt={item.title} fill className="object-cover" />
-              </div>
-              <div className="flex-1">
-                <p className="font-medium">{item.title}</p>
-                <p className="text-sm text-muted-foreground">
-                  {item.size} × {item.quantity}
-                </p>
-              </div>
-              <p className="font-medium">${item.price * item.quantity}</p>
-            </div>
-          ))}
-        </div>
-        <div className="border-t border-border p-4">
-          <div className="flex justify-between">
-            <span className="font-medium">Total</span>
-            <span className="font-bold">${order.total}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  );
 }

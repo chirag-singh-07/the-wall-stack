@@ -71,6 +71,9 @@ export async function createPoster(data: any) {
         categoryId,
         collectionId,
         status,
+        isBestseller: data.isBestseller || false,
+        isLimitedEdition: data.isLimitedEdition || false,
+        isFeatured: data.isFeatured || false,
       },
     });
 
@@ -108,6 +111,9 @@ export async function updatePoster(id: string, data: any) {
       categoryId,
       collectionId,
       status,
+      isBestseller: data.isBestseller,
+      isLimitedEdition: data.isLimitedEdition,
+      isFeatured: data.isFeatured,
     };
 
     const poster = await db.poster.update({
@@ -253,6 +259,8 @@ export async function createCollection(data: any) {
         slug,
         description,
         image,
+        coverImage: data.coverImage,
+        isFeatured: data.isFeatured || false,
         status,
       },
     });
@@ -272,6 +280,8 @@ export async function updateCollection(id: string, data: any) {
         title: data.title,
         description: data.description,
         image: data.image,
+        coverImage: data.coverImage,
+        isFeatured: data.isFeatured,
         status: data.status,
       },
     });

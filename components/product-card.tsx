@@ -5,8 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, Eye } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import type { Product } from "@/lib/products";
+import { useCartStore } from "@/lib/cart-store";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
@@ -19,8 +21,25 @@ export function ProductCard({ product }: { product: any }) {
   const identifier = product.slug || product.id;
   const displayPrice =
     typeof product.price === "number"
-      ? product.price.toFixed(2)
-      : product.price;
+      ? product.price
+      : parseFloat(product.price);
+
+  const { addItem } = useCartStore();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Default to A3 size for quick add
+    const defaultSize = "A3 (30×42cm)";
+    const price =
+      typeof product.price === "number"
+        ? product.price
+        : parseFloat(product.price);
+
+    addItem(product.id, defaultSize, price, 1);
+    toast.success(`Added ${product.title} to cart`);
+  };
 
   return (
     <div
@@ -53,7 +72,7 @@ export function ProductCard({ product }: { product: any }) {
           <Button
             className="flex-1 shadow-lg"
             size="sm"
-            onClick={(e) => e.preventDefault()}
+            onClick={handleAddToCart}
           >
             <ShoppingBag className="h-4 w-4 mr-2" />
             Add to Cart
@@ -87,7 +106,9 @@ export function ProductCard({ product }: { product: any }) {
         <h3 className="font-medium group-hover:text-primary transition-colors line-clamp-1">
           {product.title}
         </h3>
-        <p className="text-muted-foreground font-light">${displayPrice}</p>
+        <p className="text-muted-foreground font-light">
+          {formatPrice(displayPrice)}
+        </p>
       </Link>
     </div>
   );

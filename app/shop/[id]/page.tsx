@@ -1,27 +1,32 @@
-import { notFound } from "next/navigation"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { ProductGallery } from "@/components/product/product-gallery"
-import { ProductInfo } from "@/components/product/product-info"
-import { ProductTabs } from "@/components/product/product-tabs"
-import { RecommendedProducts } from "@/components/product/recommended-products"
-import { getProductWithDetails, getRecommendedProducts } from "@/lib/products"
-import Link from "next/link"
-import { ChevronRight } from "lucide-react"
+import { notFound } from "next/navigation";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { ProductGallery } from "@/components/product/product-gallery";
+import { ProductInfo } from "@/components/product/product-info";
+import { ProductTabs } from "@/components/product/product-tabs";
+import { RecommendedProducts } from "@/components/product/recommended-products";
+import { getProductWithDetails, getRecommendedProducts } from "@/lib/products";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
+import { ReviewSection } from "@/components/reviews/review-section";
 
 interface ProductPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const { id } = await params
-  const product = await getProductWithDetails(id)
+  const { id } = await params;
+  const product = await getProductWithDetails(id);
 
   if (!product) {
-    notFound()
+    notFound();
   }
 
-  const recommendedProducts = await getRecommendedProducts(id, product.category, 4)
+  const recommendedProducts = await getRecommendedProducts(
+    id,
+    product.category,
+    4
+  );
 
   return (
     <main className="min-h-screen bg-background">
@@ -35,7 +40,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
               Home
             </Link>
             <ChevronRight className="h-4 w-4" />
-            <Link href="/shop" className="hover:text-foreground transition-colors">
+            <Link
+              href="/shop"
+              className="hover:text-foreground transition-colors"
+            >
               Shop
             </Link>
             <ChevronRight className="h-4 w-4" />
@@ -46,7 +54,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {product.category}
             </Link>
             <ChevronRight className="h-4 w-4" />
-            <span className="text-foreground font-medium truncate max-w-[150px]">{product.title}</span>
+            <span className="text-foreground font-medium truncate max-w-[150px]">
+              {product.title}
+            </span>
           </nav>
         </div>
       </div>
@@ -77,10 +87,20 @@ export default async function ProductPage({ params }: ProductPageProps) {
       {/* Tabs Section */}
       <ProductTabs description={product.description} />
 
+      {/* Review Section */}
+      <section className="py-8 md:py-16 bg-muted/20">
+        <div className="container px-4 md:px-8 mx-auto">
+          <ReviewSection productId={product.id} />
+        </div>
+      </section>
+
       {/* Recommended Products */}
-      <RecommendedProducts products={recommendedProducts} currentCategory={product.category} />
+      <RecommendedProducts
+        products={recommendedProducts}
+        currentCategory={product.category}
+      />
 
       <Footer />
     </main>
-  )
+  );
 }

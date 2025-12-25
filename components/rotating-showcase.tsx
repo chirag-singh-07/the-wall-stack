@@ -1,84 +1,97 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef } from "react"
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect, useRef } from "react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/lib/utils";
 
 const showcasePosters = [
   {
     id: 1,
     title: "Midnight Geometry",
     artist: "Studio Noir",
-    price: 49,
+    price: 4499,
     image: "/geometric-black-white-abstract-poster-art.jpg",
   },
   {
     id: 2,
     title: "Urban Shadows",
     artist: "Metro Arts",
-    price: 59,
+    price: 5499,
     image: "/urban-cityscape-black-white-poster-photography.jpg",
   },
   {
     id: 3,
     title: "Botanical Dreams",
     artist: "Nature Press",
-    price: 45,
+    price: 3999,
     image: "/botanical-plants-black-white-line-art-poster.jpg",
   },
   {
     id: 4,
     title: "Wave Forms",
     artist: "Ocean Studio",
-    price: 55,
+    price: 4999,
     image: "/ocean-waves-black-white-abstract-poster.jpg",
   },
   {
     id: 5,
     title: "Mountain Echo",
     artist: "Peak Design",
-    price: 52,
+    price: 4799,
     image: "/mountain-landscape-black-white-minimalist-poster.jpg",
   },
-]
+];
 
 export function RotatingShowcase() {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
-  const [isHovered, setIsHovered] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
-  const sectionRef = useRef<HTMLElement>(null)
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), { threshold: 0.2 })
-    if (sectionRef.current) observer.observe(sectionRef.current)
-    return () => observer.disconnect()
-  }, [])
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.2 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
-    if (!isAutoPlaying || isHovered) return
+    if (!isAutoPlaying || isHovered) return;
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % showcasePosters.length)
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [isAutoPlaying, isHovered])
+      setCurrentIndex((prev) => (prev + 1) % showcasePosters.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, isHovered]);
 
   const goTo = (index: number) => {
-    setCurrentIndex(index)
-  }
+    setCurrentIndex(index);
+  };
 
-  const next = () => setCurrentIndex((prev) => (prev + 1) % showcasePosters.length)
-  const prev = () => setCurrentIndex((prev) => (prev - 1 + showcasePosters.length) % showcasePosters.length)
+  const next = () =>
+    setCurrentIndex((prev) => (prev + 1) % showcasePosters.length);
+  const prev = () =>
+    setCurrentIndex(
+      (prev) => (prev - 1 + showcasePosters.length) % showcasePosters.length
+    );
 
   return (
-    <section ref={sectionRef} className="py-24 bg-foreground text-background overflow-hidden">
+    <section
+      ref={sectionRef}
+      className="py-24 bg-foreground text-background overflow-hidden"
+    >
       <div className="container mx-auto px-4">
         <div
           className={`text-center mb-16 transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          <span className="text-sm tracking-[0.3em] uppercase text-background/60 mb-4 block">Interactive Gallery</span>
+          <span className="text-sm tracking-[0.3em] uppercase text-background/60 mb-4 block">
+            Interactive Gallery
+          </span>
           <h2 className="text-4xl md:text-6xl font-bold mb-4">3D Showcase</h2>
           <p className="text-background/70 max-w-2xl mx-auto">
             Explore our featured posters in an immersive 3D carousel
@@ -93,32 +106,48 @@ export function RotatingShowcase() {
           {/* 3D Carousel */}
           <div className="absolute inset-0 flex items-center justify-center">
             {showcasePosters.map((poster, index) => {
-              const offset = index - currentIndex
-              const absOffset = Math.abs(offset)
-              const isCenter = offset === 0
+              const offset = index - currentIndex;
+              const absOffset = Math.abs(offset);
+              const isCenter = offset === 0;
 
-              let transform = ""
-              let zIndex = 10 - absOffset
-              let opacity = 1
+              let transform = "";
+              let zIndex = 10 - absOffset;
+              let opacity = 1;
 
               if (offset === 0) {
-                transform = "translateX(0) translateZ(100px) rotateY(0deg)"
-                zIndex = 20
-              } else if (offset === 1 || offset === -showcasePosters.length + 1) {
-                transform = "translateX(250px) translateZ(-50px) rotateY(-25deg)"
-                opacity = 0.7
-              } else if (offset === -1 || offset === showcasePosters.length - 1) {
-                transform = "translateX(-250px) translateZ(-50px) rotateY(25deg)"
-                opacity = 0.7
-              } else if (offset === 2 || offset === -showcasePosters.length + 2) {
-                transform = "translateX(400px) translateZ(-150px) rotateY(-35deg)"
-                opacity = 0.4
-              } else if (offset === -2 || offset === showcasePosters.length - 2) {
-                transform = "translateX(-400px) translateZ(-150px) rotateY(35deg)"
-                opacity = 0.4
+                transform = "translateX(0) translateZ(100px) rotateY(0deg)";
+                zIndex = 20;
+              } else if (
+                offset === 1 ||
+                offset === -showcasePosters.length + 1
+              ) {
+                transform =
+                  "translateX(250px) translateZ(-50px) rotateY(-25deg)";
+                opacity = 0.7;
+              } else if (
+                offset === -1 ||
+                offset === showcasePosters.length - 1
+              ) {
+                transform =
+                  "translateX(-250px) translateZ(-50px) rotateY(25deg)";
+                opacity = 0.7;
+              } else if (
+                offset === 2 ||
+                offset === -showcasePosters.length + 2
+              ) {
+                transform =
+                  "translateX(400px) translateZ(-150px) rotateY(-35deg)";
+                opacity = 0.4;
+              } else if (
+                offset === -2 ||
+                offset === showcasePosters.length - 2
+              ) {
+                transform =
+                  "translateX(-400px) translateZ(-150px) rotateY(35deg)";
+                opacity = 0.4;
               } else {
-                transform = "translateX(0) translateZ(-300px) rotateY(0deg)"
-                opacity = 0
+                transform = "translateX(0) translateZ(-300px) rotateY(0deg)";
+                opacity = 0;
               }
 
               return (
@@ -149,7 +178,9 @@ export function RotatingShowcase() {
                       {/* Shine Effect */}
                       <div
                         className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-1000 ${
-                          isCenter && isVisible ? "translate-x-[200%]" : "-translate-x-[200%]"
+                          isCenter && isVisible
+                            ? "translate-x-[200%]"
+                            : "-translate-x-[200%]"
                         }`}
                         style={{ transitionDelay: "500ms" }}
                       />
@@ -158,12 +189,18 @@ export function RotatingShowcase() {
                     {/* Info Panel */}
                     <div
                       className={`absolute -bottom-20 left-0 right-0 bg-foreground text-background p-4 transition-all duration-500 ${
-                        isCenter ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                        isCenter
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 translate-y-4"
                       }`}
                     >
                       <h3 className="font-bold text-lg">{poster.title}</h3>
-                      <p className="text-background/60 text-sm">{poster.artist}</p>
-                      <p className="font-bold mt-2">${poster.price}</p>
+                      <p className="text-background/60 text-sm">
+                        {poster.artist}
+                      </p>
+                      <p className="font-bold mt-2">
+                        {formatPrice(poster.price)}
+                      </p>
                     </div>
 
                     {/* Corner Accents for Center */}
@@ -177,7 +214,7 @@ export function RotatingShowcase() {
                     )}
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
 
@@ -205,7 +242,9 @@ export function RotatingShowcase() {
                 key={index}
                 onClick={() => goTo(index)}
                 className={`h-2 rounded-full transition-all duration-300 ${
-                  index === currentIndex ? "w-8 bg-background" : "w-2 bg-background/30 hover:bg-background/50"
+                  index === currentIndex
+                    ? "w-8 bg-background"
+                    : "w-2 bg-background/30 hover:bg-background/50"
                 }`}
               />
             ))}
@@ -218,10 +257,14 @@ export function RotatingShowcase() {
             onClick={() => setIsAutoPlaying(!isAutoPlaying)}
             className="ml-4 border-background/30 text-background hover:bg-background/10"
           >
-            {isAutoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {isAutoPlaying ? (
+              <Pause className="w-4 h-4" />
+            ) : (
+              <Play className="w-4 h-4" />
+            )}
           </Button>
         </div>
       </div>
     </section>
-  )
+  );
 }

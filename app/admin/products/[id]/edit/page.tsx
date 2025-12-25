@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, Loader2, AlertTriangle } from "lucide-react";
 import {
   AlertDialog,
@@ -55,6 +56,9 @@ export default function EditProductPage({
     stock: "",
     status: "draft" as "active" | "draft" | "archived",
     images: [] as string[],
+    isBestseller: false,
+    isLimitedEdition: false,
+    isFeatured: false,
   });
 
   useEffect(() => {
@@ -67,7 +71,7 @@ export default function EditProductPage({
       ]);
 
       if (posterRes.success && posterRes.data) {
-        const p = posterRes.data;
+        const p: any = posterRes.data;
         setFormData({
           title: p.title,
           price: p.price.toString(),
@@ -77,6 +81,9 @@ export default function EditProductPage({
           stock: p.stock.toString(),
           status: p.status as any,
           images: p.images.length > 0 ? p.images : [p.image],
+          isBestseller: p.isBestseller || false,
+          isLimitedEdition: p.isLimitedEdition || false,
+          isFeatured: p.isFeatured || false,
         });
       } else {
         toast.error("Failed to fetch poster details");
@@ -286,6 +293,54 @@ export default function EditProductPage({
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card p-6 rounded-xl border border-border space-y-6">
+              <h3 className="text-lg font-semibold">Visibility & Features</h3>
+              <div className="grid gap-4">
+                <div className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Featured Product</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Highlight this product in the featured section
+                    </p>
+                  </div>
+                  <Switch
+                    checked={formData.isFeatured}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, isFeatured: checked })
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Bestseller</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Mark as a bestseller
+                    </p>
+                  </div>
+                  <Switch
+                    checked={formData.isBestseller}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, isBestseller: checked })
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Limited Edition</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Show limited edition badge
+                    </p>
+                  </div>
+                  <Switch
+                    checked={formData.isLimitedEdition}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, isLimitedEdition: checked })
+                    }
+                  />
                 </div>
               </div>
             </div>

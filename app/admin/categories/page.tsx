@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { DataTable } from "@/components/admin/data-table";
 import { type AdminCategory } from "@/lib/admin-store";
@@ -44,6 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ImageUploader } from "@/components/admin/image-uploader";
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -57,6 +58,7 @@ export default function AdminCategoriesPage() {
     name: "",
     slug: "",
     description: "",
+    image: "",
     status: "active" as "active" | "inactive",
   });
 
@@ -71,15 +73,16 @@ export default function AdminCategoriesPage() {
     setIsFetching(false);
   };
 
-  useState(() => {
+  useEffect(() => {
     fetchCategories();
-  });
+  }, []);
 
   const resetForm = () => {
     setFormData({
       name: "",
       slug: "",
       description: "",
+      image: "",
       status: "active",
     });
     setEditingCategory(null);
@@ -92,6 +95,7 @@ export default function AdminCategoriesPage() {
         name: category.name,
         slug: category.slug,
         description: category.description || "",
+        image: category.image || "",
         status: category.status as any,
       });
     } else {

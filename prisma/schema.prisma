@@ -19,6 +19,7 @@ model User {
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+  phone         String?
   createdAt     DateTime  @default(now())
   role          String    @default("USER")
   banned        Boolean   @default(false)
@@ -27,6 +28,10 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  orders        Order[]
+  wishlist      Wishlist[]
+  galleryComments GalleryComment[]
+  reviews       Review[]
 
   @@unique([email])
   @@map("user")
@@ -92,6 +97,7 @@ model Category {
   name        String
   slug        String   @unique
   description String?
+  image       String?  // Image for category showcase
   status      String   @default("active") // "active", "inactive"
   posters     Poster[]
   createdAt   DateTime @default(now())
@@ -106,8 +112,11 @@ model Collection {
   slug        String   @unique
   description String?
   image       String?
+  coverImage  String?  // Cover image for collection listing pages
+  isFeatured  Boolean  @default(false)
   status      String   @default("draft") // "active", "draft"
   posters     Poster[]
+  reviews     Review[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -127,6 +136,12 @@ model Poster {
   categoryId   String?
   collection   Collection? @relation(fields: [collectionId], references: [id])
   collectionId String?
+  orderItems   OrderItem[]
+  inWishlists  Wishlist[]
+  isBestseller    Boolean     @default(false)
+  isLimitedEdition Boolean    @default(false)
+  isFeatured      Boolean     @default(false)
+  reviews      Review[]
   status       String      @default("draft") // "active", "draft", "archived"
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
@@ -134,3 +149,123 @@ model Poster {
   @@map("poster")
 }
 
+model CustomerGalleryPost {
+  id           String   @id @default(cuid())
+  userId       String?
+  userName     String
+  userAvatar   String?
+  userLocation String?
+  image        String
+  caption      String
+  posterName   String?
+  likes        Int      @default(0)
+  commentCount Int      @default(0) // Renamed from 'comments' to avoid confusion with relation
+  postComments GalleryComment[]
+  instagramUrl String?
+  status       String   @default("pending") // "pending", "approved", "rejected"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("customer_gallery_post")
+}
+
+model Review {
+  id           String      @id @default(cuid())
+  rating       Int
+  text         String
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posterId     String?
+  poster       Poster?     @relation(fields: [posterId], references: [id])
+  collectionId String?
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+  status       String      @default("pending") // "pending", "approved", "rejected"
+  isFeatured   Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@map("review")
+}
+
+model GalleryComment {
+  id        String   @id @default(cuid())
+  postId    String
+  post      CustomerGalleryPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  text      String
+  createdAt DateTime @default(now())
+
+  @@map("gallery_comment")
+}
+
+model CustomPoster {
+  id        String   @id @default(cuid())
+  userId    String?
+  design    String   // JSON string containing design data
+  price     Float
+  orderItems OrderItem[]
+  status    String   @default("pending") // "pending", "in-progress", "completed"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("custom_poster")
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id])
+  name          String
+  email         String
+  phone         String
+  address       String
+  city          String
+  postalCode    String?
+  country       String
+  total         Float
+  status        String      @default("pending") // "pending", "processing", "completed", "cancelled"
+  paymentMethod String      @default("COD")     // "COD"
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("order")
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String   // Assuming relation to Poster or can be generic
+  poster    Poster   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model OrderItem {
+  id             String        @id @default(cuid())
+  orderId        String
+  order          Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId      String?
+  posterId       String?
+  poster         Poster?       @relation(fields: [posterId], references: [id])
+  customPosterId String?
+  customPoster   CustomPoster? @relation(fields: [customPosterId], references: [id])
+  quantity       Int
+  price          Float
+  size           String
+
+  @@map("order_item")
+}
+
+model PageSection {
+  id        String   @id @default(cuid())
+  key       String   @unique // e.g., "hero", "trending"
+  content   String   // JSON string
+  isActive  Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+
+  @@map("page_section")
+}

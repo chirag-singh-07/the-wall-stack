@@ -1,31 +1,38 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import Image from "next/image"
-import { ArrowRight, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { allProducts } from "@/lib/products"
-import { useCartStore } from "@/lib/cart-store"
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/lib/utils";
+import { allProducts } from "@/lib/products";
+import { useCartStore } from "@/lib/cart-store";
 
 export function CartRecommendations() {
-  const { items, addItem } = useCartStore()
+  const { items, addItem } = useCartStore();
 
   // Get products not in cart
-  const cartProductIds = items.map((item) => item.productId)
-  const recommendations = allProducts.filter((p) => !cartProductIds.includes(p.id)).slice(0, 4)
+  const cartProductIds = items.map((item) => item.productId);
+  const recommendations = allProducts
+    .filter((p) => !cartProductIds.includes(p.id))
+    .slice(0, 4);
 
-  if (recommendations.length === 0) return null
+  if (recommendations.length === 0) return null;
 
   const handleQuickAdd = (productId: string, price: number) => {
-    addItem(productId, "A3 (30×42cm)", price)
-  }
+    addItem(productId, "A3 (30×42cm)", price);
+  };
 
   return (
     <section className="py-12 md:py-16 border-t border-border">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-xl md:text-2xl font-bold">Complete Your Collection</h2>
-          <p className="text-sm text-muted-foreground mt-1">Curated picks that complement your cart</p>
+          <h2 className="text-xl md:text-2xl font-bold">
+            Complete Your Collection
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Curated picks that complement your cart
+          </p>
         </div>
         <Link
           href="/shop"
@@ -48,7 +55,7 @@ export function CartRecommendations() {
             }}
           >
             <Link href={`/shop/${product.id}`}>
-              <div className="relative aspect-[3/4] bg-muted rounded-lg overflow-hidden mb-3">
+              <div className="relative aspect-3/4 bg-muted rounded-lg overflow-hidden mb-3">
                 <Image
                   src={product.image || "/placeholder.svg"}
                   alt={product.title}
@@ -61,11 +68,17 @@ export function CartRecommendations() {
 
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-xs uppercase tracking-[0.1em] text-muted-foreground mb-0.5">{product.category}</p>
+                <p className="text-xs uppercase tracking-[0.1em] text-muted-foreground mb-0.5">
+                  {product.category}
+                </p>
                 <Link href={`/shop/${product.id}`}>
-                  <h3 className="font-medium text-sm truncate hover:underline underline-offset-4">{product.title}</h3>
+                  <h3 className="font-medium text-sm truncate hover:underline underline-offset-4">
+                    {product.title}
+                  </h3>
                 </Link>
-                <p className="text-sm text-muted-foreground mt-0.5">${product.price}</p>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  {formatPrice(product.price)}
+                </p>
               </div>
 
               <Button
@@ -103,5 +116,5 @@ export function CartRecommendations() {
         }
       `}</style>
     </section>
-  )
+  );
 }

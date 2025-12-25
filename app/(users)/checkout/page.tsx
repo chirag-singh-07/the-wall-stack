@@ -1,39 +1,112 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useCartStore } from "@/lib/cart-store"
-import { CheckoutForm } from "@/components/checkout/checkout-form"
-import { PaymentForm } from "@/components/checkout/payment-form"
-import { CheckoutSummary } from "@/components/checkout/checkout-summary"
-import { OrderSuccess } from "@/components/checkout/order-success"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { ChevronRight, ShoppingBag, Lock } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import Link from "next/link";
+import { useCartStore } from "@/lib/cart-store";
+import {
+  CheckoutForm,
+  type CheckoutFormData,
+} from "@/components/checkout/checkout-form";
+import { CheckoutSummary } from "@/components/checkout/checkout-summary";
+import { OrderSuccess } from "@/components/checkout/order-success";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { ChevronRight, ShoppingBag, Lock, Banknote } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { createOrder } from "@/actions/user/checkout-actions";
+import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
 
 export default function CheckoutPage() {
-  const { items, clearCart } = useCartStore()
-  const [shippingMethod, setShippingMethod] = useState("standard")
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [orderComplete, setOrderComplete] = useState(false)
-  const [orderId, setOrderId] = useState("")
+  const { items, clearCart, getCartTotal } = useCartStore();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [orderComplete, setOrderComplete] = useState(false);
+  const [orderId, setOrderId] = useState("");
+
+  const [formData, setFormData] = useState<CheckoutFormData>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    apartment: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "us",
+    shippingMethod: "standard",
+    sameAsBilling: true,
+  });
+
+  const calculateTotal = () => {
+    const subtotal = getCartTotal();
+    let shipping = 9.99;
+    if (formData.shippingMethod === "free" && subtotal >= 75) shipping = 0;
+    if (formData.shippingMethod === "express") shipping = 19.99;
+    if (formData.shippingMethod === "standard") shipping = 9.99;
+
+    // Simple tax calc as per summary
+    const tax = subtotal * 0.08;
+    return subtotal + shipping + tax;
+  };
 
   const handlePlaceOrder = async () => {
-    setIsProcessing(true)
+    // Basic validation
+    if (
+      !formData.firstName ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.address
+    ) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
 
-    // Simulate order processing
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    setIsProcessing(true);
 
-    // Generate order ID
-    const newOrderId = `POS-${Date.now().toString(36).toUpperCase()}`
-    setOrderId(newOrderId)
+    try {
+      // Get session user id if logged in
+      const { data: session } = await authClient.getSession();
 
-    // Clear cart and show success
-    clearCart()
-    setOrderComplete(true)
-    setIsProcessing(false)
-  }
+      const totalPrice = calculateTotal();
+
+      const orderItems = items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.price,
+        size: item.size,
+      }));
+
+      const res = await createOrder({
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        phone: formData.phone,
+        address: `${formData.address} ${
+          formData.apartment ? formData.apartment : ""
+        } ${formData.city}, ${formData.state} ${formData.zip}`,
+        city: formData.city,
+        postalCode: formData.zip,
+        country: formData.country,
+        total: totalPrice,
+        items: orderItems,
+        userId: session?.user?.id,
+      });
+
+      if (res.success && res.data) {
+        setOrderId(res.data.id);
+        clearCart();
+        setOrderComplete(true);
+        toast.success("Order placed successfully!");
+      } else {
+        toast.error(res.error || "Failed to place order");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   if (orderComplete) {
     return (
@@ -44,7 +117,7 @@ export default function CheckoutPage() {
         </main>
         <Footer />
       </>
-    )
+    );
   }
 
   if (items.length === 0) {
@@ -59,7 +132,9 @@ export default function CheckoutPage() {
               </div>
               <div className="space-y-2">
                 <h1 className="text-2xl font-bold">Your cart is empty</h1>
-                <p className="text-muted-foreground">Add some beautiful posters to your cart before checking out.</p>
+                <p className="text-muted-foreground">
+                  Add some beautiful posters to your cart before checking out.
+                </p>
               </div>
               <Button asChild size="lg">
                 <Link href="/shop">Browse Shop</Link>
@@ -69,7 +144,7 @@ export default function CheckoutPage() {
         </main>
         <Footer />
       </>
-    )
+    );
   }
 
   return (
@@ -83,7 +158,10 @@ export default function CheckoutPage() {
               Home
             </Link>
             <ChevronRight className="h-4 w-4" />
-            <Link href="/cart" className="hover:text-foreground transition-colors">
+            <Link
+              href="/cart"
+              className="hover:text-foreground transition-colors"
+            >
               Cart
             </Link>
             <ChevronRight className="h-4 w-4" />
@@ -94,23 +172,60 @@ export default function CheckoutPage() {
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-2">
               <Lock className="h-5 w-5" />
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Secure Checkout</h1>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+                Secure Checkout
+              </h1>
             </div>
-            <p className="text-muted-foreground">Complete your order in just a few steps</p>
+            <p className="text-muted-foreground">
+              Complete your order in just a few steps
+            </p>
           </div>
 
           {/* Checkout Content */}
           <div className="grid lg:grid-cols-3 gap-10">
             {/* Forms */}
             <div className="lg:col-span-2 space-y-10">
-              <CheckoutForm shippingMethod={shippingMethod} onShippingMethodChange={setShippingMethod} />
-              <PaymentForm />
+              <CheckoutForm formData={formData} setFormData={setFormData} />
+
+              {/* Payment Method - COD Only */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center text-sm font-medium">
+                    {/* Previous step was 3 in form, this is conceptually 4 if billing is merged or separate.
+                        In CheckoutForm component, Billing was 4. But we removed payment form. 
+                        Let's just make it clear visually. */}
+                    Payment
+                  </div>
+                  <h2 className="text-lg font-semibold">Payment Method</h2>
+                </div>
+
+                <div className="pl-11">
+                  <div className="p-4 rounded-xl border border-foreground bg-muted/50 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center border">
+                        <Banknote className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Cash on Delivery</p>
+                        <p className="text-sm text-muted-foreground">
+                          Pay when your order arrives
+                        </p>
+                      </div>
+                    </div>
+                    <div className="h-4 w-4 rounded-full border-[5px] border-foreground" />
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Note: We will call you to confirm your order before
+                    shipping.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Summary */}
             <div className="lg:col-span-1">
               <CheckoutSummary
-                shippingMethod={shippingMethod}
+                shippingMethod={formData.shippingMethod}
                 onPlaceOrder={handlePlaceOrder}
                 isProcessing={isProcessing}
               />
@@ -120,5 +235,5 @@ export default function CheckoutPage() {
       </main>
       <Footer />
     </>
-  )
+  );
 }

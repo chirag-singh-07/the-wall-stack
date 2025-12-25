@@ -1,53 +1,91 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
+// Imports fixed
 
-const pressLogos = [
-  { name: "Vogue", logo: "VOGUE" },
-  { name: "Architectural Digest", logo: "AD" },
-  { name: "Elle Decor", logo: "ELLE DECOR" },
-  { name: "Dezeen", logo: "DEZEEN" },
-  { name: "Wallpaper", logo: "WALLPAPER*" },
-  { name: "Dwell", logo: "DWELL" },
-  { name: "Monocle", logo: "MONOCLE" },
-  { name: "Surface", logo: "SURFACE" },
-]
+import { getCategories } from "@/actions/admin/poster-actions";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 export function PressMentions() {
-  const [isVisible, setIsVisible] = useState(false)
-  const sectionRef = useRef<HTMLElement>(null)
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), { threshold: 0.2 })
-    if (sectionRef.current) observer.observe(sectionRef.current)
-    return () => observer.disconnect()
-  }, [])
+    // Fetch categories
+    getCategories().then((res) => {
+      if (res.success && res.data) {
+        // Filter active categories and those with images preferred, or just first 6
+        setCategories(res.data.filter((c: any) => c.status === "active"));
+      }
+      setLoading(false);
+    });
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  if (loading) return null; // Or a skeleton
+
+  if (categories.length === 0) return null;
 
   return (
-    <section ref={sectionRef} className="py-16 bg-background border-y">
+    <section
+      ref={sectionRef}
+      className="py-20 bg-background border-y border-border/40"
+    >
       <div className="container mx-auto px-4">
-        <p
-          className={`text-center text-sm tracking-[0.2em] uppercase text-muted-foreground mb-10 transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          }`}
-        >
-          As Featured In
-        </p>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-heading tracking-tight">
+            Browse by Category
+          </h2>
+          <p className="text-muted-foreground">
+            Explore our curated collections of exclusive posters
+          </p>
+        </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
-          {pressLogos.map((press, index) => (
-            <div
-              key={press.name}
-              className={`text-2xl md:text-3xl font-serif font-bold text-muted-foreground/40 hover:text-foreground transition-all duration-500 cursor-default ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {categories.map((category, index) => (
+            <Link
+              href={`/shop?category=${category.slug}`}
+              key={category.id}
+              className={`group relative aspect-square overflow-hidden rounded-xl bg-muted transition-all duration-700 ${
+                isVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-8"
               }`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              {press.logo}
-            </div>
+              {category.image ? (
+                <Image
+                  src={category.image}
+                  alt={category.name}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-secondary">
+                  <span className="text-4xl opacity-20 font-bold">
+                    {category.name.charAt(0)}
+                  </span>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <h3 className="text-white font-bold text-lg md:text-xl tracking-wide drop-shadow-md transform transition-transform group-hover:scale-105">
+                  {category.name}
+                </h3>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

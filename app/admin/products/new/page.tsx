@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, Loader2, AlertTriangle } from "lucide-react";
 import {
   AlertDialog,
@@ -49,6 +50,9 @@ export default function NewProductPage() {
     stock: "50",
     status: "draft" as "active" | "draft" | "archived",
     images: [] as string[],
+    isBestseller: false,
+    isLimitedEdition: false,
+    isFeatured: false,
   });
 
   useEffect(() => {
@@ -288,6 +292,66 @@ export default function NewProductPage() {
                 The first image will be used as the main thumbnail. High
                 resolution (2:3 or 3:4 ratio) recommended.
               </p>
+            </div>
+
+            <div className="bg-card p-6 rounded-xl border border-border space-y-6">
+              <h3 className="text-lg font-semibold">Attributes</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="isFeatured"
+                    className="flex flex-col gap-1 cursor-pointer"
+                  >
+                    <span>Featured Product</span>
+                    <span className="text-xs font-normal text-muted-foreground">
+                      Show on homepage
+                    </span>
+                  </Label>
+                  <Switch
+                    id="isFeatured"
+                    checked={formData.isFeatured}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, isFeatured: checked })
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="isBestseller"
+                    className="flex flex-col gap-1 cursor-pointer"
+                  >
+                    <span>Bestseller</span>
+                    <span className="text-xs font-normal text-muted-foreground">
+                      Mark as bestseller
+                    </span>
+                  </Label>
+                  <Switch
+                    id="isBestseller"
+                    checked={formData.isBestseller}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, isBestseller: checked })
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="isLimitedEdition"
+                    className="flex flex-col gap-1 cursor-pointer"
+                  >
+                    <span>Limited Edition</span>
+                    <span className="text-xs font-normal text-muted-foreground">
+                      Mark as limited run
+                    </span>
+                  </Label>
+                  <Switch
+                    id="isLimitedEdition"
+                    checked={formData.isLimitedEdition}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, isLimitedEdition: checked })
+                    }
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="bg-card p-6 rounded-xl border border-border space-y-6">

@@ -1,70 +1,113 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useRef, useEffect } from "react"
-import { Check, ChevronDown } from "lucide-react"
+import { useState, useRef, useEffect } from "react";
+import { Check, ChevronDown } from "lucide-react";
 
 const rooms = [
-  { id: "living", name: "Living Room", image: "/modern-minimalist-living-room-white-walls-interior.jpg" },
-  { id: "bedroom", name: "Bedroom", image: "/modern-bedroom-white-walls-scandinavian-interior.jpg" },
-  { id: "office", name: "Home Office", image: "/modern-home-office-white-walls-minimal-interior.jpg" },
-  { id: "dining", name: "Dining Room", image: "/modern-dining-room-white-walls-interior-design.jpg" },
-]
+  {
+    id: "living",
+    name: "Living Room",
+    image: "/modern-minimalist-living-room-white-walls-interior.jpg",
+  },
+  {
+    id: "bedroom",
+    name: "Bedroom",
+    image: "/modern-bedroom-white-walls-scandinavian-interior.jpg",
+  },
+  {
+    id: "office",
+    name: "Home Office",
+    image: "/modern-home-office-white-walls-minimal-interior.jpg",
+  },
+  {
+    id: "dining",
+    name: "Dining Room",
+    image: "/modern-dining-room-white-walls-interior-design.jpg",
+  },
+];
 
 const posters = [
-  { id: 1, name: "Abstract Lines", image: "/abstract-black-white-lines-poster-art.jpg" },
-  { id: 2, name: "Mountain Vista", image: "/mountain-black-white-minimalist-poster.jpg" },
-  { id: 3, name: "Ocean Waves", image: "/ocean-waves-black-white-poster-art.jpg" },
-  { id: 4, name: "City Grid", image: "/city-grid-black-white-architecture-poster.jpg" },
-  { id: 5, name: "Botanical", image: "/botanical-leaves-black-white-poster-art.jpg" },
-  { id: 6, name: "Typography", image: "/typography-black-white-motivational-poster.jpg" },
-]
+  {
+    id: 1,
+    name: "Abstract Lines",
+    image: "/abstract-black-white-lines-poster-art.jpg",
+  },
+  {
+    id: 2,
+    name: "Mountain Vista",
+    image: "/mountain-black-white-minimalist-poster.jpg",
+  },
+  {
+    id: 3,
+    name: "Ocean Waves",
+    image: "/ocean-waves-black-white-poster-art.jpg",
+  },
+  {
+    id: 4,
+    name: "City Grid",
+    image: "/city-grid-black-white-architecture-poster.jpg",
+  },
+  {
+    id: 5,
+    name: "Botanical",
+    image: "/botanical-leaves-black-white-poster-art.jpg",
+  },
+  {
+    id: 6,
+    name: "Typography",
+    image: "/typography-black-white-motivational-poster.jpg",
+  },
+];
 
 const frames = [
   { id: "black", name: "Black", color: "#000000" },
   { id: "white", name: "White", color: "#FFFFFF" },
   { id: "natural", name: "Natural Oak", color: "#D4A574" },
   { id: "none", name: "No Frame", color: "transparent" },
-]
+];
 
 const sizes = [
   { id: "small", name: "Small", width: 80, height: 110 },
   { id: "medium", name: "Medium", width: 120, height: 160 },
   { id: "large", name: "Large", width: 160, height: 220 },
-]
+];
 
 export function RoomVisualizer() {
-  const [selectedRoom, setSelectedRoom] = useState(rooms[0])
-  const [selectedPoster, setSelectedPoster] = useState(posters[0])
-  const [selectedFrame, setSelectedFrame] = useState(frames[0])
-  const [selectedSize, setSelectedSize] = useState(sizes[1])
-  const [posterPosition, setPosterPosition] = useState({ x: 50, y: 40 })
-  const [isDragging, setIsDragging] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
-  const [showRoomDropdown, setShowRoomDropdown] = useState(false)
-  const sectionRef = useRef<HTMLElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [selectedRoom, setSelectedRoom] = useState(rooms[0]);
+  const [selectedPoster, setSelectedPoster] = useState(posters[0]);
+  const [selectedFrame, setSelectedFrame] = useState(frames[0]);
+  const [selectedSize, setSelectedSize] = useState(sizes[1]);
+  const [posterPosition, setPosterPosition] = useState({ x: 50, y: 40 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [showRoomDropdown, setShowRoomDropdown] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), { threshold: 0.2 })
-    if (sectionRef.current) observer.observe(sectionRef.current)
-    return () => observer.disconnect()
-  }, [])
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.2 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
 
-  const handleMouseDown = () => setIsDragging(true)
-  const handleMouseUp = () => setIsDragging(false)
+  const handleMouseDown = () => setIsDragging(true);
+  const handleMouseUp = () => setIsDragging(false);
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !containerRef.current) return
-    const rect = containerRef.current.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width) * 100
-    const y = ((e.clientY - rect.top) / rect.height) * 100
+    if (!isDragging || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
     setPosterPosition({
       x: Math.max(10, Math.min(90, x)),
       y: Math.max(10, Math.min(80, y)),
-    })
-  }
+    });
+  };
 
   return (
     <section ref={sectionRef} className="py-24 bg-background">
@@ -77,7 +120,9 @@ export function RoomVisualizer() {
           <span className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-4 block">
             Preview in Your Space
           </span>
-          <h2 className="text-4xl md:text-6xl font-bold mb-4">Room Visualizer</h2>
+          <h2 className="text-4xl md:text-6xl font-bold mb-4">
+            Room Visualizer
+          </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             See how your poster looks in different rooms. Drag to reposition.
           </p>
@@ -87,7 +132,9 @@ export function RoomVisualizer() {
           {/* Room Preview */}
           <div
             className={`lg:col-span-2 transition-all duration-1000 delay-200 ${
-              isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
+              isVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 -translate-x-10"
             }`}
           >
             <div
@@ -122,7 +169,10 @@ export function RoomVisualizer() {
                   style={{
                     padding: selectedFrame.id === "none" ? 0 : 8,
                     backgroundColor: selectedFrame.color,
-                    border: selectedFrame.id === "white" ? "1px solid #e5e5e5" : "none",
+                    border:
+                      selectedFrame.id === "white"
+                        ? "1px solid #e5e5e5"
+                        : "none",
                   }}
                 >
                   <img
@@ -148,7 +198,9 @@ export function RoomVisualizer() {
           {/* Controls */}
           <div
             className={`space-y-6 transition-all duration-1000 delay-400 ${
-              isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+              isVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 translate-x-10"
             }`}
           >
             {/* Room Selector */}
@@ -160,7 +212,11 @@ export function RoomVisualizer() {
                   className="w-full flex items-center justify-between px-4 py-3 border rounded-lg hover:border-foreground/50 transition-colors"
                 >
                   <span>{selectedRoom.name}</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${showRoomDropdown ? "rotate-180" : ""}`} />
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${
+                      showRoomDropdown ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
                 {showRoomDropdown && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-lg shadow-lg z-10 overflow-hidden">
@@ -168,13 +224,15 @@ export function RoomVisualizer() {
                       <button
                         key={room.id}
                         onClick={() => {
-                          setSelectedRoom(room)
-                          setShowRoomDropdown(false)
+                          setSelectedRoom(room);
+                          setShowRoomDropdown(false);
                         }}
                         className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors"
                       >
                         <span>{room.name}</span>
-                        {selectedRoom.id === room.id && <Check className="w-4 h-4" />}
+                        {selectedRoom.id === room.id && (
+                          <Check className="w-4 h-4" />
+                        )}
                       </button>
                     ))}
                   </div>
@@ -220,12 +278,18 @@ export function RoomVisualizer() {
                     key={frame.id}
                     onClick={() => setSelectedFrame(frame)}
                     className={`w-10 h-10 rounded-full border-2 transition-all ${
-                      selectedFrame.id === frame.id ? "ring-2 ring-foreground ring-offset-2" : "hover:scale-110"
+                      selectedFrame.id === frame.id
+                        ? "ring-2 ring-foreground ring-offset-2"
+                        : "hover:scale-110"
                     }`}
                     style={{
                       backgroundColor: frame.color,
                       borderColor:
-                        frame.id === "white" ? "#e5e5e5" : frame.color === "transparent" ? "#e5e5e5" : frame.color,
+                        frame.id === "white"
+                          ? "#e5e5e5"
+                          : frame.color === "transparent"
+                          ? "#e5e5e5"
+                          : frame.color,
                     }}
                     title={frame.name}
                   />
@@ -255,11 +319,11 @@ export function RoomVisualizer() {
 
             {/* Add to Cart */}
             <button className="w-full py-4 bg-foreground text-background font-medium rounded-lg hover:bg-foreground/90 transition-all hover:scale-[1.02] active:scale-[0.98]">
-              Add to Cart - $49
+              Add to Cart - ₹499
             </button>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

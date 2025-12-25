@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Package,
@@ -16,10 +16,13 @@ import {
   LogOut,
   ChevronLeft,
   Menu,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+  Image,
+  FileText,
+  Star,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -29,12 +32,21 @@ const navItems = [
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/custom-orders", label: "Custom Orders", icon: Palette },
+  { href: "/admin/reviews", label: "Reviews", icon: Star },
+  { href: "/admin/gallery", label: "Gallery", icon: Image },
+  { href: "/admin/cms", label: "Content", icon: FileText },
   { href: "/admin/sales", label: "Sales", icon: TrendingUp },
   { href: "/admin/profile", label: "Profile", icon: User },
-]
+];
 
-function SidebarContent({ collapsed, onCollapse }: { collapsed: boolean; onCollapse?: () => void }) {
-  const pathname = usePathname()
+function SidebarContent({
+  collapsed,
+  onCollapse,
+}: {
+  collapsed: boolean;
+  onCollapse?: () => void;
+}) {
+  const pathname = usePathname();
 
   return (
     <div className="flex h-full flex-col bg-foreground text-background">
@@ -68,7 +80,9 @@ function SidebarContent({ collapsed, onCollapse }: { collapsed: boolean; onColla
       {/* Navigation */}
       <nav className="flex-1 space-y-1 p-3">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href))
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/admin" && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}
@@ -77,13 +91,13 @@ function SidebarContent({ collapsed, onCollapse }: { collapsed: boolean; onColla
                 "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
                   ? "bg-background text-foreground"
-                  : "text-background/70 hover:bg-background/10 hover:text-background",
+                  : "text-background/70 hover:bg-background/10 hover:text-background"
               )}
             >
               <item.icon className="h-5 w-5 shrink-0" />
               {!collapsed && <span>{item.label}</span>}
             </Link>
-          )
+          );
         })}
       </nav>
 
@@ -98,22 +112,29 @@ function SidebarContent({ collapsed, onCollapse }: { collapsed: boolean; onColla
         </Link>
       </div>
     </div>
-  )
+  );
 }
 
 export function AdminSidebar() {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <>
       {/* Mobile Sidebar */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="fixed left-4 top-4 z-50 lg:hidden bg-transparent">
+          <Button
+            variant="outline"
+            size="icon"
+            className="fixed left-4 top-4 z-50 lg:hidden bg-transparent"
+          >
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0 bg-foreground border-none">
+        <SheetContent
+          side="left"
+          className="w-64 p-0 bg-foreground border-none"
+        >
           <SidebarContent collapsed={false} />
         </SheetContent>
       </Sheet>
@@ -122,10 +143,13 @@ export function AdminSidebar() {
       <aside
         className={cn(
           "fixed left-0 top-0 z-40 hidden h-screen border-r border-border transition-all duration-300 lg:block",
-          collapsed ? "w-16" : "w-64",
+          collapsed ? "w-16" : "w-64"
         )}
       >
-        <SidebarContent collapsed={collapsed} onCollapse={() => setCollapsed(!collapsed)} />
+        <SidebarContent
+          collapsed={collapsed}
+          onCollapse={() => setCollapsed(!collapsed)}
+        />
         {collapsed && (
           <Button
             variant="ghost"
@@ -138,5 +162,5 @@ export function AdminSidebar() {
         )}
       </aside>
     </>
-  )
+  );
 }

@@ -78,6 +78,7 @@ export default function RegisterPage() {
     toast.success(
       "Registration successful! Please check your email to verify your account."
     );
+
     router.push("/verify-email"); // or "/login"
   };
 

@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 export default function EditCollectionPage({
   params,
@@ -39,6 +40,8 @@ export default function EditCollectionPage({
     title: "",
     description: "",
     image: "",
+    coverImage: "",
+    isFeatured: false,
     status: "draft" as "active" | "draft",
   });
 
@@ -51,6 +54,8 @@ export default function EditCollectionPage({
           title: res?.data?.title || "",
           description: res?.data?.description || "",
           image: res?.data?.image || "",
+          coverImage: res?.data?.coverImage || "",
+          isFeatured: res?.data?.isFeatured || false,
           status: res?.data?.status as any,
         });
       } else {
@@ -99,9 +104,58 @@ export default function EditCollectionPage({
         </Button>
 
         <form onSubmit={handleSubmit} className="max-w-2xl space-y-8">
-          {/* Image Upload */}
+          {/* Cover Image Upload (New) */}
           <div className="space-y-2">
-            <Label>Collection Cover Image</Label>
+            <Label>Cover Image (For Collection Listing)</Label>
+            <div className="flex items-start gap-4">
+              <div className="relative h-40 w-64 overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted">
+                {formData.coverImage ? (
+                  <>
+                    <Image
+                      src={formData.coverImage || "/placeholder.svg"}
+                      alt="Preview"
+                      fill
+                      className="object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="icon"
+                      className="absolute right-1 top-1 h-6 w-6"
+                      onClick={() =>
+                        setFormData({ ...formData, coverImage: "" })
+                      }
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </>
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
+                    <Upload className="mb-2 h-8 w-8" />
+                    <span className="text-xs">Upload Cover</span>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Input
+                  type="url"
+                  placeholder="Paste cover image URL..."
+                  value={formData.coverImage || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, coverImage: e.target.value })
+                  }
+                  className="w-64"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Landscape 4:3 Ratio Recommended
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Banner Image Upload */}
+          <div className="space-y-2">
+            <Label>Banner Image (For Collection Detail)</Label>
             <div className="flex items-start gap-4">
               <div className="relative h-40 w-64 overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted">
                 {formData.image ? (
@@ -125,7 +179,7 @@ export default function EditCollectionPage({
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
                     <Upload className="mb-2 h-8 w-8" />
-                    <span className="text-xs">Upload Image</span>
+                    <span className="text-xs">Upload Banner</span>
                   </div>
                 )}
               </div>
@@ -187,6 +241,17 @@ export default function EditCollectionPage({
                 <SelectItem value="active">Active</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="isFeatured"
+              checked={formData.isFeatured}
+              onCheckedChange={(checked: boolean) =>
+                setFormData({ ...formData, isFeatured: checked })
+              }
+            />
+            <Label htmlFor="isFeatured">Featured Collection</Label>
           </div>
 
           {/* Actions */}

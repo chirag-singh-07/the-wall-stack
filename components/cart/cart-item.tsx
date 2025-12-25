@@ -1,21 +1,22 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { Trash2, Plus, Minus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useCartStore, type CartItem as CartItemType } from "@/lib/cart-store"
-import { allProducts } from "@/lib/products"
+import Image from "next/image";
+import Link from "next/link";
+import { Trash2, Plus, Minus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/lib/utils";
+import { useCartStore, type CartItem as CartItemType } from "@/lib/cart-store";
+import { allProducts } from "@/lib/products";
 
 interface CartItemProps {
-  item: CartItemType
+  item: CartItemType;
 }
 
 export function CartItem({ item }: CartItemProps) {
-  const { updateQuantity, removeItem } = useCartStore()
-  const product = allProducts.find((p) => p.id === item.productId)
+  const { updateQuantity, removeItem } = useCartStore();
+  const product = allProducts.find((p) => p.id === item.productId);
 
-  if (!product) return null
+  if (!product) return null;
 
   return (
     <div className="flex gap-4 md:gap-6 py-6 border-b border-border group">
@@ -37,7 +38,9 @@ export function CartItem({ item }: CartItemProps) {
         <div className="space-y-1">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <span className="text-xs uppercase tracking-[0.15em] text-muted-foreground">{product.category}</span>
+              <span className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
+                {product.category}
+              </span>
               <Link href={`/shop/${product.id}`}>
                 <h3 className="font-medium text-sm md:text-base hover:underline underline-offset-4 truncate">
                   {product.title}
@@ -61,15 +64,21 @@ export function CartItem({ item }: CartItemProps) {
           {/* Quantity Controls */}
           <div className="flex items-center border rounded-lg">
             <button
-              onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)}
+              onClick={() =>
+                updateQuantity(item.productId, item.size, item.quantity - 1)
+              }
               className="p-2 hover:bg-muted transition-colors"
               aria-label="Decrease quantity"
             >
               <Minus className="h-3 w-3" />
             </button>
-            <span className="px-3 min-w-[2.5rem] text-center text-sm font-medium">{item.quantity}</span>
+            <span className="px-3 min-w-[2.5rem] text-center text-sm font-medium">
+              {item.quantity}
+            </span>
             <button
-              onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)}
+              onClick={() =>
+                updateQuantity(item.productId, item.size, item.quantity + 1)
+              }
               className="p-2 hover:bg-muted transition-colors"
               aria-label="Increase quantity"
             >
@@ -79,11 +88,17 @@ export function CartItem({ item }: CartItemProps) {
 
           {/* Price */}
           <div className="text-right">
-            <p className="font-medium">${item.price * item.quantity}</p>
-            {item.quantity > 1 && <p className="text-xs text-muted-foreground">${item.price} each</p>}
+            <p className="font-medium">
+              {formatPrice(item.price * item.quantity)}
+            </p>
+            {item.quantity > 1 && (
+              <p className="text-xs text-muted-foreground">
+                {formatPrice(item.price)} each
+              </p>
+            )}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

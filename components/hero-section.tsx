@@ -1,35 +1,45 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, ArrowDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, ArrowDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export function HeroSection() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+interface HeroSectionProps {
+  content?: {
+    title?: string;
+    subtitle?: string;
+    ctaText?: string;
+    ctaLink?: string;
+    image?: string;
+  };
+}
+
+export function HeroSection({ content }: HeroSectionProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    setIsVisible(true)
+    setIsVisible(true);
 
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({
         x: (e.clientX / window.innerWidth - 0.5) * 20,
         y: (e.clientY / window.innerHeight - 0.5) * 20,
-      })
-    }
+      });
+    };
 
-    window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [])
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   const scrollToNextSection = () => {
     window.scrollTo({
       top: window.innerHeight,
       behavior: "smooth",
-    })
-  }
+    });
+  };
 
   return (
     <section className="min-h-screen flex items-center pt-20 relative overflow-hidden">
@@ -49,48 +59,53 @@ export function HeroSection() {
             <div
               className={cn(
                 "w-12 h-1 bg-foreground mb-8 transition-all duration-1000",
-                isVisible ? "opacity-100 w-12" : "opacity-0 w-0",
+                isVisible ? "opacity-100 w-12" : "opacity-0 w-0"
               )}
             />
             <h1
               className={cn(
                 "text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tighter leading-[0.9] text-balance transition-all duration-700",
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+                isVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-8"
               )}
-            >
-              Art for
-              <br />
-              <span className="relative">
-                your walls.
-                <span
-                  className={cn(
-                    "absolute bottom-2 left-0 h-3 bg-foreground/10 transition-all duration-1000 delay-700",
-                    isVisible ? "w-full" : "w-0",
-                  )}
-                />
-              </span>
-            </h1>
+              dangerouslySetInnerHTML={{
+                __html: content?.title || "Art for<br />your walls.",
+              }}
+            />
             <p
               className={cn(
                 "mt-6 text-lg md:text-xl text-muted-foreground max-w-md transition-all duration-700 delay-150",
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+                isVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-8"
               )}
             >
-              Premium posters crafted for design enthusiasts. Transform any space with our curated collection.
+              {content?.subtitle ||
+                "Premium posters crafted for design enthusiasts. Transform any space with our curated collection."}
             </p>
             <div
               className={cn(
                 "mt-8 flex flex-col sm:flex-row gap-4 transition-all duration-700 delay-300",
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+                isVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-8"
               )}
             >
-              <Button size="lg" className="group h-14 px-10 text-base relative overflow-hidden">
+              <Button
+                size="lg"
+                className="group h-14 px-10 text-base relative overflow-hidden"
+              >
                 <span className="relative z-10 flex items-center">
-                  Shop Posters
+                  {content?.ctaText || "Shop Posters"}
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </span>
               </Button>
-              <Button variant="outline" size="lg" className="h-14 px-10 text-base bg-transparent group">
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-14 px-10 text-base bg-transparent group"
+              >
                 <span className="relative">
                   Explore Collections
                   <span className="absolute bottom-0 left-0 w-0 h-px bg-foreground group-hover:w-full transition-all duration-300" />
@@ -101,7 +116,9 @@ export function HeroSection() {
             <div
               className={cn(
                 "mt-12 flex items-center gap-8 transition-all duration-700 delay-500",
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+                isVisible
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-8"
               )}
             >
               <div className="text-sm">
@@ -119,18 +136,26 @@ export function HeroSection() {
           <div
             className={cn(
               "order-1 lg:order-2 transition-all duration-1000 delay-500",
-              isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-12 scale-95",
+              isVisible
+                ? "opacity-100 translate-y-0 scale-100"
+                : "opacity-0 translate-y-12 scale-95"
             )}
             style={{
-              transform: isVisible ? `translate(${mousePosition.x * 0.5}px, ${mousePosition.y * 0.5}px)` : undefined,
+              transform: isVisible
+                ? `translate(${mousePosition.x * 0.5}px, ${
+                    mousePosition.y * 0.5
+                  }px)`
+                : undefined,
             }}
           >
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-4">
                 <div
-                  className="relative aspect-[3/4] overflow-hidden bg-muted rounded-lg group"
+                  className="relative aspect-3/4 overflow-hidden bg-muted rounded-lg group"
                   style={{
-                    transform: `translate(${mousePosition.x * -0.3}px, ${mousePosition.y * -0.3}px)`,
+                    transform: `translate(${mousePosition.x * -0.3}px, ${
+                      mousePosition.y * -0.3
+                    }px)`,
                   }}
                 >
                   <Image
@@ -144,7 +169,9 @@ export function HeroSection() {
                 <div
                   className="relative aspect-square overflow-hidden bg-muted rounded-lg group"
                   style={{
-                    transform: `translate(${mousePosition.x * 0.2}px, ${mousePosition.y * 0.2}px)`,
+                    transform: `translate(${mousePosition.x * 0.2}px, ${
+                      mousePosition.y * 0.2
+                    }px)`,
                   }}
                 >
                   <Image
@@ -160,7 +187,9 @@ export function HeroSection() {
                 <div
                   className="relative aspect-square overflow-hidden bg-muted rounded-lg group"
                   style={{
-                    transform: `translate(${mousePosition.x * -0.2}px, ${mousePosition.y * -0.2}px)`,
+                    transform: `translate(${mousePosition.x * -0.2}px, ${
+                      mousePosition.y * -0.2
+                    }px)`,
                   }}
                 >
                   <Image
@@ -172,9 +201,11 @@ export function HeroSection() {
                   <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-all duration-500" />
                 </div>
                 <div
-                  className="relative aspect-[3/4] overflow-hidden bg-muted rounded-lg group"
+                  className="relative aspect-3/4 overflow-hidden bg-muted rounded-lg group"
                   style={{
-                    transform: `translate(${mousePosition.x * 0.3}px, ${mousePosition.y * 0.3}px)`,
+                    transform: `translate(${mousePosition.x * 0.3}px, ${
+                      mousePosition.y * 0.3
+                    }px)`,
                   }}
                 >
                   <Image
@@ -195,12 +226,12 @@ export function HeroSection() {
         onClick={scrollToNextSection}
         className={cn(
           "absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-700 delay-1000 cursor-pointer",
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}
       >
         <span className="text-xs tracking-widest uppercase">Scroll</span>
         <ArrowDown className="h-4 w-4 animate-bounce" />
       </button>
     </section>
-  )
+  );
 }
