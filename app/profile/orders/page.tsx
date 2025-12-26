@@ -1,32 +1,43 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Package, Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { ProfileSidebar } from "@/components/profile/profile-sidebar"
-import { ProfileHeader } from "@/components/profile/profile-header"
-import { OrderCard } from "@/components/profile/order-card"
-import { useUserStore } from "@/lib/user-store"
-import { cn } from "@/lib/utils"
+import { useState } from "react";
+import { Package, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ProfileSidebar } from "@/components/profile/profile-sidebar";
+import { ProfileHeader } from "@/components/profile/profile-header";
+import { OrderCard } from "@/components/profile/order-card";
+import { useUserStore } from "@/lib/user-store";
+import { cn } from "@/lib/utils";
+import { Navbar } from "@/components/navbar";
 
-const filterOptions = ["All", "Processing", "Shipped", "Delivered", "Cancelled"]
+const filterOptions = [
+  "All",
+  "Processing",
+  "Shipped",
+  "Delivered",
+  "Cancelled",
+];
 
 export default function OrdersPage() {
-  const { orders } = useUserStore()
-  const [activeFilter, setActiveFilter] = useState("All")
-  const [searchQuery, setSearchQuery] = useState("")
+  const { orders } = useUserStore();
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredOrders = orders.filter((order) => {
-    const matchesFilter = activeFilter === "All" || order.status === activeFilter.toLowerCase()
+    const matchesFilter =
+      activeFilter === "All" || order.status === activeFilter.toLowerCase();
     const matchesSearch =
       order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.items.some((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase()))
-    return matchesFilter && matchesSearch
-  })
+      order.items.some((item) =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    return matchesFilter && matchesSearch;
+  });
 
   return (
     <main className="min-h-screen bg-background pt-24 pb-16">
+      <Navbar />
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col lg:flex-row gap-8">
           <ProfileSidebar />
@@ -57,7 +68,10 @@ export default function OrdersPage() {
                     variant={activeFilter === filter ? "default" : "outline"}
                     size="sm"
                     onClick={() => setActiveFilter(filter)}
-                    className={cn("whitespace-nowrap", activeFilter === filter ? "" : "bg-transparent")}
+                    className={cn(
+                      "whitespace-nowrap",
+                      activeFilter === filter ? "" : "bg-transparent"
+                    )}
                   >
                     {filter}
                   </Button>
@@ -90,5 +104,5 @@ export default function OrdersPage() {
         </div>
       </div>
     </main>
-  )
+  );
 }

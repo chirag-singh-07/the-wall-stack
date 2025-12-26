@@ -37,43 +37,40 @@ export async function createOrder(data: CreateOrderInput) {
         status: "pending",
         paymentMethod: "COD",
         items: {
-          create: data.items.map((item) => {
-            // Determine if it's a regular poster or custom poster based on ID prefix or check
-            // For now, we'll try to connect to Poster if it exists, otherwise assume CustomPoster
-            // or just store the IDs. But relation requires valid ID.
-            // A safer way if IDs are distinct:
-            const isCustom = item.productId.startsWith("cus_"); // Assuming custom posters might have a prefix or we check DB.
-            // Actually, the cart store puts 'productId' which matches schema IDs.
+          create: await Promise.all(
+            data.items.map(async (item) => {
+              // Check if it's a valid Poster in DB to avoid foreign key violation
+              const posterExists = await prisma.poster.findUnique({
+                where: { id: item.productId },
+                select: { id: true },
+              });
 
-            // Simplification: We will store the ID in specific field if we can map it.
-            // But prisma create needs explicit connection.
-            // If we can't guarantee existence (e.g. deleted), we might need to be careful.
-            // Let's assume standard Posters for now. Custom Posters might need logic.
-
-            // To handle both, we should check what 'productId' is.
-            // For this implementation, I'll link to `posterId` if possible.
-
-            return {
-              quantity: item.quantity,
-              price: item.price,
-              size: item.size,
-              // We will try to link to Poster. If it fails, it might be an issue.
-              // Ideally we should know the type.
-              // Let's rely on the cart assuming it passes valid Poster IDs.
-              // If it's a custom poster, we need to know.
-              // I'll add logic to check if it's a custom poster later or assume regular for now.
-              posterId: item.productId,
-            };
-          }),
+              return {
+                quantity: item.quantity,
+                price: item.price,
+                size: item.size,
+                productId: item.productId, // Always store the plain ID
+                posterId: posterExists ? item.productId : null, // Only link if exists
+                customPosterId: item.productId.startsWith("cus_")
+                  ? item.productId
+                  : null,
+              };
+            })
+          ),
         },
       },
     });
 
-    revalidatePath("/admin/orders");
-    return { success: true, data: order };
-  } catch (error) {
+    return {
+      success: true,
+      data: { id: order.id }, // Return just the ID or necessary data
+    };
+  } catch (error: any) {
     console.error("Failed to create order:", error);
-    return { success: false, error: "Failed to create order" };
+    return {
+      success: false,
+      error: error?.message || "Failed to create order. Please try again.",
+    };
   }
 }
 

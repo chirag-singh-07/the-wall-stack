@@ -50,7 +50,7 @@ export function ReviewForm({
     const result = await createReview({
       userId: user.id,
       rating,
-      comment,
+      text: comment,
       productId,
       collectionId,
     });

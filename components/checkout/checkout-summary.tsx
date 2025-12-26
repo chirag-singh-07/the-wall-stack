@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tag, Check, Truck, Shield, RotateCcw, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 interface CheckoutSummaryProps {
   shippingMethod: string;
@@ -76,7 +76,7 @@ export function CheckoutSummary({
                 <p className="font-medium text-sm truncate">{details.title}</p>
                 <p className="text-xs text-muted-foreground">{item.size}</p>
                 <p className="text-sm font-medium mt-1">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  {formatPrice(item.price * item.quantity)}
                 </p>
               </div>
             </div>

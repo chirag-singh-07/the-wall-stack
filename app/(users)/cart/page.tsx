@@ -1,25 +1,26 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { ChevronRight, ArrowLeft } from "lucide-react"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { CartItem } from "@/components/cart/cart-item"
-import { OrderSummary } from "@/components/cart/order-summary"
-import { EmptyCart } from "@/components/cart/empty-cart"
-import { CartRecommendations } from "@/components/cart/cart-recommendations"
-import { useCartStore } from "@/lib/cart-store"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ChevronRight, ArrowLeft } from "lucide-react";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { CartItem } from "@/components/cart/cart-item";
+import { OrderSummary } from "@/components/cart/order-summary";
+import { EmptyCart } from "@/components/cart/empty-cart";
+import { CartRecommendations } from "@/components/cart/cart-recommendations";
+import { useCartStore } from "@/lib/cart-store";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function CartPage() {
-  const { items, clearCart } = useCartStore()
-  const [mounted, setMounted] = useState(false)
+  const { items, clearCart } = useCartStore();
+  const [mounted, setMounted] = useState(false);
 
   // Handle hydration mismatch
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
     return (
@@ -42,10 +43,10 @@ export default function CartPage() {
         </div>
         <Footer />
       </main>
-    )
+    );
   }
 
-  const isEmpty = items.length === 0
+  const isEmpty = items.length === 0;
 
   return (
     <main className="min-h-screen bg-background">
@@ -69,16 +70,22 @@ export default function CartPage() {
               {/* Header */}
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Shopping Cart</h1>
+                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+                    Shopping Cart
+                  </h1>
                   <p className="text-muted-foreground mt-1">
-                    {items.length} {items.length === 1 ? "item" : "items"} in your cart
+                    {items.length} {items.length === 1 ? "item" : "items"} in
+                    your cart
                   </p>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="text-muted-foreground hover:text-destructive"
-                  onClick={clearCart}
+                  onClick={() => {
+                    clearCart();
+                    toast.success("Cart cleared");
+                  }}
                 >
                   Clear Cart
                 </Button>
@@ -90,7 +97,10 @@ export default function CartPage() {
                 <div className="lg:col-span-2">
                   <div className="border-t border-border">
                     {items.map((item) => (
-                      <CartItem key={`${item.productId}-${item.size}`} item={item} />
+                      <CartItem
+                        key={`${item.productId}-${item.size}`}
+                        item={item}
+                      />
                     ))}
                   </div>
 
@@ -120,5 +130,5 @@ export default function CartPage() {
 
       <Footer />
     </main>
-  )
+  );
 }

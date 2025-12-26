@@ -6,12 +6,12 @@ import { revalidatePath } from "next/cache";
 export async function createReview(data: {
   userId: string;
   rating: number;
-  comment?: string;
+  text: string;
   productId?: string;
   collectionId?: string;
 }) {
   try {
-    const { userId, rating, comment, productId, collectionId } = data;
+    const { userId, rating, text, productId, collectionId } = data;
 
     if (!productId && !collectionId) {
       return { success: false, error: "Product or Collection ID is required" };
@@ -21,8 +21,8 @@ export async function createReview(data: {
       data: {
         userId,
         rating,
-        comment,
-        productId,
+        text,
+        posterId: productId,
         collectionId,
         status: "pending", // Reviews default to pending moderation
       },
@@ -43,7 +43,7 @@ export async function getReviews(
 ) {
   try {
     const whereClause =
-      type === "product" ? { productId: targetId } : { collectionId: targetId };
+      type === "product" ? { posterId: targetId } : { collectionId: targetId };
 
     const reviews = await db.review.findMany({
       where: {
@@ -81,7 +81,7 @@ export async function getAllReviews() {
             email: true,
           },
         },
-        product: {
+        poster: {
           select: {
             title: true,
           },

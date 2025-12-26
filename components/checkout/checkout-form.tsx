@@ -21,7 +21,7 @@ import {
   Truck,
   Zap,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 export interface CheckoutFormData {
   firstName: string;
@@ -41,9 +41,14 @@ export interface CheckoutFormData {
 interface CheckoutFormProps {
   formData: CheckoutFormData;
   setFormData: (data: CheckoutFormData) => void;
+  errors?: Partial<Record<keyof CheckoutFormData, string>>;
 }
 
-export function CheckoutForm({ formData, setFormData }: CheckoutFormProps) {
+export function CheckoutForm({
+  formData,
+  setFormData,
+  errors = {},
+}: CheckoutFormProps) {
   const handleChange = (field: keyof CheckoutFormData, value: any) => {
     setFormData({ ...formData, [field]: value });
   };
@@ -72,10 +77,18 @@ export function CheckoutForm({ formData, setFormData }: CheckoutFormProps) {
               <Input
                 id="firstName"
                 placeholder="John"
-                className="bg-background"
+                className={cn(
+                  "bg-background",
+                  errors.firstName && "border-destructive"
+                )}
                 value={formData.firstName}
                 onChange={(e) => handleChange("firstName", e.target.value)}
               />
+              {errors.firstName && (
+                <p className="text-xs text-destructive mt-1">
+                  {errors.firstName}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastName" className="text-sm">
@@ -100,10 +113,16 @@ export function CheckoutForm({ formData, setFormData }: CheckoutFormProps) {
               id="email"
               type="email"
               placeholder="john@example.com"
-              className="bg-background"
+              className={cn(
+                "bg-background",
+                errors.email && "border-destructive"
+              )}
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
             />
+            {errors.email && (
+              <p className="text-xs text-destructive mt-1">{errors.email}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -144,10 +163,16 @@ export function CheckoutForm({ formData, setFormData }: CheckoutFormProps) {
             <Input
               id="address"
               placeholder="123 Main Street"
-              className="bg-background"
+              className={cn(
+                "bg-background",
+                errors.address && "border-destructive"
+              )}
               value={formData.address}
               onChange={(e) => handleChange("address", e.target.value)}
             />
+            {errors.address && (
+              <p className="text-xs text-destructive mt-1">{errors.address}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -278,7 +303,7 @@ export function CheckoutForm({ formData, setFormData }: CheckoutFormProps) {
                   </div>
                 </div>
               </div>
-              <span className="font-medium">$9.99</span>
+              <span className="font-medium">{formatPrice(9.99)}</span>
             </label>
 
             <label
@@ -304,7 +329,7 @@ export function CheckoutForm({ formData, setFormData }: CheckoutFormProps) {
                   </div>
                 </div>
               </div>
-              <span className="font-medium">$19.99</span>
+              <span className="font-medium">{formatPrice(19.99)}</span>
             </label>
 
             <label

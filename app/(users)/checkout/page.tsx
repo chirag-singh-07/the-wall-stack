@@ -22,6 +22,9 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState("");
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof CheckoutFormData, string>>
+  >({});
 
   const [formData, setFormData] = useState<CheckoutFormData>({
     firstName: "",
@@ -40,27 +43,35 @@ export default function CheckoutPage() {
 
   const calculateTotal = () => {
     const subtotal = getCartTotal();
-    let shipping = 9.99;
-    if (formData.shippingMethod === "free" && subtotal >= 75) shipping = 0;
-    if (formData.shippingMethod === "express") shipping = 19.99;
-    if (formData.shippingMethod === "standard") shipping = 9.99;
+    let shipping = 99; // Base shipping in INR
+    if (formData.shippingMethod === "free" && subtotal >= 2999) shipping = 0;
+    if (formData.shippingMethod === "express") shipping = 199;
+    if (formData.shippingMethod === "standard") shipping = 99;
 
     // Simple tax calc as per summary
-    const tax = subtotal * 0.08;
+    const tax = subtotal * 0.18; // 18% GST for India
     return subtotal + shipping + tax;
   };
 
   const handlePlaceOrder = async () => {
-    // Basic validation
-    if (
-      !formData.firstName ||
-      !formData.email ||
-      !formData.phone ||
-      !formData.address
-    ) {
-      toast.error("Please fill in all required fields");
+    // Validation
+    const newErrors: Partial<Record<keyof CheckoutFormData, string>> = {};
+    if (!formData.firstName) newErrors.firstName = "First name is required";
+    if (!formData.email) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Invalid email format";
+    if (!formData.phone) newErrors.phone = "Phone number is required";
+    if (!formData.address) newErrors.address = "Address is required";
+    if (!formData.city) newErrors.city = "City is required";
+    if (!formData.zip) newErrors.zip = "Postal code is required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please correct the errors in the form");
       return;
     }
+
+    setErrors({});
 
     setIsProcessing(true);
 
@@ -185,7 +196,11 @@ export default function CheckoutPage() {
           <div className="grid lg:grid-cols-3 gap-10">
             {/* Forms */}
             <div className="lg:col-span-2 space-y-10">
-              <CheckoutForm formData={formData} setFormData={setFormData} />
+              <CheckoutForm
+                formData={formData}
+                setFormData={setFormData}
+                errors={errors}
+              />
 
               {/* Payment Method - COD Only */}
               <div className="space-y-4">

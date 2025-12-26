@@ -1,13 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Bell, Moon, Sun, Shield, Trash2, Mail, Smartphone } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { ProfileSidebar } from "@/components/profile/profile-sidebar"
-import { ProfileHeader } from "@/components/profile/profile-header"
+import { useState } from "react";
+import {
+  Bell,
+  Moon,
+  Sun,
+  Shield,
+  Trash2,
+  Mail,
+  Smartphone,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { ProfileSidebar } from "@/components/profile/profile-sidebar";
+import { ProfileHeader } from "@/components/profile/profile-header";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +23,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
+import { Navbar } from "@/components/navbar";
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState({
@@ -26,10 +35,11 @@ export default function SettingsPage() {
     newsletter: true,
     darkMode: false,
     twoFactorAuth: false,
-  })
+  });
 
   return (
     <main className="min-h-screen bg-background pt-24 pb-16">
+      <Navbar />
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col lg:flex-row gap-8">
           <ProfileSidebar />
@@ -54,13 +64,22 @@ export default function SettingsPage() {
                     <div className="flex items-center gap-3">
                       <Mail className="w-4 h-4 text-muted-foreground" />
                       <div>
-                        <Label className="font-medium">Email Notifications</Label>
-                        <p className="text-sm text-muted-foreground">Receive updates via email</p>
+                        <Label className="font-medium">
+                          Email Notifications
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          Receive updates via email
+                        </p>
                       </div>
                     </div>
                     <Switch
                       checked={settings.emailNotifications}
-                      onCheckedChange={(checked) => setSettings({ ...settings, emailNotifications: checked })}
+                      onCheckedChange={(checked) =>
+                        setSettings({
+                          ...settings,
+                          emailNotifications: checked,
+                        })
+                      }
                     />
                   </div>
 
@@ -69,12 +88,16 @@ export default function SettingsPage() {
                       <Smartphone className="w-4 h-4 text-muted-foreground" />
                       <div>
                         <Label className="font-medium">SMS Notifications</Label>
-                        <p className="text-sm text-muted-foreground">Receive updates via text message</p>
+                        <p className="text-sm text-muted-foreground">
+                          Receive updates via text message
+                        </p>
                       </div>
                     </div>
                     <Switch
                       checked={settings.smsNotifications}
-                      onCheckedChange={(checked) => setSettings({ ...settings, smsNotifications: checked })}
+                      onCheckedChange={(checked) =>
+                        setSettings({ ...settings, smsNotifications: checked })
+                      }
                     />
                   </div>
 
@@ -82,33 +105,47 @@ export default function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <Label className="font-medium">Order Updates</Label>
-                        <p className="text-sm text-muted-foreground">Shipping and delivery notifications</p>
+                        <p className="text-sm text-muted-foreground">
+                          Shipping and delivery notifications
+                        </p>
                       </div>
                       <Switch
                         checked={settings.orderUpdates}
-                        onCheckedChange={(checked) => setSettings({ ...settings, orderUpdates: checked })}
+                        onCheckedChange={(checked) =>
+                          setSettings({ ...settings, orderUpdates: checked })
+                        }
                       />
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label className="font-medium">Promotions & Sales</Label>
-                        <p className="text-sm text-muted-foreground">Exclusive deals and discounts</p>
+                        <Label className="font-medium">
+                          Promotions & Sales
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          Exclusive deals and discounts
+                        </p>
                       </div>
                       <Switch
                         checked={settings.promotions}
-                        onCheckedChange={(checked) => setSettings({ ...settings, promotions: checked })}
+                        onCheckedChange={(checked) =>
+                          setSettings({ ...settings, promotions: checked })
+                        }
                       />
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
                         <Label className="font-medium">Newsletter</Label>
-                        <p className="text-sm text-muted-foreground">Weekly curated content and new arrivals</p>
+                        <p className="text-sm text-muted-foreground">
+                          Weekly curated content and new arrivals
+                        </p>
                       </div>
                       <Switch
                         checked={settings.newsletter}
-                        onCheckedChange={(checked) => setSettings({ ...settings, newsletter: checked })}
+                        onCheckedChange={(checked) =>
+                          setSettings({ ...settings, newsletter: checked })
+                        }
                       />
                     </div>
                   </div>
@@ -118,7 +155,11 @@ export default function SettingsPage() {
               {/* Appearance Section */}
               <section className="border border-border">
                 <div className="flex items-center gap-3 p-4 border-b border-border bg-muted/30">
-                  {settings.darkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                  {settings.darkMode ? (
+                    <Moon className="w-5 h-5" />
+                  ) : (
+                    <Sun className="w-5 h-5" />
+                  )}
                   <h2 className="font-semibold">Appearance</h2>
                 </div>
 
@@ -126,11 +167,15 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <Label className="font-medium">Dark Mode</Label>
-                      <p className="text-sm text-muted-foreground">Switch between light and dark themes</p>
+                      <p className="text-sm text-muted-foreground">
+                        Switch between light and dark themes
+                      </p>
                     </div>
                     <Switch
                       checked={settings.darkMode}
-                      onCheckedChange={(checked) => setSettings({ ...settings, darkMode: checked })}
+                      onCheckedChange={(checked) =>
+                        setSettings({ ...settings, darkMode: checked })
+                      }
                     />
                   </div>
                 </div>
@@ -146,12 +191,18 @@ export default function SettingsPage() {
                 <div className="p-4 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="font-medium">Two-Factor Authentication</Label>
-                      <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
+                      <Label className="font-medium">
+                        Two-Factor Authentication
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        Add an extra layer of security
+                      </p>
                     </div>
                     <Switch
                       checked={settings.twoFactorAuth}
-                      onCheckedChange={(checked) => setSettings({ ...settings, twoFactorAuth: checked })}
+                      onCheckedChange={(checked) =>
+                        setSettings({ ...settings, twoFactorAuth: checked })
+                      }
                     />
                   </div>
 
@@ -159,7 +210,9 @@ export default function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <Label className="font-medium">Change Password</Label>
-                        <p className="text-sm text-muted-foreground">Update your account password</p>
+                        <p className="text-sm text-muted-foreground">
+                          Update your account password
+                        </p>
                       </div>
                       <Dialog>
                         <DialogTrigger asChild>
@@ -170,7 +223,9 @@ export default function SettingsPage() {
                         <DialogContent>
                           <DialogHeader>
                             <DialogTitle>Change Password</DialogTitle>
-                            <DialogDescription>Enter your current password and a new password</DialogDescription>
+                            <DialogDescription>
+                              Enter your current password and a new password
+                            </DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4 py-4">
                             <div className="space-y-2">
@@ -201,7 +256,9 @@ export default function SettingsPage() {
               <section className="border border-destructive/30">
                 <div className="flex items-center gap-3 p-4 border-b border-destructive/30 bg-destructive/5">
                   <Trash2 className="w-5 h-5 text-destructive" />
-                  <h2 className="font-semibold text-destructive">Danger Zone</h2>
+                  <h2 className="font-semibold text-destructive">
+                    Danger Zone
+                  </h2>
                 </div>
 
                 <div className="p-4">
@@ -222,8 +279,9 @@ export default function SettingsPage() {
                         <DialogHeader>
                           <DialogTitle>Are you sure?</DialogTitle>
                           <DialogDescription>
-                            This action cannot be undone. This will permanently delete your account and remove your data
-                            from our servers.
+                            This action cannot be undone. This will permanently
+                            delete your account and remove your data from our
+                            servers.
                           </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
@@ -246,5 +304,5 @@ export default function SettingsPage() {
         </div>
       </div>
     </main>
-  )
+  );
 }

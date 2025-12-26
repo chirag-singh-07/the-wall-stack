@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 interface Review {
   id: string;
   rating: number;
-  comment?: string;
+  text: string;
   createdAt: Date;
   user: {
     name: string | null;
@@ -64,9 +64,9 @@ export function ReviewList({ reviews }: ReviewListProps) {
                   />
                 ))}
               </div>
-              {review.comment && (
+              {review.text && (
                 <p className="text-sm text-muted-foreground mt-2">
-                  {review.comment}
+                  {review.text}
                 </p>
               )}
             </div>

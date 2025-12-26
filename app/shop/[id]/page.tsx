@@ -33,7 +33,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <Navbar />
 
       {/* Breadcrumb */}
-      <div className="border-b">
+      <div className="border-b mt-20">
         <div className="container px-4 md:px-8 mx-auto py-4">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground transition-colors">

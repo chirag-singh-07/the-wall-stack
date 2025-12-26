@@ -178,7 +178,7 @@ export function Navbar() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => authClient.signOut()}
+                  onClick={handleLogout}
                   title="Logout"
                   className="hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-full"
                 >

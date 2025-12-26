@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore, type CartItem as CartItemType } from "@/lib/cart-store";
 import { allProducts } from "@/lib/products";
+import { toast } from "sonner";
 
 interface CartItemProps {
   item: CartItemType;
@@ -51,7 +52,10 @@ export function CartItem({ item }: CartItemProps) {
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-              onClick={() => removeItem(item.productId, item.size)}
+              onClick={() => {
+                removeItem(item.productId, item.size);
+                toast.success("Removed from cart");
+              }}
             >
               <Trash2 className="h-4 w-4" />
               <span className="sr-only">Remove item</span>
