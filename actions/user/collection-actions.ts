@@ -1,34 +1,40 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 
 /**
  * Get all active collections for public view
  */
 export async function getActiveCollections() {
-  try {
-    const collections = await db.collection.findMany({
-      where: { status: "active" },
-      include: {
-        _count: {
-          select: { posters: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+  return unstable_cache(
+    async () => {
+      try {
+        const collections = await db.collection.findMany({
+          where: { status: "active" },
+          include: {
+            _count: {
+              select: { posters: true },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        });
 
-    return {
-      success: true,
-      data: collections.map((c: any) => ({
-        ...c,
-        posterCount: c._count.posters,
-      })),
-    };
-  } catch (error) {
-    console.error("Error fetching active collections:", error);
-    return { success: false, error: "Failed to fetch collections" };
-  }
+        return {
+          success: true,
+          data: collections.map((c: any) => ({
+            ...c,
+            posterCount: c._count.posters,
+          })),
+        };
+      } catch (error) {
+        console.error("Error fetching active collections:", error);
+        return { success: false, error: "Failed to fetch collections" };
+      }
+    },
+    ["active-collections"],
+    { tags: ["collections"] }
+  )();
 }
 
 /**

@@ -159,7 +159,7 @@ export function HeroSection({ content }: HeroSectionProps) {
                   }}
                 >
                   <Image
-                    src="/minimal-black-white-poster-art-geometric.jpg"
+                    src="/poster-images/pinterest_3.jpg"
                     alt="Minimal poster"
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -175,7 +175,7 @@ export function HeroSection({ content }: HeroSectionProps) {
                   }}
                 >
                   <Image
-                    src="/abstract-black-white-poster-art.jpg"
+                    src="/poster-images/pinterest_5.jpg"
                     alt="Abstract poster"
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -193,7 +193,7 @@ export function HeroSection({ content }: HeroSectionProps) {
                   }}
                 >
                   <Image
-                    src="/typography-black-white-poster-art.jpg"
+                    src="/poster-images/pinterest_7.jpg"
                     alt="Typography poster"
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -209,7 +209,7 @@ export function HeroSection({ content }: HeroSectionProps) {
                   }}
                 >
                   <Image
-                    src="/minimal-lines-black-white-poster-art.jpg"
+                    src="/poster-images/pinterest_8.jpg"
                     alt="Line art poster"
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"

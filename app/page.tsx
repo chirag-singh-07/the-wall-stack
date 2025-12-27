@@ -10,16 +10,12 @@ import { BestSellers } from "@/components/best-sellers";
 import { ComboSection } from "@/components/combo-section";
 import { LimitedEdition } from "@/components/limited-edition";
 import { CustomPosterCreator } from "@/components/custom-poster-creator";
-import { RoomVisualizer } from "@/components/room-visualizer";
-import { ComparisonSlider } from "@/components/comparison-slider";
 import { ProcessSection } from "@/components/process-section";
 import { FeaturedProducts } from "@/components/featured-products";
 import { ParallaxBanner } from "@/components/parallax-banner";
 import { CollectionShowcase } from "@/components/collection-showcase";
 import { CollectionsSection } from "@/components/collections-section";
 import { ArtistSpotlight } from "@/components/artist-spotlight";
-import { SizeGuide } from "@/components/size-guide";
-import { GiftCards } from "@/components/gift-cards";
 import { CustomerGallery } from "@/components/customer-gallery";
 import { StatsCounter } from "@/components/stats-counter";
 import { Testimonials } from "@/components/testimonials";
@@ -54,9 +50,9 @@ export default async function HomePage() {
       <BestSellers />
       <LimitedEdition />
       <ComboSection />
-      <CustomPosterCreator />
-      <RoomVisualizer />
-      <ComparisonSlider />
+      {/* <CustomPosterCreator /> */}
+      {/* <RoomVisualizer /> */}
+      {/* <ComparisonSlider /> */}
       <ProcessSection />
       <FeaturedProducts />
       <ParallaxBanner />

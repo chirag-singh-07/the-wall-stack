@@ -1,0 +1,103 @@
+Active posters count: 16
+Posters sample: [
+  {
+    "id": "cmjojmbz90007uttw472j9ee7",
+    "title": "Car Poster Prints",
+    "slug": "car-poster-prints-1766854617224",
+    "description": "Elevate your space with our stunning posters! Explore a world of art, culture, and inspiration. Shop now for a touch of elegance.",
+    "price": 300,
+    "stock": 50,
+    "image": "https://res.cloudinary.com/dbz7ltvxw/image/upload/v1766854603/jh28izlqofelbsyc3kbx.jpg",
+    "images": [
+      "https://res.cloudinary.com/dbz7ltvxw/image/upload/v1766854603/jh28izlqofelbsyc3kbx.jpg"
+    ],
+    "categoryId": "cmjohn6ep0000uttwkpimus45",
+    "collectionId": null,
+    "isBestseller": true,
+    "isLimitedEdition": true,
+    "isFeatured": true,
+    "status": "active",
+    "createdAt": "2025-12-27T16:56:57.227Z",
+    "updatedAt": "2025-12-27T16:57:17.922Z"
+  },
+  {
+    "id": "cmjojptnr0009uttwviz5cww4",
+    "title": "Mustang Shelby GT500 Metal Poster: Stainless Steel Muscle Car Wall Art",
+    "slug": "mustang-shelby-gt500-metal-poster-stainless-steel-muscle-car-wall-art-1766854780143",
+    "description": "Mustang Shelby GT500 Car Poster - Premium Stainless Steel Wall Art Celebrate American muscle with this bold Mustang Shelby GT500 metal poster - a high-impact wall art piece perfect for fans of performance and power. Featuring a dynamic design and precision detailing, this stainless steel artwork blends matte depth with glossy highlights for a rich, textured finish",
+    "price": 300,
+    "stock": 50,
+    "image": "https://res.cloudinary.com/dbz7ltvxw/image/upload/v1766854783/aen8zsayzdtxu67fphao.jpg",
+    "images": [
+      "https://res.cloudinary.com/dbz7ltvxw/image/upload/v1766854783/aen8zsayzdtxu67fphao.jpg"
+    ],
+    "categoryId": "cmjohn6ep0000uttwkpimus45",
+    "collectionId": null,
+    "isBestseller": false,
+    "isLimitedEdition": false,
+    "isFeatured": true,
+    "status": "active",
+    "createdAt": "2025-12-27T16:59:40.147Z",
+    "updatedAt": "2025-12-27T16:59:40.147Z"
+  },
+  {
+    "id": "cmjojrh4y000buttw2rc5xg0x",
+    "title": "Nissan Skyline GT-R: The Legend Reimagined Poster Design",
+    "slug": "nissan-skyline-gtr-the-legend-reimagined-poster-design-1766854857205",
+    "description": "Experience the timeless beauty and raw power of the Nissan Skyline GT-R! This iconic machine seamlessly blends sleek, aerodynamic design with turbocharged performance, making it a symbol of speed, style, and innovation.",
+    "price": 300,
+    "stock": 50,
+    "image": "https://res.cloudinary.com/dbz7ltvxw/image/upload/v1766854853/r3f9hqnrrqamib0cktb9.jpg",
+    "images": [
+      "https://res.cloudinary.com/dbz7ltvxw/image/upload/v1766854853/r3f9hqnrrqamib0cktb9.jpg"
+    ],
+    "categoryId": "cmjohn6ep0000uttwkpimus45",
+    "collectionId": null,
+    "isBestseller": false,
+    "isLimitedEdition": false,
+    "isFeatured": true,
+    "status": "active",
+    "createdAt": "2025-12-27T17:00:57.209Z",
+    "updatedAt": "2025-12-27T17:00:57.209Z"
+  },
+  {
+    "id": "cmjojvft8000duttwmg84irhv",
+    "title": "Pullin’ up in a G-Wagon = instant main character energy 🎬🔥",
+    "slug": "pullin-up-in-a-gwagon-instant-main-character-energy--1766855040458",
+    "description": "Big body, bold moves 🚦💨 The G-Wagon isn’t just a car, it’s a statement. Luxury + power = your ultimate flex 🤌✨",
+    "price": 200,
+    "stock": 50,
+    "image": "https://res.cloudinary.com/dbz7ltvxw/image/upload/v1766855013/wjqtw4n04z2xnyalu1gf.jpg",
+    "images": [
+      "https://res.cloudinary.com/dbz7ltvxw/image/upload/v1766855013/wjqtw4n04z2xnyalu1gf.jpg"
+    ],
+    "categoryId": "cmjohn6ep0000uttwkpimus45",
+    "collectionId": null,
+    "isBestseller": false,
+    "isLimitedEdition": false,
+    "isFeatured": true,
+    "status": "active",
+    "createdAt": "2025-12-27T17:04:00.463Z",
+    "updatedAt": "2025-12-27T17:04:00.463Z"
+  },
+  {
+    "id": "cmjojx7xf000futtwkpdo12qe",
+    "title": "amborghini Huracán Performante | Gritty Urban Poster Design (Grain + Texture)",
+    "slug": "amborghini-huracn-performante-gritty-urban-poster-design-grain-texture-1766855125203",
+    "description": "A gritty, high-performance Lamborghini Huracán Performante poster with a crumpled paper texture, grainy 3D visuals, and neon green vector elements. This design blends street-style attitude with supercar elegance, showcasing the aggressive lines, golden forged wheels, and raw V10 spirit of the Huracán. Ideal for automotive lovers, aesthetic wall art collectors, and Pinterest car moodboards. The perfect blend of motorsport energy and underground design",
+    "price": 300,
+    "stock": 50,
+    "image": "https://res.cloudinary.com/dbz7ltvxw/image/upload/v1766855121/yqqgmwano7e52zmntv9q.jpg",
+    "images": [
+      "https://res.cloudinary.com/dbz7ltvxw/image/upload/v1766855121/yqqgmwano7e52zmntv9q.jpg"
+    ],
+    "categoryId": "cmjohn6ep0000uttwkpimus45",
+    "collectionId": null,
+    "isBestseller": true,
+    "isLimitedEdition": false,
+    "isFeatured": true,
+    "status": "active",
+    "createdAt": "2025-12-27T17:05:25.205Z",
+    "updatedAt": "2025-12-27T17:05:25.205Z"
+  }
+]

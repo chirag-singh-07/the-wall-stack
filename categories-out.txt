@@ -1,0 +1,252 @@
+Categories: [
+  {
+    "id": "cmjohn6ep0000uttwkpimus45",
+    "name": "Cars",
+    "slug": "cars",
+    "description": "You Will See All Car's Poster",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T16:01:37.474Z",
+    "updatedAt": "2025-12-27T16:01:37.474Z"
+  },
+  {
+    "id": "cmjohnowo0001uttwve2f7a3j",
+    "name": "All",
+    "slug": "all",
+    "description": "All The Poster",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T16:02:01.444Z",
+    "updatedAt": "2025-12-27T16:02:01.444Z"
+  },
+  {
+    "id": "cmjohqqq10002uttwjtykxyx5",
+    "name": "Anime",
+    "slug": "anime",
+    "description": "Anime like Posters",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T16:04:23.734Z",
+    "updatedAt": "2025-12-27T16:04:23.734Z"
+  },
+  {
+    "id": "cmjohs4i70003uttw6bwwese6",
+    "name": "Super-heroes",
+    "slug": "super-heroes",
+    "description": "All the Super Heroes",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T16:05:28.131Z",
+    "updatedAt": "2025-12-27T16:05:28.131Z"
+  },
+  {
+    "id": "cmjokllp1000uuttw9tccsnxp",
+    "name": "Gaming",
+    "slug": "gaming",
+    "description": "(Video games, characters, esports)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:24:22.934Z",
+    "updatedAt": "2025-12-27T17:24:22.934Z"
+  },
+  {
+    "id": "cmjoklyvp000vuttw09bbm9i3",
+    "name": "Movies & TV",
+    "slug": "movies-tv",
+    "description": "(Movies, series, web shows)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:24:39.639Z",
+    "updatedAt": "2025-12-27T17:24:39.639Z"
+  },
+  {
+    "id": "cmjokma4z000wuttwgzimbmqo",
+    "name": "Art & Aesthetic",
+    "slug": "art-aesthetic",
+    "description": "(Minimal, cyberpunk, neon, abstract)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:24:54.612Z",
+    "updatedAt": "2025-12-27T17:24:54.612Z"
+  },
+  {
+    "id": "cmjokmnss000xuttwy7fns6bm",
+    "name": "Quotes & Motivation",
+    "slug": "quotes-motivation",
+    "description": "(Motivational, hustle, life quotes)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:25:12.200Z",
+    "updatedAt": "2025-12-27T17:25:12.200Z"
+  },
+  {
+    "id": "cmjokn59a000yuttwxpws08yq",
+    "name": "Space & Nature",
+    "slug": "space-nature",
+    "description": "(Galaxy, planets, landscapes, animals)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:25:34.701Z",
+    "updatedAt": "2025-12-27T17:25:34.701Z"
+  },
+  {
+    "id": "cmjoknmwp000zuttwrk7mo47j",
+    "name": "Music",
+    "slug": "music",
+    "description": "(Rappers, bands, album art)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:25:57.679Z",
+    "updatedAt": "2025-12-27T17:25:57.679Z"
+  },
+  {
+    "id": "cmjoknzvx0010uttwh6q30vha",
+    "name": "Sports",
+    "slug": "sports",
+    "description": "(Football, cricket, F1, athletes)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:26:13.736Z",
+    "updatedAt": "2025-12-27T17:26:13.736Z"
+  },
+  {
+    "id": "cmjokodm80011uttw4t4ilah8",
+    "name": "Tech & Coding",
+    "slug": "tech-coding",
+    "description": "(Programming, AI, hacker vibes)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:26:32.281Z",
+    "updatedAt": "2025-12-27T17:26:32.281Z"
+  },
+  {
+    "id": "cmjokonnn0012uttwsjjva0bi",
+    "name": "Merch / Designs",
+    "slug": "merch-designs",
+    "description": "(T-shirt designs, stickers, digital art)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:26:45.444Z",
+    "updatedAt": "2025-12-27T17:26:45.444Z"
+  },
+  {
+    "id": "cmjokpxma0013uttwobe1120t",
+    "name": "Minimal",
+    "slug": "minimal",
+    "description": "(Clean, simple, modern posters)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:27:44.653Z",
+    "updatedAt": "2025-12-27T17:27:44.653Z"
+  },
+  {
+    "id": "cmjokq8ij0014uttwsz4l00v1",
+    "name": "Dark Aesthetic",
+    "slug": "dark-aesthetic",
+    "description": "(Black, moody, cinematic vibes)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:27:59.131Z",
+    "updatedAt": "2025-12-27T17:27:59.131Z"
+  },
+  {
+    "id": "cmjokqj5a0015uttw1pnrtjcr",
+    "name": "Neon & Cyberpunk",
+    "slug": "neon-cyberpunk",
+    "description": "(Neon lights, futuristic designs)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:28:12.801Z",
+    "updatedAt": "2025-12-27T17:28:12.801Z"
+  },
+  {
+    "id": "cmjokqrzo0016uttwg6e2s7qy",
+    "name": "Retro & Vintage",
+    "slug": "retro-vintage",
+    "description": "(Old-school games, classic art)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:28:24.372Z",
+    "updatedAt": "2025-12-27T17:28:24.372Z"
+  },
+  {
+    "id": "cmjokr24j0017uttwj7jmerdf",
+    "name": "Urban & Street",
+    "slug": "urban-street",
+    "description": "(Street art, graffiti, city vibes)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:28:37.383Z",
+    "updatedAt": "2025-12-27T17:28:37.383Z"
+  },
+  {
+    "id": "cmjokrad90018uttwzus3rjnx",
+    "name": "Luxury",
+    "slug": "luxury",
+    "description": "(Premium cars, watches, rich aesthetics)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:28:48.190Z",
+    "updatedAt": "2025-12-27T17:28:48.190Z"
+  },
+  {
+    "id": "cmjokrl8l0019uttw37d2byxf",
+    "name": "Action",
+    "slug": "action",
+    "description": "(High-energy scenes, intense visuals)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:29:02.131Z",
+    "updatedAt": "2025-12-27T17:29:02.131Z"
+  },
+  {
+    "id": "cmjokrv4z001auttweyvpa4p4",
+    "name": "Abstract",
+    "slug": "abstract",
+    "description": "(Creative, conceptual art)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:29:12.902Z",
+    "updatedAt": "2025-12-27T17:29:12.902Z"
+  },
+  {
+    "id": "cmjoks7sn001buttwrsvl09lq",
+    "name": "Pop Culture",
+    "slug": "pop-culture",
+    "description": "(Trending internet & culture icons)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:29:31.360Z",
+    "updatedAt": "2025-12-27T17:29:31.360Z"
+  },
+  {
+    "id": "cmjoksgrx001cuttwzdnu5f2o",
+    "name": "Calm & Peace",
+    "slug": "calm-peace",
+    "description": "(Soft colors, relaxing visuals)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:29:43.149Z",
+    "updatedAt": "2025-12-27T17:29:43.149Z"
+  },
+  {
+    "id": "cmjokso6o001duttwj9b9ifcw",
+    "name": "Villains",
+    "slug": "villains",
+    "description": "(Anime, movie, comic villains)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:29:52.628Z",
+    "updatedAt": "2025-12-27T17:29:52.628Z"
+  },
+  {
+    "id": "cmjoksvwy001euttwr9qn4fn2",
+    "name": "Emotional",
+    "slug": "emotional",
+    "description": "(Sad, love, deep feeling posters)",
+    "image": null,
+    "status": "active",
+    "createdAt": "2025-12-27T17:30:02.770Z",
+    "updatedAt": "2025-12-27T17:30:02.770Z"
+  }
+]

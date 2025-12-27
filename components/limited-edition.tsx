@@ -1,63 +1,34 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef } from "react"
-import { Clock, Flame, Users } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect, useRef } from "react";
+import { Clock, Flame, Users, ArrowRight, ShoppingBag } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { getLimitedEditions } from "@/actions/user/product-actions";
+import { cn, formatPrice } from "@/lib/utils";
+import Image from "next/image";
+import Link from "next/link";
+import { motion, useInView } from "framer-motion";
 
-const limitedPosters = [
-  {
-    id: 1,
-    title: "Eclipse Series #001",
-    artist: "Luna Studio",
-    originalPrice: 149,
-    salePrice: 99,
-    image: "/placeholder.svg?height=500&width=350",
-    edition: "50/100",
-    endTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    viewers: 47,
-  },
-  {
-    id: 2,
-    title: "Architect's Dream",
-    artist: "Blueprint Co",
-    originalPrice: 199,
-    salePrice: 129,
-    image: "/placeholder.svg?height=500&width=350",
-    edition: "23/50",
-    endTime: new Date(Date.now() + 12 * 60 * 60 * 1000),
-    viewers: 82,
-  },
-  {
-    id: 3,
-    title: "Zen Garden",
-    artist: "Eastern Arts",
-    originalPrice: 129,
-    salePrice: 79,
-    image: "/placeholder.svg?height=500&width=350",
-    edition: "78/100",
-    endTime: new Date(Date.now() + 6 * 60 * 60 * 1000),
-    viewers: 156,
-  },
-]
-
-function CountdownTimer({ endTime }: { endTime: Date }) {
-  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 })
+function CountdownTimer({ hours: initialHours }: { hours: number }) {
+  const [timeLeft, setTimeLeft] = useState({
+    hours: initialHours,
+    minutes: 45,
+    seconds: 12,
+  });
 
   useEffect(() => {
-    const calculateTime = () => {
-      const diff = endTime.getTime() - Date.now()
-      if (diff <= 0) return { hours: 0, minutes: 0, seconds: 0 }
-      return {
-        hours: Math.floor(diff / (1000 * 60 * 60)),
-        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((diff % (1000 * 60)) / 1000),
-      }
-    }
-
-    setTimeLeft(calculateTime())
-    const interval = setInterval(() => setTimeLeft(calculateTime()), 1000)
-    return () => clearInterval(interval)
-  }, [endTime])
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
+        if (prev.minutes > 0)
+          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        if (prev.hours > 0)
+          return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        return prev;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="flex gap-2">
@@ -67,137 +38,166 @@ function CountdownTimer({ endTime }: { endTime: Date }) {
         { value: timeLeft.seconds, label: "SEC" },
       ].map((item, i) => (
         <div key={i} className="text-center">
-          <div className="bg-foreground text-background w-12 h-12 rounded flex items-center justify-center font-mono text-xl font-bold">
+          <div className="bg-white/10 backdrop-blur-md text-white w-12 h-12 rounded-xl flex items-center justify-center font-mono text-xl font-black border border-white/10">
             {String(item.value).padStart(2, "0")}
           </div>
-          <span className="text-[10px] text-muted-foreground mt-1 block">{item.label}</span>
+          <span className="text-[8px] text-white/40 mt-1.5 block font-black tracking-widest leading-none">
+            {item.label}
+          </span>
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 export function LimitedEdition() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null)
-  const sectionRef = useRef<HTMLElement>(null)
+  const [posters, setPosters] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), { threshold: 0.2 })
-    if (sectionRef.current) observer.observe(sectionRef.current)
-    return () => observer.disconnect()
-  }, [])
+    getLimitedEditions().then((res) => {
+      if (res.success && res.data) {
+        setPosters(res.data);
+      }
+      setLoading(false);
+    });
+  }, []);
+
+  if (!loading && posters.length === 0) return null;
 
   return (
-    <section ref={sectionRef} className="py-24 bg-foreground text-background overflow-hidden">
+    <section
+      ref={containerRef}
+      className="py-24 bg-black text-white overflow-hidden relative"
+    >
       <div className="container mx-auto px-4">
-        <div
-          className={`flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center gap-2 px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm animate-pulse">
-                <Flame className="w-4 h-4" />
-                <span>Limited Time</span>
-              </div>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-bold mb-4">Limited Editions</h2>
-            <p className="text-background/70 max-w-xl">
-              Exclusive artist collaborations. Once they are gone, they are gone forever.
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            className="border-background/30 text-background hover:bg-background/10 self-start md:self-auto bg-transparent"
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8 }}
+            className="max-w-2xl"
           >
-            View All Exclusives
-          </Button>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center gap-2 px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-500/20">
+                <Flame className="w-3 h-3 animate-pulse" />
+                <span>Reserved for Collectors</span>
+              </div>
+              <div className="h-px w-12 bg-white/10" />
+            </div>
+            <h2 className="text-4xl md:text-8xl font-black tracking-tighter uppercase leading-[0.8] mb-6">
+              Limited <span className="text-white/10 italic">Editions</span>
+            </h2>
+            <p className="text-white/40 max-w-lg text-xs font-bold uppercase tracking-widest leading-relaxed">
+              Rare, numbered releases that will never be reprinted.{" "}
+              <br className="hidden md:block" />
+              Secure your piece of digital history.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <Link
+              href="/shop"
+              className="group flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-white/60 hover:text-white transition-all underline underline-offset-8 decoration-white/10 hover:decoration-white"
+            >
+              View All Exclusives
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-2" />
+            </Link>
+          </motion.div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {limitedPosters.map((poster, index) => (
-            <div
-              key={poster.id}
-              className={`group transition-all duration-700 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
-              }`}
-              style={{ transitionDelay: `${index * 150}ms` }}
-              onMouseEnter={() => setHoveredCard(poster.id)}
-              onMouseLeave={() => setHoveredCard(null)}
-            >
-              <div className="relative bg-background/5 backdrop-blur-sm rounded-lg overflow-hidden border border-background/10">
-                {/* Badge */}
-                <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-                  <span className="px-3 py-1 bg-background text-foreground text-xs font-bold rounded-full">
-                    {Math.round((1 - poster.salePrice / poster.originalPrice) * 100)}% OFF
-                  </span>
-                  <span className="px-3 py-1 bg-foreground/80 text-background text-xs rounded-full">
-                    Edition {poster.edition}
-                  </span>
-                </div>
+        {/* Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {loading
+            ? // Premium Skeletons
+              Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="aspect-3/4 bg-white/5 rounded-3xl animate-pulse border border-white/5"
+                />
+              ))
+            : posters.map((poster, index) => (
+                <motion.div
+                  key={poster.id}
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  className="group relative"
+                >
+                  <div className="relative bg-white/5 backdrop-blur-sm rounded-4xl overflow-hidden border border-white/10 transition-all duration-700 hover:bg-white/10 hover:border-white/20">
+                    {/* Image Container */}
+                    <div className="relative aspect-3/4 overflow-hidden">
+                      <Image
+                        src={poster.image || "/placeholder.svg"}
+                        alt={poster.title}
+                        fill
+                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                      />
 
-                {/* Viewers Badge */}
-                <div className="absolute top-4 right-4 z-10 flex items-center gap-1 px-2 py-1 bg-foreground/80 text-background text-xs rounded-full">
-                  <Users className="w-3 h-3" />
-                  <span>{poster.viewers} watching</span>
-                </div>
+                      {/* Dark Glossy Overlay */}
+                      <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent group-hover:opacity-40 transition-opacity duration-700" />
 
-                {/* Image */}
-                <div className="relative aspect-[3/4] overflow-hidden">
-                  <img
-                    src={poster.image || "/placeholder.svg"}
-                    alt={poster.title}
-                    className={`w-full h-full object-cover transition-transform duration-700 ${
-                      hoveredCard === poster.id ? "scale-110" : "scale-100"
-                    }`}
-                  />
-
-                  {/* Overlay Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground via-transparent to-transparent" />
-
-                  {/* Animated Border */}
-                  <div
-                    className={`absolute inset-0 border-2 border-background/50 transition-all duration-500 ${
-                      hoveredCard === poster.id ? "inset-2 opacity-100" : "inset-0 opacity-0"
-                    }`}
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <div className="flex items-center gap-2 text-background/60 text-sm mb-2">
-                    <Clock className="w-4 h-4" />
-                    <span>Ends in:</span>
-                  </div>
-                  <CountdownTimer endTime={poster.endTime} />
-
-                  <div className="mt-4 pt-4 border-t border-background/20">
-                    <h3 className="font-bold text-xl mb-1">{poster.title}</h3>
-                    <p className="text-background/60 text-sm mb-3">{poster.artist}</p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold">${poster.salePrice}</span>
-                        <span className="text-background/50 line-through">${poster.originalPrice}</span>
+                      {/* Badge Overlay */}
+                      <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
+                        <div className="bg-white px-3 py-1 rounded-full shadow-2xl">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-black">
+                            Exclusive Release
+                          </span>
+                        </div>
                       </div>
-                      <Button
-                        size="sm"
-                        className={`bg-background text-foreground hover:bg-background/90 transition-all duration-300 ${
-                          hoveredCard === poster.id ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
-                        }`}
-                      >
-                        Claim Now
-                      </Button>
+                    </div>
+
+                    {/* Content Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-8 space-y-6">
+                      {/* Timer Logic (Visual placeholder) */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-white/40 text-[10px] uppercase font-black tracking-widest">
+                          <Clock className="w-3 h-3" />
+                          <span>Edition Closing In:</span>
+                        </div>
+                        <CountdownTimer hours={12 + index * 5} />
+                      </div>
+
+                      <div className="pt-6 border-t border-white/10">
+                        <h3 className="font-black text-2xl uppercase tracking-tighter text-white mb-1 group-hover:tracking-widest transition-all duration-700">
+                          {poster.title}
+                        </h3>
+                        <div className="flex items-center gap-3 text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
+                          <span>{poster.category?.name || "Masterpiece"}</span>
+                          <span className="w-1 h-1 rounded-full bg-white/20" />
+                          <span>Numbered Edition</span>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex flex-col">
+                            <span className="text-[8px] font-mono font-bold text-white/30 tracking-widest mb-1">
+                              PRICE
+                            </span>
+                            <span className="text-2xl font-black text-white">
+                              {formatPrice(poster.price)}
+                            </span>
+                          </div>
+                          <Link href={`/shop/${poster.slug}`}>
+                            <Button className="bg-white text-black hover:bg-white/90 rounded-full px-6 font-black uppercase tracking-widest text-[10px] h-12">
+                              <ShoppingBag className="w-4 h-4 mr-2" />
+                              Claim Edition
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          ))}
+                </motion.div>
+              ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

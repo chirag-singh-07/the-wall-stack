@@ -1,217 +1,276 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState, useEffect, useRef } from "react"
-import { Instagram, Twitter, Globe, ArrowRight, Quote } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useRef } from "react";
+import {
+  Globe,
+  ArrowRight,
+  CheckCircle2,
+  MessageCircle,
+  Sparkles,
+  ExternalLink,
+  Zap,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { motion, useInView } from "framer-motion";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 const featuredArtist = {
   name: "Elena Vasquez",
-  title: "Abstract Minimalist",
+  username: "evasquez_studio",
+  title: "Principal Abstract Minimalist",
   location: "Barcelona, Spain",
-  bio: "Elena's work explores the intersection of architecture and nature, creating striking compositions that challenge perception. Her minimalist approach has garnered international acclaim, with pieces featured in galleries across Europe and North America.",
-  quote: "I believe in the power of negative space. What you don't see is just as important as what you do.",
-  avatar: "/placeholder.svg?height=400&width=400",
-  stats: {
-    posters: 47,
-    sales: "12K+",
-    rating: 4.9,
-  },
+  bio: "Architectural narratives translated into minimalist form. Exploring the tension between negative space and structural integrity. Her work is a dialogue between the seen and the felt.",
+  avatar:
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&h=400&auto=format&fit=crop",
+  stats: [
+    { label: "Original Works", value: "47" },
+    { label: "Verified Collectors", value: "12.4K" },
+    { label: "Exhibitions", value: "12" },
+  ],
   works: [
-    { id: 1, image: "/placeholder.svg?height=400&width=300" },
-    { id: 2, image: "/placeholder.svg?height=400&width=300" },
-    { id: 3, image: "/placeholder.svg?height=400&width=300" },
-    { id: 4, image: "/placeholder.svg?height=400&width=300" },
+    {
+      id: 1,
+      image:
+        "https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=800&h=1000&auto=format&fit=crop",
+      category: "Noir Series",
+      size: "large",
+    },
+    {
+      id: 2,
+      image:
+        "https://images.unsplash.com/photo-1515405295579-ba7b45403062?q=80&w=400&h=400&auto=format&fit=crop",
+      category: "Abstract",
+      size: "small",
+    },
+    {
+      id: 3,
+      image:
+        "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=400&h=400&auto=format&fit=crop",
+      category: "Minimal",
+      size: "small",
+    },
+    {
+      id: 4,
+      image:
+        "https://images.unsplash.com/photo-1501472312651-726afe119ff1?q=80&w=800&h=600&auto=format&fit=crop",
+      category: "Series X",
+      size: "wide",
+    },
+    {
+      id: 5,
+      image:
+        "https://images.unsplash.com/photo-1459706484596-7a8ca1833446?q=80&w=400&h=400&auto=format&fit=crop",
+      category: "Canvas",
+      size: "small",
+    },
+    {
+      id: 6,
+      image:
+        "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=400&h=400&auto=format&fit=crop",
+      category: "Noir",
+      size: "small",
+    },
   ],
   socials: {
-    instagram: "#",
-    twitter: "#",
-    website: "#",
+    website: "evasquez.studio",
   },
-}
+};
 
 export function ArtistSpotlight() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [hoveredWork, setHoveredWork] = useState<number | null>(null)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const sectionRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), { threshold: 0.2 })
-    if (sectionRef.current) observer.observe(sectionRef.current)
-    return () => observer.disconnect()
-  }, [])
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    setMousePos({
-      x: ((e.clientX - rect.left) / rect.width - 0.5) * 20,
-      y: ((e.clientY - rect.top) / rect.height - 0.5) * 20,
-    })
-  }
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
   return (
-    <section ref={sectionRef} className="py-24 bg-muted/30 overflow-hidden">
+    <section
+      ref={sectionRef}
+      className="py-24 md:py-48 bg-white overflow-hidden"
+    >
       <div className="container mx-auto px-4">
-        <div
-          className={`text-center mb-16 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          <span className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-4 block">Featured Creator</span>
-          <h2 className="text-4xl md:text-6xl font-bold">Artist Spotlight</h2>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Artist Info */}
-          <div
-            className={`transition-all duration-1000 delay-200 ${
-              isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
-            }`}
+        {/* Editorial Header */}
+        <div className="grid lg:grid-cols-12 gap-16 items-center mb-32">
+          {/* Visual Side */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-5 relative"
           >
-            <div className="flex items-start gap-6 mb-8">
-              <div className="relative" onMouseMove={handleMouseMove} onMouseLeave={() => setMousePos({ x: 0, y: 0 })}>
-                <div
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-background shadow-xl transition-transform duration-300"
-                  style={{
-                    transform: `rotateX(${-mousePos.y}deg) rotateY(${mousePos.x}deg)`,
-                  }}
-                >
-                  <img
-                    src={featuredArtist.avatar || "/placeholder.svg"}
-                    alt={featuredArtist.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-foreground rounded-full flex items-center justify-center">
-                  <span className="text-background text-xs font-bold">PRO</span>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-2xl md:text-3xl font-bold">{featuredArtist.name}</h3>
-                <p className="text-muted-foreground">{featuredArtist.title}</p>
-                <p className="text-sm text-muted-foreground mt-1">{featuredArtist.location}</p>
-                <div className="flex gap-3 mt-4">
-                  <a
-                    href={featuredArtist.socials.instagram}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Instagram className="w-5 h-5" />
-                  </a>
-                  <a
-                    href={featuredArtist.socials.twitter}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Twitter className="w-5 h-5" />
-                  </a>
-                  <a
-                    href={featuredArtist.socials.website}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Globe className="w-5 h-5" />
-                  </a>
-                </div>
-              </div>
+            <div className="relative aspect-square md:aspect-[4/5] overflow-hidden rounded-[40px] border border-black/5 shadow-2xl">
+              <Image
+                src={featuredArtist.avatar}
+                alt={featuredArtist.name}
+                fill
+                className="object-cover scale-110 grayscale hover:grayscale-0 transition-all duration-1000"
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent" />
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              {[
-                { label: "Posters", value: featuredArtist.stats.posters },
-                { label: "Sales", value: featuredArtist.stats.sales },
-                { label: "Rating", value: featuredArtist.stats.rating },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  className={`text-center p-4 bg-background rounded-lg border transition-all duration-500 hover:shadow-lg ${
-                    isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-                  }`}
-                  style={{ transitionDelay: `${400 + i * 100}ms` }}
-                >
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+            {/* Floating Signature-style Text */}
+            <div className="absolute -bottom-8 -right-8 bg-black p-8 rounded-3xl shadow-2xl hidden md:block border-4 border-white">
+              <Zap className="w-8 h-8 text-white mb-4 animate-pulse" />
+              <p className="text-white font-black text-2xl uppercase tracking-tighter italic leading-none">
+                Maestro <br /> <span className="text-white/40">Edition</span>
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Narrative Side */}
+          <div className="lg:col-span-7 space-y-12">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="space-y-6"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-black uppercase tracking-[0.5em] text-black/20">
+                  The Collaborator
+                </span>
+                <div className="h-px w-12 bg-black/10" />
+              </div>
+              <div className="flex flex-col md:flex-row md:items-end gap-6 md:gap-8">
+                <h2 className="text-6xl md:text-9xl font-black uppercase tracking-tighter leading-[0.8]">
+                  {featuredArtist.name.split(" ")[0]} <br />
+                  <span className="text-black/10">
+                    {featuredArtist.name.split(" ")[1]}
+                  </span>
+                </h2>
+                <div className="pb-2">
+                  <div className="flex items-center gap-2 bg-black/5 px-4 py-2 rounded-full border border-black/10">
+                    <CheckCircle2 className="w-4 h-4 text-black" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      {featuredArtist.username}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="grid sm:grid-cols-3 gap-8 py-10 border-y border-black/5"
+            >
+              {featuredArtist.stats.map((stat, i) => (
+                <div key={i} className="space-y-1">
+                  <p className="text-4xl font-black tracking-tighter">
+                    {stat.value}
+                  </p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/30">
+                    {stat.label}
+                  </p>
                 </div>
               ))}
-            </div>
+            </motion.div>
 
-            {/* Quote */}
-            <div
-              className={`relative bg-foreground text-background p-6 rounded-lg mb-8 transition-all duration-1000 delay-700 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-              }`}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="space-y-8"
             >
-              <Quote className="absolute -top-3 -left-3 w-8 h-8 text-background/20" />
-              <p className="italic text-lg leading-relaxed">{featuredArtist.quote}</p>
-            </div>
-
-            <p className="text-muted-foreground mb-8 leading-relaxed">{featuredArtist.bio}</p>
-
-            <Button className="group">
-              View Full Collection
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </div>
-
-          {/* Artist Works Grid */}
-          <div
-            className={`transition-all duration-1000 delay-400 ${
-              isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
-            }`}
-          >
-            <div className="grid grid-cols-2 gap-4">
-              {featuredArtist.works.map((work, index) => (
-                <div
-                  key={work.id}
-                  className={`relative overflow-hidden rounded-lg cursor-pointer group transition-all duration-500 ${
-                    index === 0 ? "row-span-2" : ""
-                  } ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
-                  style={{ transitionDelay: `${600 + index * 100}ms` }}
-                  onMouseEnter={() => setHoveredWork(work.id)}
-                  onMouseLeave={() => setHoveredWork(null)}
+              <p className="text-xl md:text-2xl font-medium text-black/60 italic leading-relaxed max-w-2xl">
+                "{featuredArtist.bio}"
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <Button className="h-14 px-8 bg-black text-white hover:bg-zinc-800 rounded-full font-black uppercase tracking-widest text-[10px] shadow-xl shadow-black/10">
+                  Acquire Exhibition Works
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-14 px-8 border-black/10 rounded-full font-black uppercase tracking-widest text-[10px] group"
                 >
-                  <div className={`${index === 0 ? "aspect-[3/4]" : "aspect-square"}`}>
-                    <img
-                      src={work.image || "/placeholder.svg"}
-                      alt={`Work ${work.id}`}
-                      className={`w-full h-full object-cover transition-transform duration-700 ${
-                        hoveredWork === work.id ? "scale-110" : "scale-100"
-                      }`}
-                    />
-                  </div>
+                  Official Website{" "}
+                  <ExternalLink className="ml-2 w-3 h-3 group-hover:translate-y-[-2px] group-hover:translate-x-[2px] transition-transform" />
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
 
-                  {/* Hover Overlay */}
-                  <div
-                    className={`absolute inset-0 bg-foreground/80 flex items-center justify-center transition-opacity duration-300 ${
-                      hoveredWork === work.id ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
+        {/* The Curated Series (No Tabs) */}
+        <div className="space-y-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.5 }}
+            className="flex items-center justify-between"
+          >
+            <h3 className="text-2xl font-black uppercase tracking-tighter">
+              The <span className="text-black/20 italic">Archives</span>
+            </h3>
+            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-black/20">
+              Series 01 // Curated Selection
+            </span>
+          </motion.div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+            {featuredArtist.works.map((work, i) => (
+              <motion.div
+                key={work.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                transition={{ duration: 0.8, delay: 0.6 + i * 0.1 }}
+                className={cn(
+                  "group relative overflow-hidden rounded-3xl border border-black/5 bg-zinc-50",
+                  work.size === "large" &&
+                    "col-span-2 row-span-2 aspect-square md:aspect-[4/5]",
+                  work.size === "wide" &&
+                    "col-span-2 aspect-square md:aspect-video",
+                  work.size === "small" && "aspect-square"
+                )}
+              >
+                <Image
+                  src={work.image}
+                  alt={work.category}
+                  fill
+                  className="object-cover transition-transform duration-[2s] group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
+                  <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end">
+                    <div className="space-y-1">
+                      <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/40">
+                        COLLECTION
+                      </span>
+                      <h4 className="text-white font-black uppercase tracking-tight text-xl">
+                        {work.category}
+                      </h4>
+                    </div>
                     <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-background text-background hover:bg-background hover:text-foreground bg-transparent"
+                      size="icon"
+                      className="bg-white text-black rounded-full hover:bg-zinc-100"
                     >
-                      View Details
+                      <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
-
-                  {/* Corner Accents */}
-                  <div
-                    className={`absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-background transition-all duration-300 ${
-                      hoveredWork === work.id ? "opacity-100 scale-100" : "opacity-0 scale-0"
-                    }`}
-                  />
-                  <div
-                    className={`absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-background transition-all duration-300 ${
-                      hoveredWork === work.id ? "opacity-100 scale-100" : "opacity-0 scale-0"
-                    }`}
-                  />
                 </div>
-              ))}
-            </div>
+              </motion.div>
+            ))}
           </div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 1, delay: 1 }}
+          className="mt-32 text-center"
+        >
+          <div className="inline-flex items-center gap-8 py-6 px-10 border border-black/5 bg-zinc-50/50 rounded-full group cursor-pointer hover:bg-black hover:text-white transition-all duration-500">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em]">
+              Official Artist Partnership
+            </span>
+            <div className="w-px h-4 bg-black/10 group-hover:bg-white/20" />
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                Connect with Elena
+              </span>
+              <MessageCircle className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,13 +1,11 @@
 "use client";
 
 import type React from "react";
-
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { AdminHeader } from "@/components/admin/admin-header";
-import { ArrowLeft, Upload, X, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import {
   getCollectionById,
   updateCollection,
@@ -25,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { ImageUploader } from "@/components/admin/image-uploader";
 
 export default function EditCollectionPage({
   params,
@@ -35,12 +34,11 @@ export default function EditCollectionPage({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+  const [images, setImages] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    image: "",
-    coverImage: "",
     isFeatured: false,
     status: "draft" as "active" | "draft",
   });
@@ -53,11 +51,12 @@ export default function EditCollectionPage({
         setFormData({
           title: res?.data?.title || "",
           description: res?.data?.description || "",
-          image: res?.data?.image || "",
-          coverImage: res?.data?.coverImage || "",
           isFeatured: res?.data?.isFeatured || false,
           status: res?.data?.status as any,
         });
+        if (res.data.image) {
+          setImages([res.data.image]);
+        }
       } else {
         toast.error(res.error || "Collection not found");
         router.push("/admin/collections");
@@ -67,6 +66,30 @@ export default function EditCollectionPage({
     fetchData();
   }, [id, router]);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (images.length === 0) {
+      toast.error("Please upload a collection image");
+      return;
+    }
+
+    setIsLoading(true);
+
+    const res = await updateCollection(id, {
+      ...formData,
+      image: images[0],
+      coverImage: images[0], // Keep them synced
+    });
+
+    if (res.success) {
+      toast.success("Collection updated successfully");
+      router.push("/admin/collections");
+    } else {
+      toast.error(res.error || "Failed to update collection");
+      setIsLoading(false);
+    }
+  };
+
   if (isFetching) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -75,193 +98,147 @@ export default function EditCollectionPage({
     );
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    const res = await updateCollection(id, formData);
-
-    if (res.success) {
-      toast.success("Collection updated");
-      router.push("/admin/collections");
-    } else {
-      toast.error(res.error || "Failed to update collection");
-    }
-
-    setIsLoading(false);
-  };
-
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <AdminHeader title="Edit Collection" />
 
-      <div className="p-6">
-        <Button variant="ghost" className="mb-6" asChild>
+      <div className="p-6 max-w-5xl mx-auto">
+        <Button variant="ghost" className="mb-6 hover:bg-muted" asChild>
           <Link href="/admin/collections">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Collections
           </Link>
         </Button>
 
-        <form onSubmit={handleSubmit} className="max-w-2xl space-y-8">
-          {/* Cover Image Upload (New) */}
-          <div className="space-y-2">
-            <Label>Cover Image (For Collection Listing)</Label>
-            <div className="flex items-start gap-4">
-              <div className="relative h-40 w-64 overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted">
-                {formData.coverImage ? (
-                  <>
-                    <Image
-                      src={formData.coverImage || "/placeholder.svg"}
-                      alt="Preview"
-                      fill
-                      className="object-cover"
-                    />
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="icon"
-                      className="absolute right-1 top-1 h-6 w-6"
-                      onClick={() =>
-                        setFormData({ ...formData, coverImage: "" })
-                      }
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </>
-                ) : (
-                  <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
-                    <Upload className="mb-2 h-8 w-8" />
-                    <span className="text-xs">Upload Cover</span>
-                  </div>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Input
-                  type="url"
-                  placeholder="Paste cover image URL..."
-                  value={formData.coverImage || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, coverImage: e.target.value })
-                  }
-                  className="w-64"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Landscape 4:3 Ratio Recommended
-                </p>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+        >
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-8">
+            <div className="bg-card p-6 rounded-xl border border-border space-y-6 shadow-sm">
+              <h3 className="text-lg font-semibold tracking-tight">
+                Collection Details
+              </h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-sm font-medium">
+                    Collection Title
+                  </Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
+                    className="bg-muted/30 border-muted focus-visible:ring-primary"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-sm font-medium">
+                    Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
+                    rows={6}
+                    className="bg-muted/30 border-muted resize-none focus-visible:ring-primary"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Banner Image Upload */}
-          <div className="space-y-2">
-            <Label>Banner Image (For Collection Detail)</Label>
-            <div className="flex items-start gap-4">
-              <div className="relative h-40 w-64 overflow-hidden rounded-lg border-2 border-dashed border-border bg-muted">
-                {formData.image ? (
-                  <>
-                    <Image
-                      src={formData.image || "/placeholder.svg"}
-                      alt="Preview"
-                      fill
-                      className="object-cover"
-                    />
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="icon"
-                      className="absolute right-1 top-1 h-6 w-6"
-                      onClick={() => setFormData({ ...formData, image: "" })}
+          {/* Right Column */}
+          <div className="space-y-8">
+            <div className="bg-card p-6 rounded-xl border border-border space-y-6 shadow-sm">
+              <h3 className="text-lg font-semibold tracking-tight">Media</h3>
+              <ImageUploader
+                value={images}
+                onChange={(urls) => setImages(urls)}
+                maxImages={1}
+              />
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Update the collection image. This will be used as both the
+                banner and the cover image.
+              </p>
+            </div>
+
+            <div className="bg-card p-6 rounded-xl border border-border space-y-6 shadow-sm">
+              <h3 className="text-lg font-semibold tracking-tight">Settings</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="isFeatured"
+                    className="flex flex-col gap-1 cursor-pointer"
+                  >
+                    <span className="text-sm font-medium">Featured</span>
+                    <span className="text-xs font-normal text-muted-foreground">
+                      Show on homepage
+                    </span>
+                  </Label>
+                  <Switch
+                    id="isFeatured"
+                    checked={formData.isFeatured}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, isFeatured: checked })
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2 pt-2">
+                  <Label htmlFor="status" className="text-sm font-medium">
+                    Status
+                  </Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value: "active" | "draft") =>
+                      setFormData({ ...formData, status: value })
+                    }
+                  >
+                    <SelectTrigger
+                      id="status"
+                      className="bg-muted/30 border-muted"
                     >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </>
-                ) : (
-                  <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
-                    <Upload className="mb-2 h-8 w-8" />
-                    <span className="text-xs">Upload Banner</span>
-                  </div>
-                )}
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Input
-                  type="url"
-                  placeholder="Or paste image URL..."
-                  value={formData.image}
-                  onChange={(e) =>
-                    setFormData({ ...formData, image: e.target.value })
-                  }
-                  className="w-64"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Recommended: 1200x800px, JPG or PNG
-                </p>
+
+              <div className="pt-6 border-t border-border space-y-3">
+                <Button
+                  type="submit"
+                  className="w-full font-semibold"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full hover:bg-muted transition-colors"
+                  asChild
+                >
+                  <Link href="/admin/collections">Cancel</Link>
+                </Button>
               </div>
             </div>
-          </div>
-
-          {/* Basic Info */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Collection Title</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value })
-              }
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              rows={4}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(value: "active" | "draft") =>
-                setFormData({ ...formData, status: value })
-              }
-            >
-              <SelectTrigger id="status" className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="isFeatured"
-              checked={formData.isFeatured}
-              onCheckedChange={(checked: boolean) =>
-                setFormData({ ...formData, isFeatured: checked })
-              }
-            />
-            <Label htmlFor="isFeatured">Featured Collection</Label>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-4 pt-4 border-t border-border">
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Saving..." : "Save Changes"}
-            </Button>
-            <Button type="button" variant="outline" asChild>
-              <Link href="/admin/collections">Cancel</Link>
-            </Button>
           </div>
         </form>
       </div>

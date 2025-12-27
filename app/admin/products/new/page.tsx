@@ -90,6 +90,8 @@ export default function NewProductPage() {
     const result = await createPoster({
       ...formData,
       image: formData.images[0], // Main image
+      collectionId:
+        formData.collectionId === "none" ? null : formData.collectionId,
     });
 
     if (result.success) {

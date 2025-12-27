@@ -3,211 +3,157 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Bell, Clock, ArrowRight, Sparkles } from "lucide-react";
-
-import { getNewArrivals } from "@/actions/user/product-actions";
+import { motion, useInView } from "framer-motion";
 import Link from "next/link";
+import { getNewArrivals } from "@/actions/user/product-actions";
+import { ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
 
 export function NewArrivals() {
   const [posters, setPosters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isVisible, setIsVisible] = useState(false);
-  const [activeCard, setActiveCard] = useState<string | null>(null);
-  const sectionRef = useRef<HTMLElement>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
   useEffect(() => {
     getNewArrivals().then((res) => {
       if (res.success && res.data) {
-        setPosters(res.data);
+        setPosters(res.data.slice(0, 4));
       }
       setLoading(false);
     });
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
   }, []);
 
-  if (loading) return null; // Or skeleton
-  if (posters.length === 0) return null; // Don't show if no new arrivals
+  if (!loading && posters.length === 0) return null;
 
   return (
     <section
-      ref={sectionRef}
-      className="py-20 md:py-32 bg-background relative overflow-hidden"
+      className="py-24 bg-white relative overflow-hidden"
+      ref={containerRef}
     >
-      {/* Animated background elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 border border-foreground/5 rounded-full animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-48 h-48 border border-foreground/5 rounded-full animate-pulse delay-500" />
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 border border-foreground/5 rotate-45 animate-pulse delay-300" />
+      {/* Background Decorative Text */}
+      <div className="absolute top-10 -right-20 pointer-events-none opacity-[0.02] select-none">
+        <span className="text-[20vw] font-black leading-none uppercase">
+          NEW
+        </span>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 relative">
+      <div className="container mx-auto px-4 relative">
         {/* Header */}
-        <div
-          className={cn(
-            "flex flex-col md:flex-row md:items-end md:justify-between mb-12 gap-4 transition-all duration-700",
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          )}
-        >
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="relative">
-                <Sparkles className="h-6 w-6 text-foreground animate-pulse" />
-                <div className="absolute inset-0 animate-ping">
-                  <Sparkles className="h-6 w-6 text-foreground/30" />
-                </div>
-              </div>
-              <span className="text-sm font-medium tracking-wider uppercase">
-                Fresh Off The Press
-              </span>
-            </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
-              New Arrivals
-            </h2>
-            <p className="text-muted-foreground mt-2">
-              The latest additions to our collection
-            </p>
-          </div>
-          <Button variant="outline" className="w-fit group bg-transparent">
-            <Bell className="mr-2 h-4 w-4" />
-            Get Notified
-          </Button>
-        </div>
-
-        {/* Cards Carousel */}
-        <div
-          ref={carouselRef}
-          className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
-        >
-          {posters.map((item, index) => (
-            <div
-              key={item.id}
-              onMouseEnter={() => setActiveCard(item.id)}
-              onMouseLeave={() => setActiveCard(null)}
-              className={cn(
-                "group relative shrink-0 w-[280px] md:w-[320px] snap-start transition-all duration-700",
-                isVisible
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-12"
-              )}
-              style={{ transitionDelay: `${index * 150}ms` }}
-            >
-              <Link href={`/product/${item.slug}`}>
-                {/* Card */}
-                <div
-                  className={cn(
-                    "relative aspect-3/4 rounded-2xl overflow-hidden transition-all duration-500",
-                    activeCard === item.id && "scale-[1.02]"
-                  )}
-                >
-                  <Image
-                    src={item.image || "/placeholder.svg"}
-                    alt={item.title}
-                    fill
-                    className={cn(
-                      "object-cover transition-all duration-700",
-                      activeCard === item.id && "scale-110"
-                    )}
-                  />
-
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-linear-to-t from-foreground/90 via-transparent to-transparent" />
-
-                  {/* New badge - Assuming all in this list are relatively new */}
-                  <div className="absolute top-4 left-4">
-                    <Badge className="bg-background text-foreground px-3 py-1 font-medium animate-pulse">
-                      NEW
-                    </Badge>
-                  </div>
-
-                  {/* Release date - Simulated or from createdAt */}
-                  <div className="absolute top-4 right-4 flex items-center gap-1 text-background/80 text-sm">
-                    <Clock className="h-3 w-3" />
-                    {new Date(item.createdAt).toLocaleDateString()}
-                  </div>
-
-                  {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-5">
-                    <h3 className="text-xl font-bold text-background mb-1">
-                      {item.title}
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-background">
-                        ${item.price}
-                      </span>
-                      <Button
-                        size="sm"
-                        className={cn(
-                          "bg-background text-foreground hover:bg-background/90 transition-all duration-300",
-                          activeCard === item.id
-                            ? "translate-y-0 opacity-100"
-                            : "translate-y-2 opacity-0"
-                        )}
-                      >
-                        View
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Shine effect on hover */}
-                  <div
-                    className={cn(
-                      "absolute inset-0 bg-linear-to-r from-transparent via-background/10 to-transparent -translate-x-full transition-transform duration-1000",
-                      activeCard === item.id && "translate-x-full"
-                    )}
-                  />
-                </div>
-              </Link>
-            </div>
-          ))}
-
-          {/* View All Card */}
-          <div
-            className={cn(
-              "relative shrink-0 w-[280px] md:w-[320px] aspect-3/4 rounded-2xl border-2 border-dashed border-foreground/20 flex flex-col items-center justify-center gap-4 snap-start transition-all duration-700 hover:border-foreground/40 hover:bg-muted/50 cursor-pointer group",
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-12"
-            )}
-            style={{ transitionDelay: `${posters.length * 150}ms` }}
+        <div className="flex flex-col items-center mb-20 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.8 }}
+            className="flex items-center gap-3 mb-6"
           >
-            <div className="w-16 h-16 rounded-full border-2 border-foreground/20 flex items-center justify-center group-hover:border-foreground/40 transition-colors">
-              <ArrowRight className="h-6 w-6 text-foreground/40 group-hover:text-foreground/60 transition-all group-hover:translate-x-1" />
-            </div>
-            <span className="text-foreground/60 font-medium group-hover:text-foreground/80 transition-colors">
-              View All New
+            <div className="h-px w-8 bg-black/20" />
+            <span className="text-[10px] uppercase tracking-[0.5em] font-black text-black/40">
+              The Latest Release
             </span>
-          </div>
+            <div className="h-px w-8 bg-black/20" />
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-4xl md:text-7xl font-black tracking-tighter text-black uppercase leading-none"
+          >
+            New <span className="text-black/10 italic">Arrivals</span>
+          </motion.h2>
         </div>
 
-        {/* Scroll indicators */}
-        <div className="flex justify-center gap-2 mt-8">
-          {posters.map((_, index) => (
-            <div
-              key={index}
-              className={cn(
-                "w-2 h-2 rounded-full transition-all duration-300",
-                index === 0 ? "w-8 bg-foreground" : "bg-foreground/20"
-              )}
-            />
-          ))}
+        {/* Grid Layout */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {loading
+            ? // Premium Skeletons
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="space-y-6 animate-pulse">
+                  <div className="aspect-3/4 bg-black/5 rounded-3xl" />
+                  <div className="space-y-3 px-2">
+                    <div className="h-3 w-1/4 bg-black/5 rounded" />
+                    <div className="h-4 w-3/4 bg-black/10 rounded" />
+                    <div className="h-3 w-1/3 bg-black/5 rounded" />
+                  </div>
+                </div>
+              ))
+            : posters.map((poster, index) => (
+                <motion.div
+                  key={poster.id}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  className="group"
+                >
+                  <Link href={`/shop/${poster.slug}`} className="block">
+                    <div className="relative aspect-3/4 rounded-3xl overflow-hidden bg-black/5 mb-6 shadow-2xl shadow-black/5 transition-transform duration-700 group-hover:-translate-y-2">
+                      <Image
+                        src={poster.image || "/placeholder.svg"}
+                        alt={poster.title}
+                        fill
+                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                      />
+
+                      {/* Dark Overlay */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-500" />
+
+                      {/* Top Badges */}
+                      <div className="absolute top-5 left-5 right-5 flex justify-between items-start opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-black">
+                            {poster.category?.name || "New"}
+                          </span>
+                        </div>
+                        <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center translate-x-2 group-hover:translate-x-0 transition-transform duration-500">
+                          <ShoppingBag className="w-4 h-4" />
+                        </div>
+                      </div>
+
+                      {/* Content Blur Overlay (Bottom) */}
+                      <div className="absolute bottom-0 left-0 right-0 p-8 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                        <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] font-bold text-white uppercase tracking-widest">
+                              Quick View
+                            </span>
+                            <ArrowRight className="w-4 h-4 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="px-2 space-y-1">
+                      <div className="flex justify-between items-start gap-2">
+                        <h3 className="text-sm font-black uppercase tracking-tight text-black flex-1 line-clamp-1 group-hover:text-black/60 transition-colors">
+                          {poster.title}
+                        </h3>
+                        <span className="text-xs font-mono font-bold text-black/30">
+                          0{index + 1}
+                        </span>
+                      </div>
+                      <p className="text-xs font-bold text-black pr-2">
+                        ₹{parseFloat(poster.price.toString()).toLocaleString()}
+                      </p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
         </div>
+
+        {/* Mobile View All */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 1, delay: 1 }}
+          className="mt-16 flex justify-center"
+        >
+          <Link
+            href="/shop"
+            className="px-8 py-3 rounded-full border border-black/10 text-[10px] uppercase tracking-[0.3em] font-black text-black hover:bg-black hover:text-white transition-all duration-300"
+          >
+            Explore All New Items
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

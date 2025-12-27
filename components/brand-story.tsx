@@ -1,99 +1,172 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, Sparkles, Target, Zap } from "lucide-react";
 
 export function BrandStory() {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
+  const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.2 }
-    );
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const imgY = useTransform(scrollYProgress, [0, 1], [-50, 50]);
 
   return (
-    <section ref={sectionRef} id="about" className="py-20 md:py-32">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          <div
-            className={cn(
-              "relative aspect-square lg:aspect-4/5 overflow-hidden rounded-lg bg-muted transition-all duration-700",
-              isVisible
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 -translate-x-8"
-            )}
-          >
-            <Image
-              src="/minimal-studio-workspace-posters-black-white.jpg"
-              alt="Our studio"
-              fill
-              className="object-cover"
+    <section
+      ref={containerRef}
+      id="about"
+      className="py-24 md:py-48 bg-white overflow-hidden relative"
+    >
+      {/* Background Decorative Element */}
+      <div className="absolute top-0 right-0 py-20 opacity-[0.02] pointer-events-none select-none">
+        <h2 className="text-[25vw] font-black uppercase leading-none tracking-tighter">
+          Legacy
+        </h2>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="grid lg:grid-cols-12 gap-16 md:gap-24 items-center">
+          {/* Visual Presentation */}
+          <div className="lg:col-span-12 xl:col-span-5 relative">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+              className="relative aspect-square md:aspect-[4/5] rounded-[60px] overflow-hidden border border-black/5 shadow-2xl"
+            >
+              <motion.div
+                style={{ y: imgY }}
+                className="absolute inset-x-0 -top-20 -bottom-20"
+              >
+                <Image
+                  src="/default-images/minimal-studio-workspace-posters-black-white.jpg"
+                  alt="THE WALL STACK Studio"
+                  fill
+                  className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+                />
+              </motion.div>
+              <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
+
+              {/* Floating Badge */}
+              <div className="absolute top-10 right-10 bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-3xl shadow-2xl">
+                <Sparkles className="w-6 h-6 text-white mb-2" />
+                <p className="text-white font-black text-xs uppercase tracking-widest">
+                  Est. 2020
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Accent Line */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={isInView ? { scaleX: 1 } : {}}
+              transition={{ duration: 1, delay: 0.5 }}
+              className="absolute -left-10 top-1/2 w-20 h-px bg-black origin-left hidden xl:block"
             />
           </div>
 
-          <div
-            className={cn(
-              "transition-all duration-700 delay-200",
-              isVisible
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 translate-x-8"
-            )}
-          >
-            <span className="text-sm font-medium tracking-wider text-muted-foreground uppercase">
-              Our Story
-            </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mt-4 mb-6 text-balance">
-              Crafting art that speaks to you.
-            </h2>
-            <div className="space-y-4 text-muted-foreground">
-              <p>
-                Founded in 2020, THE WALL STACK began as a passion project
-                between two design enthusiasts who believed that beautiful art
-                should be accessible to everyone.
+          {/* Narrative Side */}
+          <div className="lg:col-span-12 xl:col-span-7 space-y-12">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="space-y-6"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-black uppercase tracking-[0.5em] text-black/20">
+                  Our Manifest
+                </span>
+                <div className="h-px w-12 bg-black/10" />
+              </div>
+
+              <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] text-balance">
+                Architects <br />
+                <span className="text-black/10">Of Ambience</span>
+              </h2>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="space-y-8 max-w-2xl"
+            >
+              <p className="text-xl md:text-2xl font-medium text-black/60 italic leading-relaxed">
+                Founded on the belief that every wall is a canvas for identity.
+                THE WALL STACK transcends traditional decor, curating artifacts
+                that define modern sanctuaries.
               </p>
-              <p>
-                Every piece in our collection is carefully curated and printed
-                using museum-quality techniques. We work directly with
-                independent artists from around the world, ensuring that each
-                poster tells a unique story.
-              </p>
-              <p>
-                Our commitment to sustainability means every purchase supports
-                responsible sourcing and eco-friendly production methods.
-              </p>
-            </div>
-            <div className="mt-8 pt-8 border-t border-border grid grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-3xl font-bold">50K+</div>
-                <div className="text-sm text-muted-foreground">
-                  Happy Customers
+
+              <div className="grid sm:grid-cols-2 gap-8 text-sm">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-black" />
+                    <span className="font-black uppercase tracking-widest text-[10px]">
+                      The Objective
+                    </span>
+                  </div>
+                  <p className="text-black/40 leading-relaxed font-bold uppercase text-[9px] tracking-wider">
+                    To democratize elite design, ensuring museum-grade curation
+                    is accessible to every discerning collector.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-black" />
+                    <span className="font-black uppercase tracking-widest text-[10px]">
+                      The Standard
+                    </span>
+                  </div>
+                  <p className="text-black/40 leading-relaxed font-bold uppercase text-[9px] tracking-wider">
+                    Direct collaboration with international visionaries to
+                    produce exclusive, time-bound artifact series.
+                  </p>
                 </div>
               </div>
-              <div>
-                <div className="text-3xl font-bold">200+</div>
-                <div className="text-sm text-muted-foreground">
-                  Unique Designs
+            </motion.div>
+
+            {/* Stats Transformation */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="pt-10 border-t border-black/5 flex flex-wrap gap-12 md:gap-24"
+            >
+              {[
+                { label: "Global Collectors", value: "50K+" },
+                { label: "Exclusive Series", value: "200+" },
+                { label: "Member Nations", value: "30+" },
+              ].map((stat, i) => (
+                <div key={i} className="space-y-2">
+                  <p className="text-4xl font-black tracking-tighter">
+                    {stat.value}
+                  </p>
+                  <p className="text-[10px] font-bold text-black/30 uppercase tracking-[0.2em]">
+                    {stat.label}
+                  </p>
                 </div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold">30+</div>
-                <div className="text-sm text-muted-foreground">Countries</div>
-              </div>
-            </div>
+              ))}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              <button className="group flex items-center gap-6 py-6 px-10 border border-black/5 bg-zinc-50/50 rounded-full hover:bg-black hover:text-white transition-all duration-500">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em]">
+                  Explore our history
+                </span>
+                <div className="w-px h-4 bg-black/10 group-hover:bg-white/20" />
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </motion.div>
           </div>
         </div>
       </div>

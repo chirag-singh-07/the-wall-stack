@@ -269,3 +269,13 @@ model PageSection {
 
   @@map("page_section")
 }
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  status    String   @default("active") // "active", "unsubscribed"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("newsletter_subscriber")
+}

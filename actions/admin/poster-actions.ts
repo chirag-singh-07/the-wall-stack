@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
 const slugify = (text: string) => {
   return text
@@ -11,37 +11,49 @@ const slugify = (text: string) => {
 };
 
 export async function getPosters() {
-  try {
-    const posters = await db.poster.findMany({
-      include: {
-        category: true,
-        collection: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-    return { success: true, data: posters };
-  } catch (error) {
-    console.error("Error fetching posters:", error);
-    return { success: false, error: "Failed to fetch posters" };
-  }
+  return unstable_cache(
+    async () => {
+      try {
+        const posters = await db.poster.findMany({
+          include: {
+            category: true,
+            collection: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+        return { success: true, data: posters };
+      } catch (error) {
+        console.error("Error fetching posters:", error);
+        return { success: false, error: "Failed to fetch posters" };
+      }
+    },
+    ["posters-list"],
+    { tags: ["posters"] }
+  )();
 }
 
 export async function getPosterById(id: string) {
-  try {
-    const poster = await db.poster.findUnique({
-      where: { id },
-      include: {
-        category: true,
-        collection: true,
-      },
-    });
-    return { success: true, data: poster };
-  } catch (error) {
-    console.error("Error fetching poster:", error);
-    return { success: false, error: "Failed to fetch poster" };
-  }
+  return unstable_cache(
+    async () => {
+      try {
+        const poster = await db.poster.findUnique({
+          where: { id },
+          include: {
+            category: true,
+            collection: true,
+          },
+        });
+        return { success: true, data: poster };
+      } catch (error) {
+        console.error("Error fetching poster:", error);
+        return { success: false, error: "Failed to fetch poster" };
+      }
+    },
+    [`poster-${id}`],
+    { tags: ["posters", `poster-${id}`] }
+  )();
 }
 
 export async function createPoster(data: any) {
@@ -68,8 +80,10 @@ export async function createPoster(data: any) {
         stock: parseInt(stock),
         image,
         images,
-        categoryId,
-        collectionId,
+        categoryId:
+          categoryId === "none" || categoryId === "" ? null : categoryId,
+        collectionId:
+          collectionId === "none" || collectionId === "" ? null : collectionId,
         status,
         isBestseller: data.isBestseller || false,
         isLimitedEdition: data.isLimitedEdition || false,
@@ -79,6 +93,7 @@ export async function createPoster(data: any) {
 
     revalidatePath("/admin/products");
     revalidatePath("/shop");
+    revalidateTag("posters");
     return { success: true, data: poster };
   } catch (error) {
     console.error("Error creating poster:", error);
@@ -108,8 +123,10 @@ export async function updatePoster(id: string, data: any) {
       stock: parseInt(stock),
       image,
       images,
-      categoryId,
-      collectionId,
+      categoryId:
+        categoryId === "none" || categoryId === "" ? null : categoryId,
+      collectionId:
+        collectionId === "none" || collectionId === "" ? null : collectionId,
       status,
       isBestseller: data.isBestseller,
       isLimitedEdition: data.isLimitedEdition,
@@ -124,6 +141,8 @@ export async function updatePoster(id: string, data: any) {
     revalidatePath("/admin/products");
     revalidatePath(`/admin/products/${id}`);
     revalidatePath("/shop");
+    revalidateTag("posters");
+    revalidateTag(`poster-${id}`);
     return { success: true, data: poster };
   } catch (error) {
     console.error("Error updating poster:", error);
@@ -138,6 +157,7 @@ export async function deletePoster(id: string) {
     });
     revalidatePath("/admin/products");
     revalidatePath("/shop");
+    revalidateTag("posters");
     return { success: true };
   } catch (error) {
     console.error("Error deleting poster:", error);
@@ -146,24 +166,30 @@ export async function deletePoster(id: string) {
 }
 
 export async function getCategories() {
-  try {
-    const categories = await db.category.findMany({
-      include: {
-        _count: {
-          select: { posters: true },
-        },
-      },
-    });
-    return {
-      success: true,
-      data: categories.map((c: any) => ({
-        ...c,
-        productCount: c._count.posters,
-      })),
-    };
-  } catch (error) {
-    return { success: false, error: "Failed to fetch categories" };
-  }
+  return unstable_cache(
+    async () => {
+      try {
+        const categories = await db.category.findMany({
+          include: {
+            _count: {
+              select: { posters: true },
+            },
+          },
+        });
+        return {
+          success: true,
+          data: categories.map((c: any) => ({
+            ...c,
+            productCount: c._count.posters,
+          })),
+        };
+      } catch (error) {
+        return { success: false, error: "Failed to fetch categories" };
+      }
+    },
+    ["categories-list"],
+    { tags: ["categories"] }
+  )();
 }
 
 export async function createCategory(data: any) {
@@ -177,6 +203,7 @@ export async function createCategory(data: any) {
       },
     });
     revalidatePath("/admin/categories");
+    revalidateTag("categories");
     return { success: true, data: category };
   } catch (error) {
     console.error("Error creating category:", error);
@@ -196,6 +223,7 @@ export async function updateCategory(id: string, data: any) {
       },
     });
     revalidatePath("/admin/categories");
+    revalidateTag("categories");
     return { success: true, data: category };
   } catch (error) {
     console.error("Error updating category:", error);
@@ -209,6 +237,7 @@ export async function deleteCategory(id: string) {
       where: { id },
     });
     revalidatePath("/admin/categories");
+    revalidateTag("categories");
     return { success: true };
   } catch (error) {
     console.error("Error deleting category:", error);
@@ -217,24 +246,30 @@ export async function deleteCategory(id: string) {
 }
 
 export async function getCollections() {
-  try {
-    const collections = await db.collection.findMany({
-      include: {
-        _count: {
-          select: { posters: true },
-        },
-      },
-    });
-    return {
-      success: true,
-      data: collections.map((c: any) => ({
-        ...c,
-        productCount: c._count.posters,
-      })),
-    };
-  } catch (error) {
-    return { success: false, error: "Failed to fetch collections" };
-  }
+  return unstable_cache(
+    async () => {
+      try {
+        const collections = await db.collection.findMany({
+          include: {
+            _count: {
+              select: { posters: true },
+            },
+          },
+        });
+        return {
+          success: true,
+          data: collections.map((c: any) => ({
+            ...c,
+            productCount: c._count.posters,
+          })),
+        };
+      } catch (error) {
+        return { success: false, error: "Failed to fetch collections" };
+      }
+    },
+    ["collections-list"],
+    { tags: ["collections"] }
+  )();
 }
 
 export async function getCollectionById(id: string) {
