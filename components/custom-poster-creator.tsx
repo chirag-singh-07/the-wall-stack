@@ -20,7 +20,14 @@ import {
   Layers,
   Wand2,
   ArrowRight,
+  LogIn,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { saveCustomPoster } from "@/actions/user/custom-poster-actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useCartStore } from "@/lib/cart-store";
+import { cn } from "@/lib/utils";
 
 const frameStyles = [
   { id: "none", name: "No Frame", border: "none", padding: "0" },
@@ -52,10 +59,10 @@ const frameStyles = [
 ];
 
 const posterSizes = [
-  { id: "small", name: "Small", dimensions: "8×10″", price: 29 },
-  { id: "medium", name: "Medium", dimensions: "12×16″", price: 49 },
-  { id: "large", name: "Large", dimensions: "18×24″", price: 79 },
-  { id: "xl", name: "Extra Large", dimensions: "24×36″", price: 129 },
+  { id: "small", name: "Small", dimensions: "8×10″", price: 129 },
+  { id: "medium", name: "Medium", dimensions: "12×16″", price: 149 },
+  { id: "large", name: "Large", dimensions: "18×24″", price: 179 },
+  { id: "xl", name: "Extra Large", dimensions: "24×36″", price: 229 },
 ];
 
 const imageFilters = [
@@ -102,6 +109,9 @@ export function CustomPosterCreator() {
   >("upload");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { data: session } = authClient.useSession();
+  const router = useRouter();
+  const addItem = useCartStore((state) => state.addItem);
 
   const sectionRef = useRef<HTMLElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -165,13 +175,67 @@ export function CustomPosterCreator() {
     setPosition({ x: 0, y: 0 });
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    if (!uploadedImage) {
+      toast.error("Please upload an image first");
+      return;
+    }
+
+    if (!session) {
+      toast.error("Please login to create a custom order", {
+        action: {
+          label: "Login",
+          onClick: () => router.push("/login"),
+        },
+      });
+      return;
+    }
+
     setIsProcessing(true);
-    setTimeout(() => {
+    try {
+      const designData = {
+        image: uploadedImage,
+        frame: selectedFrame.id,
+        size: selectedSize.id,
+        filter: selectedFilter.id,
+        ratio: selectedRatio.id,
+        text: customText,
+        textPosition,
+        zoom,
+        position,
+      };
+
+      const result = await saveCustomPoster({
+        userId: session.user.id,
+        design: designData,
+        price: selectedSize.price,
+      });
+
+      if (result.success && result.data) {
+        // We can either add it to cart with a special prefix or redirect to a custom checkout
+        // For simplicity, let's add a "custom_" prefix to the ID
+        addItem(
+          `custom_${result.data.id}`,
+          selectedSize.name,
+          selectedSize.price,
+          1
+        );
+
+        setShowSuccess(true);
+        toast.success("Custom design saved and added to cart!");
+        setTimeout(() => {
+          setShowSuccess(false);
+          router.push("/cart");
+        }, 2000);
+      } else {
+        toast.error(result.error || "Failed to save design");
+      }
+    } catch (error) {
+      console.error("Custom order error:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
       setIsProcessing(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-    }, 2000);
+    }
   };
 
   const tabs = [
@@ -200,13 +264,12 @@ export function CustomPosterCreator() {
               Create Your Own
             </span>
           </div>
-          <h2 className="text-4xl md:text-7xl font-black tracking-tighter mb-8 uppercase leading-[0.8]">
-            Custom Poster <br />
-            <span className="text-white/20 italic font-light">Studio</span>
+          <h2 className="text-5xl md:text-8xl font-black tracking-tighter mb-8 uppercase leading-[0.8]">
+            Poster <br />
+            <span className="text-white/20 italic font-light">Architect</span>
           </h2>
-          <p className="text-background/60 max-w-2xl mx-auto text-lg mb-10">
-            Transform your favorite photos into stunning wall art. Upload,
-            customize, and order your unique poster in minutes.
+          <p className="text-background/40 max-w-2xl mx-auto text-sm font-medium uppercase tracking-[0.2em] mb-12">
+            Professional-grade customization at your fingertips.
           </p>
           <div className="flex justify-center">
             <NextLink href="/custom-poster">
@@ -345,7 +408,7 @@ export function CustomPosterCreator() {
                       Your Custom Poster
                     </span>
                     <span className="text-2xl font-light">
-                      ${selectedSize.price}
+                      ₹{selectedSize.price}
                     </span>
                   </div>
                   <div className="space-y-2 text-sm text-background/40 mb-6">
@@ -367,25 +430,24 @@ export function CustomPosterCreator() {
                   <Button
                     onClick={handleAddToCart}
                     disabled={isProcessing}
-                    className="w-full bg-background text-foreground hover:bg-background/90 h-12 text-sm tracking-wider uppercase relative overflow-hidden group"
+                    className="w-full bg-white text-black hover:bg-zinc-200 h-14 font-black uppercase tracking-[0.2em] text-[10px] rounded-full relative overflow-hidden group transition-all duration-500 shadow-xl shadow-white/5"
                   >
                     {isProcessing ? (
                       <span className="flex items-center gap-2">
-                        <span className="w-4 h-4 border-2 border-foreground/30 border-t-foreground rounded-full animate-spin" />
-                        Processing...
+                        <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                        Initializing...
                       </span>
                     ) : showSuccess ? (
                       <span className="flex items-center gap-2">
                         <Check className="w-4 h-4" />
-                        Added to Cart!
+                        Secured in Cart
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
                         <ShoppingCart className="w-4 h-4" />
-                        Add to Cart
+                        Add to Gallery
                       </span>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-foreground/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                   </Button>
                 </div>
               )}

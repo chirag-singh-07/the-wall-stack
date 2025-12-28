@@ -37,7 +37,8 @@ import { toast } from "sonner";
 import {
   getApprovedGalleryPosts,
   submitGalleryPost,
-  likeGalleryPost,
+  toggleGalleryLike,
+  getUserLikedPostIds,
   checkUserSubmissionStatus,
   addGalleryComment,
   getGalleryComments,
@@ -50,7 +51,7 @@ import Link from "next/link";
 
 export function CustomerGallery() {
   const [posts, setPosts] = useState<any[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
+
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -78,10 +79,245 @@ export function CustomerGallery() {
     instagramUrl: "",
   });
 
+  // Dummy data for when no posts exist (Pinterest Style - Vertical Aspect Ratios)
+  const DUMMY_POSTS = [
+    {
+      id: "dummy-1",
+      userName: "Alex Morgan",
+      userAvatar:
+        "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop",
+      userLocation: "New York, USA",
+      image:
+        "https://images.unsplash.com/photo-1582234381865-9a29148d944c?q=80&w=800&h=1200&fit=crop", // Portrait
+      caption: "the wall stack",
+      posterName: "Noir Edition #01",
+      likes: 124,
+      commentCount: 12,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-2",
+      userName: "Sarah Chen",
+      userAvatar:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+      userLocation: "Tokyo, Japan",
+      image:
+        "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=800&h=800&fit=crop", // Square
+      caption: "Minimalism at its finest. Love the paper quality.",
+      posterName: "Abstract Forms V2",
+      likes: 89,
+      commentCount: 5,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-3",
+      userName: "James Wilson",
+      userAvatar:
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
+      userLocation: "London, UK",
+      image:
+        "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?q=80&w=800&h=1000&fit=crop", // Portrait
+      caption: "A perfect addition to the lounge grid.",
+      posterName: "Urban Architecture",
+      likes: 256,
+      commentCount: 45,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-4",
+      userName: "Elena Rodriguez",
+      userAvatar:
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop",
+      userLocation: "Barcelona, Spain",
+      image:
+        "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=800&h=1100&fit=crop", // Portrait
+      caption: "The colors are even more vibrant in person.",
+      posterName: "Chromatics #4",
+      likes: 167,
+      commentCount: 23,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-5",
+      userName: "Marcus Weber",
+      userAvatar:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
+      userLocation: "Berlin, Germany",
+      image:
+        "https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=800&h=600&fit=crop", // Landscape
+      caption: "Industrial chic meets modern art.",
+      posterName: "Bauhaus Revival",
+      likes: 92,
+      commentCount: 8,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-6",
+      userName: "Sophie Dubois",
+      userAvatar:
+        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop",
+      userLocation: "Paris, France",
+      image:
+        "https://images.unsplash.com/photo-1549488352-257a965f9507?q=80&w=800&h=1000&fit=crop", // Portrait
+      caption: "Très magnifique! The framing is exquisite.",
+      posterName: "Botanical Study",
+      likes: 145,
+      commentCount: 16,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-7",
+      userName: "David Kim",
+      userAvatar:
+        "https://images.unsplash.com/photo-1595152772835-219638901822?w=100&h=100&fit=crop",
+      userLocation: "Seoul, South Korea",
+      image:
+        "https://images.unsplash.com/photo-1522771753035-4a53c9f13185?q=80&w=800&h=1200&fit=crop", // Portrait
+      caption: "Creating a sanctuary with clean lines.",
+      posterName: "Minimalist Lines",
+      likes: 203,
+      commentCount: 34,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-8",
+      userName: "Olivia Brown",
+      userAvatar:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
+      userLocation: "Sydney, Australia",
+      image:
+        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=800&h=800&fit=crop", // Square
+      caption: "Sunday morning vibes with my new art.",
+      posterName: "Coastal Dreams",
+      likes: 178,
+      commentCount: 29,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-9",
+      userName: "Lucas Rossi",
+      userAvatar:
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
+      userLocation: "Milan, Italy",
+      image:
+        "https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=800&h=1000&fit=crop", // Portrait
+      caption: "Design is intelligence made visible.",
+      posterName: "Typography Series",
+      likes: 112,
+      commentCount: 19,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-10",
+      userName: "Emma Wilson",
+      userAvatar:
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop",
+      userLocation: "Toronto, Canada",
+      image:
+        "https://images.unsplash.com/photo-1507149833265-60c30f2129f0?q=80&w=800&h=600&fit=crop", // Landscape
+      caption: "Finally completed my gallery wall!",
+      posterName: "Nordic Collection",
+      likes: 267,
+      commentCount: 42,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-11",
+      userName: "Ryan Cooper",
+      userAvatar:
+        "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&h=100&fit=crop",
+      userLocation: "Austin, USA",
+      image:
+        "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=800&h=1200&fit=crop", // Portrait
+      caption: "Bold. Simple. Perfect.",
+      posterName: "Monochrome #5",
+      likes: 95,
+      commentCount: 7,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-12",
+      userName: "Nina Patel",
+      userAvatar:
+        "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?w=100&h=100&fit=crop",
+      userLocation: "Mumbai, India",
+      image:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&h=800&fit=crop", // Square
+      caption: "Bringing some inspiration to the studio.",
+      posterName: "Creative Mindset",
+      likes: 310,
+      commentCount: 56,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-13",
+      userName: "Thomas Hofman",
+      userAvatar:
+        "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=100&h=100&fit=crop",
+      userLocation: "Zurich, Switzerland",
+      image:
+        "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?q=80&w=800&h=1000&fit=crop", // Portrait
+      caption: "Precision and style.",
+      posterName: "Swiss Grid",
+      likes: 134,
+      commentCount: 15,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-14",
+      userName: "Julia Anders",
+      userAvatar:
+        "https://images.unsplash.com/photo-1520813792240-56fc4a37b1a9?w=100&h=100&fit=crop",
+      userLocation: "Stockholm, Sweden",
+      image:
+        "https://images.unsplash.com/photo-1484154218962-a1c002085d2f?q=80&w=800&h=1100&fit=crop", // Portrait
+      caption: "Hygge vibes all day.",
+      posterName: "Scandi Series",
+      likes: 198,
+      commentCount: 28,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+    {
+      id: "dummy-15",
+      userName: "Liam O'Connor",
+      userAvatar:
+        "https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=100&h=100&fit=crop",
+      userLocation: "Dublin, Ireland",
+      image:
+        "https://images.unsplash.com/photo-1545642454-32a396a2988b?q=80&w=800&h=800&fit=crop", // Portrait
+      caption: "Art that speaks for itself.",
+      posterName: "Modern Classic",
+      likes: 156,
+      commentCount: 21,
+      createdAt: new Date().toISOString(),
+      instagramUrl: "https://instagram.com",
+    },
+  ];
+
   const fetchPosts = async () => {
-    const result = await getApprovedGalleryPosts();
-    if (result.success && result.data) {
-      setPosts(result.data);
+    try {
+      const result = await getApprovedGalleryPosts();
+      if (result.success && result.data && result.data.length > 0) {
+        setPosts(result.data);
+      } else {
+        setPosts(DUMMY_POSTS);
+      }
+    } catch (e) {
+      setPosts(DUMMY_POSTS);
     }
     setIsLoading(false);
   };
@@ -98,27 +334,64 @@ export function CustomerGallery() {
 
     fetchPosts();
     checkStatus();
+
+    if (session?.user?.id) {
+      getUserLikedPostIds(session.user.id).then((res) => {
+        if (res.success && res.likedPostIds) {
+          setLikedPosts(new Set(res.likedPostIds));
+        }
+      });
+    }
   }, [session?.user?.id]);
 
   const handleLike = async (postId: string) => {
-    if (likedPosts.has(postId)) return;
+    if (postId.startsWith("dummy")) {
+      toast("This is a demo post. Likes are disabled.");
+      return;
+    }
 
-    setLikedPosts((prev) => new Set(prev).add(postId));
+    if (!session?.user?.id) {
+      toast.error("Please login to like posts");
+      return;
+    }
+
+    const isLiked = likedPosts.has(postId);
+    const newLikedPosts = new Set(likedPosts);
+    if (isLiked) {
+      newLikedPosts.delete(postId);
+    } else {
+      newLikedPosts.add(postId);
+    }
+    setLikedPosts(newLikedPosts);
+
+    // Optimistic Update
     setPosts((current) =>
-      current.map((p) => (p.id === postId ? { ...p, likes: p.likes + 1 } : p))
+      current.map((p) =>
+        p.id === postId ? { ...p, likes: p.likes + (isLiked ? -1 : 1) } : p
+      )
     );
-    await likeGalleryPost(postId);
+
+    const res = await toggleGalleryLike(session.user.id, postId);
+    if (!res.success) {
+      // Revert if failed
+      setLikedPosts(likedPosts);
+      setPosts((current) =>
+        current.map((p) =>
+          p.id === postId ? { ...p, likes: p.likes + (isLiked ? 1 : -1) } : p
+        )
+      );
+      toast.error("Failed to update like");
+    }
   };
 
   const handleDelete = async (postId: string) => {
+    if (postId.startsWith("dummy")) return;
     if (!confirm("Are you sure you want to delete this gallery post?")) return;
 
     const res = await deleteGalleryPost(postId);
     if (res.success) {
       toast.success("Post deleted");
       setPosts(posts.filter((p) => p.id !== postId));
-      if (activeIndex >= posts.length - 1)
-        setActiveIndex(Math.max(0, posts.length - 2));
     } else {
       toast.error("Failed to delete post");
     }
@@ -190,6 +463,10 @@ export function CustomerGallery() {
   };
 
   const handlePostComment = async () => {
+    if (selectedPostDetails?.id?.startsWith("dummy")) {
+      toast("This is a demo post. Comments are disabled.");
+      return;
+    }
     if (!newComment.trim() || !session?.user?.id || !selectedPostDetails)
       return;
 
@@ -212,18 +489,12 @@ export function CustomerGallery() {
     }
   };
 
-  const navigate = (dir: number) => {
-    setActiveIndex((prev) => (prev + dir + posts.length) % posts.length);
-  };
-
   if (isLoading)
     return (
       <div className="h-[80vh] flex items-center justify-center bg-white">
         <Loader2 className="w-8 h-8 animate-spin text-black/20" />
       </div>
     );
-
-  const currentPost = posts[activeIndex];
 
   return (
     <section
@@ -236,260 +507,103 @@ export function CustomerGallery() {
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8 }}
-            className="max-w-xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex-1"
           >
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center gap-2 px-3 py-1 bg-black/5 text-black/60 rounded-full text-[10px] font-black uppercase tracking-widest border border-black/10">
-                <Sparkles className="w-3 h-3" />
-                <span>#THEWALLSTACKCommunity</span>
-              </div>
-              <div className="h-px w-12 bg-black/10" />
-            </div>
-            <h2 className="text-5xl md:text-9xl font-black tracking-tighter uppercase leading-[0.8] mb-8">
-              Community <span className="text-black/10 italic">Gallery</span>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-4">
+              Community <span className="text-zinc-400 italic">Gallery</span>
             </h2>
-            <p className="text-black/40 max-w-sm text-[10px] font-bold uppercase tracking-widest leading-relaxed">
-              Witness how our global community integrates THE WALL STACK
-              masterpieces into their private sanctuaries.
+            <p className="text-zinc-500 max-w-lg text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+              Explore how our global community styles their spaces. Discover
+              ideas, save your favorites, and shop the look.
             </p>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-col items-end gap-6"
+          <Button
+            size="lg"
+            className="bg-black text-white hover:bg-zinc-800 rounded-full px-8 h-12 font-black uppercase tracking-widest text-[10px] shadow-lg"
+            onClick={() => {
+              if (session) {
+                if (!hasSubmitted) setIsDialogOpen(true);
+              } else {
+                toast.error("Please login to share");
+              }
+            }}
+            disabled={hasSubmitted}
           >
-            {session ? (
-              <Button
-                size="lg"
-                className="bg-black text-white hover:bg-black/90 rounded-full px-10 h-14 font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-black/10 group"
-                disabled={hasSubmitted}
-                onClick={() => setIsDialogOpen(true)}
-              >
-                {hasSubmitted ? "Already Shared" : "Share Your Setup"}
-                <Camera className="ml-3 w-4 h-4 transition-transform group-hover:scale-110" />
-              </Button>
-            ) : (
-              <Link href="/login">
-                <Button
-                  size="lg"
-                  className="bg-black text-white hover:bg-black/90 rounded-full px-10 h-14 font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-black/10 group"
-                >
-                  Login to Share
-                  <ArrowRight className="ml-3 w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
-            )}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate(-1)}
-                className="w-12 h-12 rounded-full border border-black/10 flex items-center justify-center hover:bg-black hover:text-white transition-all group"
-              >
-                <ChevronLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </button>
-              <button
-                onClick={() => navigate(1)}
-                className="w-12 h-12 rounded-full border border-black/10 flex items-center justify-center hover:bg-black hover:text-white transition-all group"
-              >
-                <ChevronRight className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </button>
-            </div>
-          </motion.div>
+            {hasSubmitted ? "Values Shared" : "Share Your Setup"}
+            <Camera className="ml-3 w-4 h-4" />
+          </Button>
         </div>
 
-        {/* Cinematic Presentation */}
-        <div className="relative">
-          <AnimatePresence mode="wait">
-            {currentPost ? (
-              <motion.div
-                key={currentPost.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="grid lg:grid-cols-12 gap-12 items-center"
-              >
-                {/* Main Visual */}
-                <div
-                  className="lg:col-span-8 group relative aspect-square md:aspect-video rounded-4xl overflow-hidden border border-black/10 shadow-2xl cursor-zoom-in"
-                  onClick={() => openDetails(currentPost)}
-                >
-                  <Image
-                    src={currentPost.image}
-                    alt={currentPost.caption}
-                    fill
-                    className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent opacity-60" />
+        {/* Pinterest Masonry Grid */}
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4 pb-20">
+          {posts.map((post, index) => (
+            <motion.div
+              key={post.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.05, duration: 0.5 }}
+              className="break-inside-avoid relative group rounded-2xl overflow-hidden cursor-zoom-in bg-zinc-100 mb-4"
+              onClick={() => openDetails(post)}
+            >
+              <img
+                src={post.image}
+                alt={post.caption}
+                className="w-full h-auto object-cover"
+                loading="lazy"
+              />
 
-                  {/* Floating Action Badge */}
-                  <div className="absolute bottom-8 right-8 flex items-center gap-4">
-                    <Button
-                      variant="outline"
-                      className="rounded-full bg-white/5 backdrop-blur-xl border-white/10 text-black hover:bg-black hover:text-white transition-all h-12 px-6 font-black uppercase tracking-widest text-[9px]"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleLike(currentPost.id);
-                      }}
-                    >
-                      <Heart
-                        className={cn(
-                          "w-4 h-4 mr-2",
-                          likedPosts.has(currentPost.id) &&
-                            "fill-red-500 text-red-500 border-none"
-                        )}
-                      />
-                      {currentPost.likes} Appreciation
-                    </Button>
-                    {isAdmin && (
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="rounded-full w-12 h-12 shadow-2xl"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(currentPost.id);
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
+                <div className="flex justify-end">
+                  <Button
+                    size="sm"
+                    className={cn(
+                      "h-9 px-4 rounded-full font-bold text-[10px] uppercase tracking-wider transition-all",
+                      likedPosts.has(post.id)
+                        ? "bg-red-500 text-white hover:bg-red-600"
+                        : "bg-red-500 text-white hover:bg-red-600"
                     )}
-                  </div>
-
-                  {/* Location Badge */}
-                  <div className="absolute top-8 left-8">
-                    <div className="flex items-center gap-3 bg-black/5 backdrop-blur-xl border border-black/10 px-5 py-2.5 rounded-full">
-                      <MapPin className="w-3.5 h-3.5 text-black/60" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-black/80">
-                        {currentPost.userLocation}
-                      </span>
-                    </div>
-                  </div>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleLike(post.id);
+                    }}
+                  >
+                    {likedPosts.has(post.id) ? "Saved" : "Save"}
+                  </Button>
                 </div>
 
-                {/* Narrative Panel */}
-                <div className="lg:col-span-4 space-y-10">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="w-16 h-16 border-2 border-black/10">
-                      <AvatarImage src={currentPost.userAvatar} />
-                      <AvatarFallback className="bg-black/5 text-black/40 font-black">
-                        {currentPost.userName.substring(0, 2).toUpperCase()}
+                <div className="flex items-center justify-between text-white">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="w-6 h-6 border border-white/20">
+                      <AvatarImage src={post.userAvatar} />
+                      <AvatarFallback className="text-[8px] bg-black/50 text-white">
+                        {post.userName?.substring(0, 1)}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <h4 className="text-xl font-black uppercase tracking-tighter">
-                        {currentPost.userName}
-                      </h4>
-                      <p className="text-[9px] font-black uppercase tracking-widest text-black/30">
-                        Resident Collector
-                      </p>
-                    </div>
+                    <span className="text-[10px] font-bold truncate max-w-[80px]">
+                      {post.userName}
+                    </span>
                   </div>
-
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-3">
-                      <div className="h-px w-8 bg-black/40" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40">
-                        The Narrative
-                      </span>
-                    </div>
-                    <h3 className="text-3xl font-black uppercase tracking-tighter leading-tight italic text-zinc-700">
-                      "{currentPost.caption}"
-                    </h3>
-                    <div className="space-y-2">
-                      <span className="text-[8px] font-black uppercase tracking-widest text-black/20 block">
-                        Featuring Artifact
-                      </span>
-                      <span className="text-sm font-black uppercase tracking-widest border-b border-black/10 pb-1 inline-block">
-                        {currentPost.posterName || "The Noir Series"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="pt-8 flex flex-col gap-4">
-                    <Button
-                      variant="outline"
-                      className="w-full h-16 rounded-full bg-black/5 backdrop-blur-md border-black/10 text-black hover:bg-black hover:text-white transition-all font-black uppercase tracking-[0.2em] text-[10px] group"
-                      onClick={() => openDetails(currentPost)}
-                    >
-                      Open Dialogue
-                      <MessageCircle className="ml-3 w-4 h-4 group-hover:scale-110 transition-transform" />
-                    </Button>
-                    <div className="flex items-center justify-center gap-4 text-[9px] font-black uppercase tracking-widest text-black/20">
-                      <span>{currentPost.commentCount || 0} Responses</span>
-                      <div className="w-1 h-1 rounded-full bg-black/10" />
-                      <span>{currentPost.likes} Approvals</span>
-                    </div>
+                  <div className="flex items-center gap-2 px-2 py-1 bg-black/50 backdrop-blur-md rounded-full">
+                    <Heart
+                      className={cn(
+                        "w-3 h-3 fill-current",
+                        likedPosts.has(post.id) ? "text-red-500" : "text-white"
+                      )}
+                    />
+                    <span className="text-[9px] font-bold">{post.likes}</span>
                   </div>
                 </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="py-32 flex flex-col items-center justify-center border-2 border-dashed border-black/10 rounded-4xl bg-zinc-50/50"
-              >
-                <div className="w-20 h-20 rounded-full bg-black/5 flex items-center justify-center mb-8">
-                  <Camera className="w-8 h-8 text-black/20" />
-                </div>
-                <h3 className="text-3xl font-black uppercase tracking-tighter mb-4 text-black text-center">
-                  The Archive is Empty
-                </h3>
-                <p className="text-black/40 text-[10px] font-black uppercase tracking-[0.4em] mb-12 text-center max-w-sm px-6 leading-relaxed">
-                  Every sanctuary deserves to be documented. Be the pioneer of
-                  our community gallery.
-                </p>
-                {session ? (
-                  <Button
-                    size="lg"
-                    className="bg-black text-white hover:bg-zinc-800 rounded-full px-12 h-16 font-black uppercase tracking-widest text-[11px] shadow-2xl shadow-black/10 group"
-                    disabled={hasSubmitted}
-                    onClick={() => setIsDialogOpen(true)}
-                  >
-                    {hasSubmitted ? "Already Shared" : "Start The Archive"}
-                    <ArrowRight className="ml-3 w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                ) : (
-                  <Link href="/login">
-                    <Button
-                      size="lg"
-                      className="bg-black text-white hover:bg-zinc-800 rounded-full px-12 h-16 font-black uppercase tracking-widest text-[11px] shadow-2xl shadow-black/10 group"
-                    >
-                      Login to Share
-                      <ArrowRight className="ml-3 w-4 h-4 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                  </Link>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="mt-20 pt-10 border-t border-black/5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {posts.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => i !== activeIndex && setActiveIndex(i)}
-                className={cn(
-                  "h-1 transition-all duration-700 rounded-full",
-                  i === activeIndex
-                    ? "w-12 bg-black"
-                    : "w-3 bg-black/10 hover:bg-black/30"
-                )}
-              />
-            ))}
-          </div>
-          <span className="text-[9px] font-black uppercase tracking-[0.5em] text-black/20">
-            Archive Sequence
-          </span>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
 
@@ -606,6 +720,9 @@ export function CustomerGallery() {
                   </span>
                 </div>
               </div>
+              <DialogTitle className="sr-only">
+                Gallery Post by {selectedPostDetails?.userName}
+              </DialogTitle>
               <div className="flex items-center gap-2">
                 {selectedPostDetails?.instagramUrl && (
                   <a
@@ -640,6 +757,23 @@ export function CustomerGallery() {
                   <p className="text-xl font-black uppercase tracking-tighter italic text-zinc-700">
                     "{selectedPostDetails?.caption}"
                   </p>
+
+                  {selectedPostDetails?.posterName && (
+                    <Link
+                      href={`/shop?search=${encodeURIComponent(
+                        selectedPostDetails.posterName
+                      )}`}
+                      className="block mt-4"
+                    >
+                      <Button
+                        variant="outline"
+                        className="w-full h-10 rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-colors"
+                      >
+                        Shop This Look
+                        <ArrowRight className="ml-2 w-3 h-3" />
+                      </Button>
+                    </Link>
+                  )}
                 </div>
 
                 <div className="space-y-6">

@@ -1,12 +1,14 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Trash2, Plus, Minus } from "lucide-react";
+import { Trash2, Plus, Minus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore, type CartItem as CartItemType } from "@/lib/cart-store";
-import { allProducts } from "@/lib/products";
+import { getPosterById } from "@/actions/user/product-actions";
+import { getCustomPosterById } from "@/actions/user/custom-poster-actions";
 import { toast } from "sonner";
 
 interface CartItemProps {
@@ -15,15 +17,71 @@ interface CartItemProps {
 
 export function CartItem({ item }: CartItemProps) {
   const { updateQuantity, removeItem } = useCartStore();
-  const product = allProducts.find((p) => p.id === item.productId);
+  const [product, setProduct] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const isCustom = item.productId.startsWith("custom_");
 
-  if (!product) return null;
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setIsLoading(true);
+      try {
+        if (isCustom) {
+          // Extract custom poster ID (remove "custom_" prefix)
+          const customId = item.productId.replace("custom_", "");
+          const result = await getCustomPosterById(customId);
+          if (result.success && result.data) {
+            setProduct({
+              id: item.productId,
+              title: "Custom Poster Design",
+              category: "Custom",
+              image: result.data.design?.image || "/placeholder.svg",
+              design: result.data.design,
+            });
+          }
+        } else {
+          const result = await getPosterById(item.productId);
+          if (result.success && result.data) {
+            setProduct(result.data);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [item.productId, isCustom]);
+
+  if (isLoading) {
+    return (
+      <div className="flex gap-4 md:gap-6 py-6 border-b border-border">
+        <div className="w-24 h-32 md:w-32 md:h-40 bg-muted rounded-lg animate-pulse" />
+        <div className="flex-1 space-y-3">
+          <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+          <div className="h-6 w-48 bg-muted rounded animate-pulse" />
+          <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="flex gap-4 md:gap-6 py-6 border-b border-border">
+        <div className="flex-1 flex items-center justify-center py-8 text-muted-foreground">
+          <p>Product not found</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex gap-4 md:gap-6 py-6 border-b border-border group">
       {/* Product Image */}
       <Link
-        href={`/shop/${product.id}`}
+        href={isCustom ? "/custom-poster" : `/shop/${product.id}`}
         className="relative w-24 h-32 md:w-32 md:h-40 flex-shrink-0 bg-muted rounded-lg overflow-hidden"
       >
         <Image
@@ -32,6 +90,23 @@ export function CartItem({ item }: CartItemProps) {
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
+        {isCustom &&
+          product.design?.frame &&
+          product.design.frame !== "none" && (
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                border:
+                  product.design.frame === "thin-black"
+                    ? "1px solid #000"
+                    : product.design.frame === "thick-black"
+                    ? "4px solid #000"
+                    : product.design.frame === "double"
+                    ? "2px double #000"
+                    : "none",
+              }}
+            />
+          )}
       </Link>
 
       {/* Product Details */}
@@ -40,13 +115,18 @@ export function CartItem({ item }: CartItemProps) {
           <div className="flex items-start justify-between gap-2">
             <div>
               <span className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                {product.category}
+                {product.category?.name || product.category || "Poster"}
               </span>
-              <Link href={`/shop/${product.id}`}>
+              <Link href={isCustom ? "/custom-poster" : `/shop/${product.id}`}>
                 <h3 className="font-medium text-sm md:text-base hover:underline underline-offset-4 truncate">
                   {product.title}
                 </h3>
               </Link>
+              {isCustom && product.design?.text && (
+                <p className="text-xs text-muted-foreground mt-1 truncate">
+                  "{product.design.text}"
+                </p>
+              )}
             </div>
             <Button
               variant="ghost"
@@ -92,12 +172,10 @@ export function CartItem({ item }: CartItemProps) {
 
           {/* Price */}
           <div className="text-right">
-            <p className="font-medium">
-              {formatPrice(item.price * item.quantity)}
-            </p>
+            <p className="font-medium">₹{item.price * item.quantity}</p>
             {item.quantity > 1 && (
               <p className="text-xs text-muted-foreground">
-                {formatPrice(item.price)} each
+                ₹{item.price} each
               </p>
             )}
           </div>

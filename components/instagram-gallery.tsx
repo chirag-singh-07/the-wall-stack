@@ -16,31 +16,31 @@ import { cn } from "@/lib/utils";
 const row1 = [
   {
     id: 1,
-    src: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=600&h=600&auto=format&fit=crop",
+    src: "/instagram-images/1.jpg",
     likes: "1.2K",
     comments: "48",
   },
   {
     id: 2,
-    src: "https://images.unsplash.com/photo-1544450297-f58445dd8970?q=80&w=600&h=600&auto=format&fit=crop",
+    src: "/instagram-images/2.jpg",
     likes: "850",
     comments: "32",
   },
   {
     id: 3,
-    src: "https://images.unsplash.com/photo-1581850518616-bcb8186c393d?q=80&w=600&h=600&auto=format&fit=crop",
+    src: "/instagram-images/3.jpg",
     likes: "2.1K",
     comments: "124",
   },
   {
     id: 4,
-    src: "https://images.unsplash.com/photo-1513519107127-1bed33748e4c?q=80&w=600&h=600&auto=format&fit=crop",
+    src: "/instagram-images/4.jpg",
     likes: "1.5K",
     comments: "67",
   },
   {
     id: 5,
-    src: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=600&h=600&auto=format&fit=crop",
+    src: "/instagram-images/5.jpg",
     likes: "3.4K",
     comments: "215",
   },
@@ -49,31 +49,31 @@ const row1 = [
 const row2 = [
   {
     id: 6,
-    src: "https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=600&h=600&auto=format&fit=crop",
+    src: "/instagram-images/6.jpg",
     likes: "940",
     comments: "29",
   },
   {
     id: 7,
-    src: "https://images.unsplash.com/photo-1515405295579-ba7b45403062?q=80&w=600&h=600&auto=format&fit=crop",
+    src: "/instagram-images/7.jpg",
     likes: "1.8K",
     comments: "88",
   },
   {
     id: 8,
-    src: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=600&h=600&auto=format&fit=crop",
+    src: "/instagram-images/8.jpg",
     likes: "2.7K",
     comments: "156",
   },
   {
     id: 9,
-    src: "https://images.unsplash.com/photo-1501472312651-726afe119ff1?q=80&w=600&h=600&auto=format&fit=crop",
+    src: "/instagram-images/9.jpg",
     likes: "1.1K",
     comments: "42",
   },
   {
     id: 10,
-    src: "https://images.unsplash.com/photo-1510784722466-f2aa9c52fe6f?q=80&w=600&h=600&auto=format&fit=crop",
+    src: "/instagram-images/10.jpg",
     likes: "2.2K",
     comments: "93",
   },

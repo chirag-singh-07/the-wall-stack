@@ -60,6 +60,9 @@ export async function getCustomPosterById(id: string) {
 export async function getAllCustomPosters() {
   try {
     const posters = await db.customPoster.findMany({
+      include: {
+        user: true,
+      },
       orderBy: { createdAt: "desc" },
     });
 

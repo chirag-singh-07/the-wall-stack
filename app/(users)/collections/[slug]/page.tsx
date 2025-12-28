@@ -8,9 +8,10 @@ import { ReviewSection } from "@/components/reviews/review-section";
 export default async function CollectionDetailPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const result = await getCollectionBySlug(params.slug);
+  const { slug } = await params;
+  const result = await getCollectionBySlug(slug);
 
   if (!result.success || !result.data) {
     notFound();

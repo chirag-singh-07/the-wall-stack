@@ -9,20 +9,10 @@ import { useRouter } from "next/navigation";
 
 export default function VerifyEmailPage() {
   const [mounted, setMounted] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(true);
-  const [verified, setVerified] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
-
-    // Fake verification delay (replace with Better Auth logic later)
-    const timer = setTimeout(() => {
-      setIsVerifying(false);
-      setVerified(true);
-    }, 2500);
-
-    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -49,7 +39,7 @@ export default function VerifyEmailPage() {
         >
           {/* Logo */}
           <div className="text-center">
-            <Link href="/" className="text-3xl font-bold tracking-tight">
+            <Link href="/login" className="text-3xl font-bold tracking-tight">
               THE WALL STACK
             </Link>
           </div>
@@ -57,24 +47,19 @@ export default function VerifyEmailPage() {
           {/* Icon */}
           <div className="flex justify-center">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-              {isVerifying ? (
-                <Loader2 className="h-8 w-8 animate-spin" />
-              ) : (
-                <CheckCircle className="h-8 w-8 text-foreground" />
-              )}
+              <Mail className="h-8 w-8 text-foreground" />
             </div>
           </div>
 
           {/* Content */}
           <div className="space-y-3 text-center">
             <h1 className="text-3xl font-bold tracking-tight">
-              {isVerifying ? "Verifying your email" : "Email verified"}
+              Check your email
             </h1>
 
             <p className="text-muted-foreground">
-              {isVerifying
-                ? "Please wait while we confirm your email address."
-                : "Your email has been successfully verified. You can now access your account."}
+              We've sent a verification link to your email address. Please check
+              your inbox and click the link to verify your account.
             </p>
           </div>
 
@@ -82,29 +67,28 @@ export default function VerifyEmailPage() {
           <div className="rounded-xl border bg-muted/40 p-4 flex items-center gap-3">
             <Mail className="h-5 w-5 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              john.doe@example.com
+              Didn't receive the email? Check your spam folder or contact
+              support.
             </p>
           </div>
 
           {/* Actions */}
-          {!isVerifying && (
-            <Button
-              className="w-full h-12 text-base font-medium"
-              onClick={() => router.push("/")}
-            >
-              Continue to Shopping
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          )}
+          <Button
+            className="w-full h-12 text-base font-medium"
+            onClick={() => router.push("/login")}
+          >
+            Go to Login
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
 
           {/* Back */}
           <div className="text-center">
             <Link
-              href="/"
+              href="/login"
               className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowRight className="h-4 w-4 rotate-180" />
-              Back to home
+              Back to login
             </Link>
           </div>
         </div>

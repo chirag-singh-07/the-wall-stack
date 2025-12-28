@@ -214,13 +214,49 @@ export function CheckoutForm({
                 value={formData.state}
               >
                 <SelectTrigger className="bg-background">
-                  <SelectValue placeholder="Select" />
+                  <SelectValue placeholder="Select State" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ny">New York</SelectItem>
-                  <SelectItem value="ca">California</SelectItem>
-                  <SelectItem value="tx">Texas</SelectItem>
-                  <SelectItem value="fl">Florida</SelectItem>
+                <SelectContent className="max-h-[200px]">
+                  <SelectItem value="AN">
+                    Andaman and Nicobar Islands
+                  </SelectItem>
+                  <SelectItem value="AP">Andhra Pradesh</SelectItem>
+                  <SelectItem value="AR">Arunachal Pradesh</SelectItem>
+                  <SelectItem value="AS">Assam</SelectItem>
+                  <SelectItem value="BR">Bihar</SelectItem>
+                  <SelectItem value="CH">Chandigarh</SelectItem>
+                  <SelectItem value="CT">Chhattisgarh</SelectItem>
+                  <SelectItem value="DN">
+                    Dadra and Nagar Haveli and Daman and Diu
+                  </SelectItem>
+                  <SelectItem value="DL">Delhi</SelectItem>
+                  <SelectItem value="GA">Goa</SelectItem>
+                  <SelectItem value="GJ">Gujarat</SelectItem>
+                  <SelectItem value="HR">Haryana</SelectItem>
+                  <SelectItem value="HP">Himachal Pradesh</SelectItem>
+                  <SelectItem value="JK">Jammu and Kashmir</SelectItem>
+                  <SelectItem value="JH">Jharkhand</SelectItem>
+                  <SelectItem value="KA">Karnataka</SelectItem>
+                  <SelectItem value="KL">Kerala</SelectItem>
+                  <SelectItem value="LA">Ladakh</SelectItem>
+                  <SelectItem value="LD">Lakshadweep</SelectItem>
+                  <SelectItem value="MP">Madhya Pradesh</SelectItem>
+                  <SelectItem value="MH">Maharashtra</SelectItem>
+                  <SelectItem value="MN">Manipur</SelectItem>
+                  <SelectItem value="ML">Meghalaya</SelectItem>
+                  <SelectItem value="MZ">Mizoram</SelectItem>
+                  <SelectItem value="NL">Nagaland</SelectItem>
+                  <SelectItem value="OR">Odisha</SelectItem>
+                  <SelectItem value="PY">Puducherry</SelectItem>
+                  <SelectItem value="PB">Punjab</SelectItem>
+                  <SelectItem value="RJ">Rajasthan</SelectItem>
+                  <SelectItem value="SK">Sikkim</SelectItem>
+                  <SelectItem value="TN">Tamil Nadu</SelectItem>
+                  <SelectItem value="TG">Telangana</SelectItem>
+                  <SelectItem value="TR">Tripura</SelectItem>
+                  <SelectItem value="UP">Uttar Pradesh</SelectItem>
+                  <SelectItem value="UT">Uttarakhand</SelectItem>
+                  <SelectItem value="WB">West Bengal</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -254,11 +290,57 @@ export function CheckoutForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="us">United States</SelectItem>
-                <SelectItem value="ca">Canada</SelectItem>
-                <SelectItem value="uk">United Kingdom</SelectItem>
-                <SelectItem value="de">Germany</SelectItem>
-                <SelectItem value="fr">France</SelectItem>
+                <SelectItem value="IN">India</SelectItem>
+                <SelectItem value="US">United States</SelectItem>
+                <SelectItem value="GB">United Kingdom</SelectItem>
+                <SelectItem value="CA">Canada</SelectItem>
+                <SelectItem value="AU">Australia</SelectItem>
+                <SelectItem value="AE">United Arab Emirates</SelectItem>
+                <SelectItem value="SG">Singapore</SelectItem>
+                <SelectItem value="DE">Germany</SelectItem>
+                <SelectItem value="FR">France</SelectItem>
+                <SelectItem value="JP">Japan</SelectItem>
+                <SelectItem value="CN">China</SelectItem>
+                <SelectItem value="BR">Brazil</SelectItem>
+                <SelectItem value="MX">Mexico</SelectItem>
+                <SelectItem value="IT">Italy</SelectItem>
+                <SelectItem value="ES">Spain</SelectItem>
+                <SelectItem value="NL">Netherlands</SelectItem>
+                <SelectItem value="SE">Sweden</SelectItem>
+                <SelectItem value="NO">Norway</SelectItem>
+                <SelectItem value="DK">Denmark</SelectItem>
+                <SelectItem value="FI">Finland</SelectItem>
+                <SelectItem value="CH">Switzerland</SelectItem>
+                <SelectItem value="AT">Austria</SelectItem>
+                <SelectItem value="BE">Belgium</SelectItem>
+                <SelectItem value="PL">Poland</SelectItem>
+                <SelectItem value="PT">Portugal</SelectItem>
+                <SelectItem value="GR">Greece</SelectItem>
+                <SelectItem value="CZ">Czech Republic</SelectItem>
+                <SelectItem value="HU">Hungary</SelectItem>
+                <SelectItem value="RO">Romania</SelectItem>
+                <SelectItem value="NZ">New Zealand</SelectItem>
+                <SelectItem value="ZA">South Africa</SelectItem>
+                <SelectItem value="KR">South Korea</SelectItem>
+                <SelectItem value="TH">Thailand</SelectItem>
+                <SelectItem value="MY">Malaysia</SelectItem>
+                <SelectItem value="ID">Indonesia</SelectItem>
+                <SelectItem value="PH">Philippines</SelectItem>
+                <SelectItem value="VN">Vietnam</SelectItem>
+                <SelectItem value="SA">Saudi Arabia</SelectItem>
+                <SelectItem value="QA">Qatar</SelectItem>
+                <SelectItem value="KW">Kuwait</SelectItem>
+                <SelectItem value="OM">Oman</SelectItem>
+                <SelectItem value="BH">Bahrain</SelectItem>
+                <SelectItem value="IL">Israel</SelectItem>
+                <SelectItem value="TR">Turkey</SelectItem>
+                <SelectItem value="EG">Egypt</SelectItem>
+                <SelectItem value="NG">Nigeria</SelectItem>
+                <SelectItem value="KE">Kenya</SelectItem>
+                <SelectItem value="AR">Argentina</SelectItem>
+                <SelectItem value="CL">Chile</SelectItem>
+                <SelectItem value="CO">Colombia</SelectItem>
+                <SelectItem value="PE">Peru</SelectItem>
               </SelectContent>
             </Select>
           </div>

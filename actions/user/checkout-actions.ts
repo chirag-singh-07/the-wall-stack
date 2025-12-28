@@ -39,21 +39,26 @@ export async function createOrder(data: CreateOrderInput) {
         items: {
           create: await Promise.all(
             data.items.map(async (item) => {
+              const isCustom = item.productId.startsWith("custom_");
+              const actualId = isCustom
+                ? item.productId.replace("custom_", "")
+                : item.productId;
+
               // Check if it's a valid Poster in DB to avoid foreign key violation
-              const posterExists = await prisma.poster.findUnique({
-                where: { id: item.productId },
-                select: { id: true },
-              });
+              const posterExists = !isCustom
+                ? await prisma.poster.findUnique({
+                    where: { id: actualId },
+                    select: { id: true },
+                  })
+                : null;
 
               return {
                 quantity: item.quantity,
                 price: item.price,
                 size: item.size,
-                productId: item.productId, // Always store the plain ID
-                posterId: posterExists ? item.productId : null, // Only link if exists
-                customPosterId: item.productId.startsWith("cus_")
-                  ? item.productId
-                  : null,
+                productId: actualId, // Always store the plain ID
+                posterId: posterExists ? actualId : null, // Only link if exists
+                customPosterId: isCustom ? actualId : null,
               };
             })
           ),
@@ -82,7 +87,7 @@ export async function getOrders() {
         items: {
           include: {
             poster: true,
-            // customPoster: true // Include this if added to schema
+            customPoster: true,
           },
         },
       },

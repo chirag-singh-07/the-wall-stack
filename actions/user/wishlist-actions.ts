@@ -69,18 +69,18 @@ export async function getUserWishlist(userId: string) {
 /**
  * Check if a product is in the user's wishlist
  */
-export async function checkWishostStatus(userId: string, productId: string) {
-    try {
-        const item = await db.wishlist.findUnique({
-            where: {
-                userId_productId: {
-                    userId,
-                    productId
-                }
-            }
-        });
-        return { success: true, inWishlist: !!item };
-    } catch (error) {
-        return { success: false, error: "Error checking status" };
-    }
+export async function checkWishlistStatus(userId: string, productId: string) {
+  try {
+    const item = await db.wishlist.findUnique({
+      where: {
+        userId_productId: {
+          userId,
+          productId,
+        },
+      },
+    });
+    return { success: true, inWishlist: !!item };
+  } catch (error) {
+    return { success: false, error: "Error checking status" };
+  }
 }

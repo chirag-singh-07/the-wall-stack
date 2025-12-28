@@ -88,24 +88,69 @@ export async function checkUserSubmissionStatus(userId: string) {
 }
 
 /**
- * Like a gallery post
+ * Toggle like on a gallery post
  */
-export async function likeGalleryPost(postId: string) {
+export async function toggleGalleryLike(userId: string, postId: string) {
   try {
-    const post = await db.customerGalleryPost.update({
-      where: { id: postId },
-      data: {
-        likes: {
-          increment: 1,
+    const existingLike = await db.galleryLike.findUnique({
+      where: {
+        userId_postId: {
+          userId,
+          postId,
         },
       },
     });
 
-    revalidatePath("/");
-    return { success: true, data: post };
+    if (existingLike) {
+      // Unlike
+      await db.galleryLike.delete({
+        where: { id: existingLike.id },
+      });
+
+      const post = await db.customerGalleryPost.update({
+        where: { id: postId },
+        data: { likes: { decrement: 1 } },
+      });
+
+      revalidatePath("/");
+      revalidatePath("/gallery");
+      return { success: true, action: "unliked", likes: post.likes };
+    } else {
+      // Like
+      await db.galleryLike.create({
+        data: {
+          userId,
+          postId,
+        },
+      });
+
+      const post = await db.customerGalleryPost.update({
+        where: { id: postId },
+        data: { likes: { increment: 1 } },
+      });
+
+      revalidatePath("/");
+      revalidatePath("/gallery");
+      return { success: true, action: "liked", likes: post.likes };
+    }
   } catch (error) {
-    console.error("Error liking gallery post:", error);
-    return { success: false, error: "Failed to like post" };
+    console.error("Error toggling gallery like:", error);
+    return { success: false, error: "Failed to update like" };
+  }
+}
+
+/**
+ * Get IDs of posts liked by user
+ */
+export async function getUserLikedPostIds(userId: string) {
+  try {
+    const likes = await db.galleryLike.findMany({
+      where: { userId },
+      select: { postId: true },
+    });
+    return { success: true, likedPostIds: likes.map((l) => l.postId) };
+  } catch (error) {
+    return { success: false, error: "Failed to fetch user likes" };
   }
 }
 

@@ -56,7 +56,7 @@ export function Navbar() {
     { name: "Shop", href: "/shop" },
     { name: "Collections", href: "/collections" },
     { name: "Custom", href: "/custom-poster" },
-    { name: "Gallery", href: "/#gallery" },
+    { name: "Gallery", href: "/gallery" },
     { name: "About", href: "/about" },
   ];
 

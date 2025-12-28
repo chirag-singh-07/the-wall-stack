@@ -1,27 +1,59 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
-import { allProducts } from "@/lib/products";
+import { getRecommendedPosters } from "@/actions/user/product-actions";
 import { useCartStore } from "@/lib/cart-store";
+import { toast } from "sonner";
 
 export function CartRecommendations() {
   const { items, addItem } = useCartStore();
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Get products not in cart
-  const cartProductIds = items.map((item) => item.productId);
-  const recommendations = allProducts
-    .filter((p) => !cartProductIds.includes(p.id))
-    .slice(0, 4);
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      setIsLoading(true);
+      try {
+        // Extract poster IDs from cart (excluding custom posters)
+        const cartPosterIds = items
+          .filter((item) => !item.productId.startsWith("custom_"))
+          .map((item) => item.productId);
+
+        const result = await getRecommendedPosters(cartPosterIds);
+        if (result.success && result.data) {
+          setRecommendations(result.data);
+        }
+      } catch (error) {
+        console.error("Error fetching recommendations:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, [items]);
+
+  const handleQuickAdd = (posterId: string, price: number) => {
+    addItem(posterId, "A3 (30×42cm)", price);
+    toast.success("Added to cart");
+  };
+
+  if (isLoading) {
+    return (
+      <section className="py-12 md:py-16 border-t border-border">
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </section>
+    );
+  }
 
   if (recommendations.length === 0) return null;
-
-  const handleQuickAdd = (productId: string, price: number) => {
-    addItem(productId, "A3 (30×42cm)", price);
-  };
 
   return (
     <section className="py-12 md:py-16 border-t border-border">
@@ -69,7 +101,7 @@ export function CartRecommendations() {
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="text-xs uppercase tracking-[0.1em] text-muted-foreground mb-0.5">
-                  {product.category}
+                  {product.category?.name || "Poster"}
                 </p>
                 <Link href={`/shop/${product.id}`}>
                   <h3 className="font-medium text-sm truncate hover:underline underline-offset-4">
@@ -77,7 +109,7 @@ export function CartRecommendations() {
                   </h3>
                 </Link>
                 <p className="text-sm text-muted-foreground mt-0.5">
-                  {formatPrice(product.price)}
+                  ₹{product.price}
                 </p>
               </div>
 
@@ -85,7 +117,9 @@ export function CartRecommendations() {
                 variant="outline"
                 size="icon"
                 className="h-8 w-8 shrink-0 bg-transparent hover:bg-foreground hover:text-background transition-colors"
-                onClick={() => handleQuickAdd(product.id, product.price)}
+                onClick={() =>
+                  handleQuickAdd(product.id, Number(product.price))
+                }
               >
                 <Plus className="h-4 w-4" />
                 <span className="sr-only">Add to cart</span>

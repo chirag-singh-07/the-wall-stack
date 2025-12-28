@@ -15,7 +15,6 @@ import { FeaturedProducts } from "@/components/featured-products";
 import { ParallaxBanner } from "@/components/parallax-banner";
 import { CollectionShowcase } from "@/components/collection-showcase";
 import { CollectionsSection } from "@/components/collections-section";
-import { ArtistSpotlight } from "@/components/artist-spotlight";
 import { CustomerGallery } from "@/components/customer-gallery";
 import { StatsCounter } from "@/components/stats-counter";
 import { Testimonials } from "@/components/testimonials";
@@ -58,7 +57,7 @@ export default async function HomePage() {
       <ParallaxBanner />
       <CollectionShowcase />
       <CollectionsSection />
-      <ArtistSpotlight />
+      {/* <ArtistSpotlight /> */}
       {/* <SizeGuide />
       <GiftCards /> */}
       <CustomerGallery />

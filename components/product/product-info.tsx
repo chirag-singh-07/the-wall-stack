@@ -14,6 +14,12 @@ import {
 } from "lucide-react";
 import { cn, formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/lib/cart-store";
+import { authClient } from "@/lib/auth-client";
+import {
+  checkWishlistStatus,
+  toggleWishlist,
+} from "@/actions/user/wishlist-actions";
+import { useEffect } from "react";
 
 interface ProductInfoProps {
   productId: string;
@@ -39,6 +45,40 @@ export function ProductInfo({
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
   const { addItem } = useCartStore();
+  const { data: session } = authClient.useSession();
+
+  useEffect(() => {
+    if (session?.user?.id && productId) {
+      checkWishlistStatus(session.user.id, productId).then((res) => {
+        if (res.success) setIsWishlisted(res.inWishlist);
+      });
+    }
+  }, [session?.user?.id, productId]);
+
+  const handleWishlist = async () => {
+    if (!session?.user) {
+      toast.error("Please login to add to wishlist");
+      return;
+    }
+
+    const prev = isWishlisted;
+    setIsWishlisted(!prev);
+
+    try {
+      const res = await toggleWishlist(session.user.id, productId);
+      if (!res.success) {
+        setIsWishlisted(prev);
+        toast.error(res.error);
+      } else {
+        toast.success(
+          res.action === "added" ? "Added to wishlist" : "Removed from wishlist"
+        );
+      }
+    } catch (err) {
+      setIsWishlisted(prev);
+      toast.error("Something went wrong");
+    }
+  };
 
   const currentPrice = sizes[selectedSize]?.price || price;
   const currentSizeName = sizes[selectedSize]?.name || "A3 (30×42cm)";
@@ -161,7 +201,7 @@ export function ProductInfo({
             isWishlisted &&
               "bg-foreground text-background hover:bg-foreground/90"
           )}
-          onClick={() => setIsWishlisted(!isWishlisted)}
+          onClick={handleWishlist}
         >
           <Heart className={cn("h-5 w-5", isWishlisted && "fill-current")} />
         </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/lib/cart-store";
 import {
@@ -14,6 +14,10 @@ import { Footer } from "@/components/footer";
 import { ChevronRight, ShoppingBag, Lock, Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createOrder } from "@/actions/user/checkout-actions";
+import {
+  getUserAddress,
+  saveUserAddress,
+} from "@/actions/user/address-actions";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 
@@ -36,7 +40,7 @@ export default function CheckoutPage() {
     city: "",
     state: "",
     zip: "",
-    country: "us",
+    country: "IN",
     shippingMethod: "standard",
     sameAsBilling: true,
   });
@@ -52,6 +56,34 @@ export default function CheckoutPage() {
     const tax = subtotal * 0.18; // 18% GST for India
     return subtotal + shipping + tax;
   };
+
+  // Load user's saved address on mount
+  useEffect(() => {
+    const loadUserAddress = async () => {
+      try {
+        const { data: session } = await authClient.getSession();
+        if (session?.user?.id) {
+          const result = await getUserAddress(session.user.id);
+          if (result.success && result.data) {
+            const userData = result.data;
+            setFormData((prev) => ({
+              ...prev,
+              address: userData.address || "",
+              apartment: userData.apartment || "",
+              city: userData.city || "",
+              state: userData.state || "",
+              zip: userData.postalCode || "",
+              country: userData.country || "IN",
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Error loading address:", error);
+      }
+    };
+
+    loadUserAddress();
+  }, []);
 
   const handlePlaceOrder = async () => {
     // Validation
@@ -108,6 +140,18 @@ export default function CheckoutPage() {
         clearCart();
         setOrderComplete(true);
         toast.success("Order placed successfully!");
+
+        // Save address for future use
+        if (session?.user?.id) {
+          await saveUserAddress(session.user.id, {
+            address: formData.address,
+            apartment: formData.apartment,
+            city: formData.city,
+            state: formData.state,
+            postalCode: formData.zip,
+            country: formData.country,
+          });
+        }
       } else {
         toast.error(res.error || "Failed to place order");
       }

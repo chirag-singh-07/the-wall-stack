@@ -9,6 +9,11 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: false,
+    sendVerificationEmail: false, // Completely disable email sending
+  },
+  emailVerification: {
+    sendOnSignUp: false, // Don't send verification emails on signup
   },
   socialProviders: {
     github: {
@@ -21,4 +26,8 @@ export const auth = betterAuth({
     },
   },
   plugins: [admin()],
+  advanced: {
+    generateId: false, // Use database auto-generated IDs
+  },
+  trustedOrigins: ["http://localhost:3000"],
 });

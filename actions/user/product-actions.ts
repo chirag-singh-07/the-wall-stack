@@ -131,3 +131,55 @@ export async function getFeaturedCollections() {
     { tags: ["collections"] }
   )();
 }
+
+/**
+ * Get poster by ID for cart display
+ */
+export async function getPosterById(id: string) {
+  try {
+    const poster = await db.poster.findUnique({
+      where: { id },
+      include: {
+        category: true,
+      },
+    });
+
+    if (!poster) {
+      return { success: false, error: "Poster not found" };
+    }
+
+    return { success: true, data: poster };
+  } catch (error) {
+    console.error("Error fetching poster:", error);
+    return { success: false, error: "Failed to fetch poster" };
+  }
+}
+
+/**
+ * Get recommended posters for cart page
+ * Excludes posters already in cart
+ */
+export async function getRecommendedPosters(excludeIds: string[] = []) {
+  try {
+    const posters = await db.poster.findMany({
+      where: {
+        status: "active",
+        id: {
+          notIn: excludeIds,
+        },
+      },
+      include: {
+        category: true,
+      },
+      take: 4,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return { success: true, data: posters };
+  } catch (error) {
+    console.error("Error fetching recommended posters:", error);
+    return { success: false, error: "Failed to fetch recommendations" };
+  }
+}

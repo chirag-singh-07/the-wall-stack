@@ -4,107 +4,118 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Quote, Star, CheckCircle2, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const testimonials = [
   {
     id: 1,
     quote:
       "The quality exceeded all my expectations. These posters have completely transformed my living room into a curated gallery space.",
-    author: "Sarah Montgomery",
+    author: "Aarav Mehta",
     role: "Interior Designer",
-    location: "New York, NY",
+    location: "Mumbai, MH",
     rating: 5,
     size: "large",
+    avatar: "/avatars/boy.png",
   },
   {
     id: 2,
     quote:
       "Finally found a brand that understands minimal design. Every piece is a conversation starter.",
-    author: "James Karlsson",
+    author: "Rohan Iyer",
     role: "Architect",
-    location: "Stockholm, SE",
+    location: "Bengaluru, KA",
     rating: 5,
     size: "small",
+    avatar: "/avatars/boy.png",
   },
   {
     id: 3,
     quote:
       "I've ordered from many poster shops, but none compare to the paper quality and the meticulous attention to detail here.",
-    author: "Emma Laurent",
+    author: "Ananya Sharma",
     role: "Art Collector",
-    location: "Paris, FR",
+    location: "Delhi, DL",
     rating: 5,
     size: "small",
+    avatar: "/avatars/girl.png",
   },
   {
     id: 4,
     quote:
       "The curation is impeccable. Each poster feels like it belongs in a museum, not just on a simple wall. The packaging was also premium.",
-    author: "Michael Russo",
+    author: "Kabir Nair",
     role: "Creative Director",
-    location: "Milan, IT",
+    location: "Kolkata, WB",
     rating: 5,
     size: "wide",
+    avatar: "/avatars/boy.png",
   },
   {
     id: 5,
     quote:
       "Absolutely stunning. The Noir series is exactly what my studio needed for that professional, minimalist edge.",
-    author: "David Chen",
+    author: "Devansh Rao",
     role: "Commercial Photographer",
-    location: "Tokyo, JP",
+    location: "Hyderabad, TS",
     rating: 5,
     size: "small",
+    avatar: "/avatars/boy.png",
   },
   {
     id: 6,
     quote:
       "Fast shipping and the quality is tangible. You can feel the weight of the paper and the depth of the ink. Truly a masterwork.",
-    author: "Olivia Wright",
+    author: "Priya Kapoor",
     role: "Graphic Artist",
-    location: "London, UK",
+    location: "Chennai, TN",
     rating: 5,
     size: "small",
+    avatar: "/avatars/girl.png",
   },
   {
     id: 7,
     quote:
       "A masterclass in modern branding and product quality. The Wall Stack is the only place I buy my office decor now.",
-    author: "Alexander Vogt",
+    author: "Arjun Malhotra",
     role: "Tech Founder",
-    location: "Berlin, DE",
+    location: "Pune, MH",
     rating: 5,
     size: "small",
+    avatar: "/avatars/boy.png",
   },
   {
     id: 8,
     quote:
       "The customer service is as premium as the products. They helped me choose the perfect collection for my new penthouse.",
-    author: "Sofia Rodriguez",
+    author: "Simran Kaur",
     role: "Luxury Real Estate",
-    location: "Madrid, ES",
+    location: "Gurgaon, HR",
     rating: 5,
     size: "large",
+    avatar: "/avatars/girl.png",
   },
   {
     id: 9,
     quote:
       "I love the story behind each collection. It's not just art; it's a narrative for your home.",
-    author: "Lucas Benini",
+    author: "Rahul Verma",
     role: "Fashion Stylist",
-    location: "Florence, IT",
+    location: "Jaipur, RJ",
     rating: 5,
     size: "small",
+    avatar: "/avatars/boy.png",
   },
   {
     id: 10,
     quote:
       "Securely delivered and flawless. The black and white contrast is the deepest I've ever seen on a print.",
-    author: "Nina Schultz",
+    author: "Neha Deshpande",
     role: "Professional Curator",
-    location: "Vienna, AT",
+    location: "Ahmedabad, GJ",
     rating: 5,
     size: "wide",
+    avatar: "/avatars/girl.png",
   },
 ];
 
@@ -150,10 +161,12 @@ export function Testimonials() {
                   key={i}
                   className="w-14 h-14 rounded-full border-4 border-white bg-zinc-100 overflow-hidden shadow-xl"
                 >
-                  <img
-                    src={`https://i.pravatar.cc/150?u=${i + 10}`}
+                  <Image
+                    src={`/avatars/boy.png`}
                     alt="User"
                     className="w-full h-full object-cover"
+                    width={56}
+                    height={56}
                   />
                 </div>
               ))}
@@ -208,10 +221,12 @@ export function Testimonials() {
               <div className="mt-12 pt-8 border-t border-black/5 group-hover:border-white/10 flex items-center justify-between transition-colors duration-500">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden bg-white border border-black/5">
-                    <img
-                      src={`https://i.pravatar.cc/150?u=${item.id + 50}`}
+                    <Image
+                      src={item.avatar}
                       alt={item.author}
                       className="w-full h-full object-cover"
+                      width={56}
+                      height={56}
                     />
                   </div>
                   <div>

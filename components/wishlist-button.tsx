@@ -4,7 +4,10 @@ import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { toggleWishlist, checkWishostStatus } from "@/actions/user/wishlist-actions";
+import {
+  toggleWishlist,
+  checkWishlistStatus,
+} from "@/actions/user/wishlist-actions";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -27,7 +30,7 @@ export function WishlistButton({
 
   useEffect(() => {
     if (session?.user?.id) {
-      checkWishostStatus(session.user.id, productId).then((res) => {
+      checkWishlistStatus(session.user.id, productId).then((res) => {
         if (res.success) {
           setIsInWishlist(res.inWishlist);
         }

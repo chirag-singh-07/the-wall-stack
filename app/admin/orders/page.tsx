@@ -160,9 +160,11 @@ export default function AdminOrdersPage() {
                                   <div>
                                     <p className="font-medium">
                                       {item.poster?.title ||
-                                        item.size + " Poster"}
+                                        (item.customPosterId
+                                          ? "Custom Design"
+                                          : item.size + " Poster")}
                                     </p>
-                                    <p className="text-muted-foreground">
+                                    <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-widest">
                                       {item.size} x {item.quantity}
                                     </p>
                                   </div>

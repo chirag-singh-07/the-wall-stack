@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { signUp } from "@/lib/auth-client";
+import { signUp, signIn } from "@/lib/auth-client";
 import { toast } from "sonner";
 
 const passwordRequirements = [
@@ -45,6 +45,27 @@ export default function RegisterPage() {
   });
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const posterImages = [
+    "/cars/car-1.jpg",
+    "/default-images/abstract-fluid-black-white-poster-art.jpg",
+    "/default-images/typography-bold-black-white-poster-art.jpg",
+    "/default-images/minimal-lines-black-white-poster-art.jpg",
+    "/default-images/abstract-chaotic-black-white-poster-art.jpg",
+  ];
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const { clientX, clientY } = e;
+      const x = (clientX - (window.innerWidth * 3) / 4) / 40;
+      const y = (clientY - window.innerHeight / 2) / 40;
+      setMousePosition({ x, y });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -62,24 +83,58 @@ export default function RegisterPage() {
 
     setIsLoading(true);
 
-    const res = await signUp.email({
-      email: formData.email,
-      password: formData.password,
-      name: formData.name,
-    });
+    // Add a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      setIsLoading(false);
+      toast.error(
+        "Registration is taking too long. Your account may have been created. Please try logging in.",
+        {
+          duration: 8000,
+          action: {
+            label: "Go to Login",
+            onClick: () => router.push("/login"),
+          },
+        }
+      );
+    }, 10000); // 10 second timeout
 
-    setIsLoading(false);
+    try {
+      const res = await signUp.email({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+      });
 
-    if (res.error) {
-      toast.error(res.error.message || "An error occurred during registration");
-      return;
+      clearTimeout(timeoutId); // Clear timeout if request completes
+
+      if (res.error) {
+        toast.error(
+          res.error.message || "An error occurred during registration"
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      // Auto-login after successful registration
+      const loginRes = await signIn.email({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (loginRes.error) {
+        toast.success("Registration successful! Please login to continue.");
+        router.push("/login");
+      } else {
+        toast.success("Welcome to The Wall Stack!");
+        router.push("/shop");
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.error("Registration error:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
     }
-
-    toast.success(
-      "Registration successful! Please check your email to verify your account."
-    );
-
-    router.push("/verify-email"); // or "/login"
   };
 
   const passwordStrength = passwordRequirements.filter((req) =>
@@ -572,39 +627,40 @@ export default function RegisterPage() {
           ))}
         </div>
 
-        {/* 3D Stacked Cards */}
-        <div className="absolute inset-0 flex items-center justify-center perspective-1000">
+        {/* Floating Posters Animation */}
+        <div className="absolute inset-0 flex items-center justify-center">
           <div
-            className={cn(
-              "relative transition-all duration-1000 delay-300",
-              mounted ? "opacity-100 rotate-0" : "opacity-0 rotate-12"
-            )}
-            style={{ transformStyle: "preserve-3d" }}
+            className="relative w-[500px] h-[600px] transition-transform duration-200 ease-out"
+            style={{
+              transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
+            }}
           >
-            {[...Array(4)].map((_, i) => (
+            {[...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className="absolute bg-background rounded-xl shadow-2xl overflow-hidden"
+                className={cn(
+                  "absolute bg-background rounded-xl shadow-2xl transition-all duration-1000 overflow-hidden group",
+                  mounted ? "opacity-100" : "opacity-0"
+                )}
                 style={{
-                  width: "300px",
-                  height: "400px",
-                  transform: `translateZ(${i * -30}px) translateX(${
-                    i * 20
-                  }px) translateY(${i * 15}px) rotateY(${i * 5}deg)`,
+                  width: `${280 - i * 10}px`,
+                  height: `${380 - i * 15}px`,
+                  left: `${50 + i * 25}px`,
+                  top: `${50 + i * 30}px`,
+                  transform: `rotate(${-15 + i * 8}deg) translate(${
+                    mousePosition.x * (i + 1) * 0.2
+                  }px, ${mousePosition.y * (i + 1) * 0.2}px)`,
+                  transitionDelay: `${i * 150}ms`,
+                  zIndex: 5 - i,
                 }}
               >
-                <div className="absolute inset-0 bg-linear-to-br from-muted to-background" />
-                <div className="absolute inset-6 border border-border rounded-lg" />
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div
-                    className="h-2 bg-muted rounded mb-2"
-                    style={{ width: `${60 + i * 10}%` }}
-                  />
-                  <div
-                    className="h-2 bg-muted rounded"
-                    style={{ width: `${40 + i * 5}%` }}
-                  />
-                </div>
+                <img
+                  src={posterImages[i]}
+                  alt="Poster"
+                  className="w-full h-full object-cover grayscale brightness-90 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
+                />
+                <div className="absolute inset-0 border border-white/10" />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
               </div>
             ))}
           </div>

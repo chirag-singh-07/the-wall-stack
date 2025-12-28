@@ -23,6 +23,27 @@ export default function LoginPage() {
     password: "",
   });
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const posterImages = [
+    "/default-images/minimal-geometric-black-white-poster-art.jpg",
+    "/default-images/abstract-fluid-black-white-poster-art.jpg",
+    "/default-images/typography-bold-black-white-poster-art.jpg",
+    "/default-images/minimal-lines-black-white-poster-art.jpg",
+    "/default-images/abstract-chaotic-black-white-poster-art.jpg",
+  ];
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const { clientX, clientY } = e;
+      const x = (clientX - window.innerWidth / 4) / 40;
+      const y = (clientY - window.innerHeight / 2) / 40;
+      setMousePosition({ x, y });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -84,26 +105,38 @@ export default function LoginPage() {
 
         {/* Floating Posters Animation */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative w-[500px] h-[600px]">
+          <div
+            className="relative w-[500px] h-[600px] transition-transform duration-200 ease-out"
+            style={{
+              transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
+            }}
+          >
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
                 className={cn(
-                  "absolute bg-background rounded-lg shadow-2xl transition-all duration-1000",
+                  "absolute bg-background rounded-lg shadow-2xl transition-all duration-1000 overflow-hidden group",
                   mounted ? "opacity-100" : "opacity-0"
                 )}
                 style={{
-                  width: `${280 - i * 20}px`,
-                  height: `${380 - i * 25}px`,
-                  left: `${50 + i * 15}px`,
-                  top: `${50 + i * 20}px`,
-                  transform: `rotate(${-15 + i * 8}deg)`,
+                  width: `${280 - i * 10}px`,
+                  height: `${380 - i * 15}px`,
+                  left: `${50 + i * 25}px`,
+                  top: `${50 + i * 30}px`,
+                  transform: `rotate(${-15 + i * 8}deg) translate(${
+                    mousePosition.x * (i + 1) * 0.2
+                  }px, ${mousePosition.y * (i + 1) * 0.2}px)`,
                   transitionDelay: `${i * 150}ms`,
                   zIndex: 5 - i,
                 }}
               >
-                <div className="absolute inset-4 border border-border" />
-                <div className="absolute inset-8 bg-muted" />
+                <img
+                  src={posterImages[i]}
+                  alt="Poster"
+                  className="w-full h-full object-cover grayscale brightness-90 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
+                />
+                <div className="absolute inset-0 border border-white/10" />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
               </div>
             ))}
           </div>

@@ -1,13 +1,15 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useCartStore } from "@/lib/cart-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tag, Check, Truck, Shield, RotateCcw, Loader2 } from "lucide-react";
-import { useState } from "react";
 import { cn, formatPrice } from "@/lib/utils";
+import { getPosterById } from "@/actions/user/product-actions";
+import { getCustomPosterById } from "@/actions/user/custom-poster-actions";
 
 interface CheckoutSummaryProps {
   shippingMethod: string;
@@ -20,23 +22,62 @@ export function CheckoutSummary({
   onPlaceOrder,
   isProcessing,
 }: CheckoutSummaryProps) {
-  const { items, getCartTotal, getItemDetails } = useCartStore();
+  const { items, getCartTotal } = useCartStore();
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState("");
+  const [productDetails, setProductDetails] = useState<Map<string, any>>(
+    new Map()
+  );
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
 
   const subtotal = getCartTotal();
 
+  // Fetch product details for all cart items
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoadingProducts(true);
+      const details = new Map();
+
+      for (const item of items) {
+        if (item.productId.startsWith("custom_")) {
+          const customId = item.productId.replace("custom_", "");
+          const result = await getCustomPosterById(customId);
+          if (result.success && result.data) {
+            details.set(item.productId, {
+              title: "Custom Poster Design",
+              image: result.data.design?.image || "/placeholder.svg",
+            });
+          }
+        } else {
+          const result = await getPosterById(item.productId);
+          if (result.success && result.data) {
+            details.set(item.productId, result.data);
+          }
+        }
+      }
+
+      setProductDetails(details);
+      setIsLoadingProducts(false);
+    };
+
+    if (items.length > 0) {
+      fetchProducts();
+    } else {
+      setIsLoadingProducts(false);
+    }
+  }, [items]);
+
   const getShippingCost = () => {
-    if (shippingMethod === "free" && subtotal >= 75) return 0;
-    if (shippingMethod === "express") return 19.99;
-    if (shippingMethod === "standard") return 9.99;
-    return subtotal >= 75 ? 0 : 9.99;
+    if (shippingMethod === "free" && subtotal >= 2999) return 0;
+    if (shippingMethod === "express") return 199;
+    if (shippingMethod === "standard") return 99;
+    return subtotal >= 2999 ? 0 : 99;
   };
 
   const shipping = getShippingCost();
   const discount = promoApplied ? subtotal * 0.1 : 0;
-  const tax = (subtotal - discount) * 0.08;
+  const tax = (subtotal - discount) * 0.18; // 18% GST
   const total = subtotal + shipping - discount + tax;
 
   const handleApplyPromo = () => {
@@ -55,33 +96,50 @@ export function CheckoutSummary({
 
       {/* Cart Items Preview */}
       <div className="space-y-4 max-h-64 overflow-y-auto scrollbar-hide">
-        {items.map((item) => {
-          const details = getItemDetails(item);
-          if (!details) return null;
-
-          return (
-            <div key={`${item.productId}-${item.size}`} className="flex gap-3">
-              <div className="relative w-16 h-16 bg-muted rounded-lg overflow-hidden shrink-0">
-                <Image
-                  src={details.image || "/placeholder.svg"}
-                  alt={details.title}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-foreground text-background rounded-full flex items-center justify-center text-xs font-medium">
-                  {item.quantity}
+        {isLoadingProducts
+          ? // Loading skeleton
+            [...Array(items.length)].map((_, i) => (
+              <div key={i} className="flex gap-3 animate-pulse">
+                <div className="w-16 h-16 bg-muted rounded-lg" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-32 bg-muted rounded" />
+                  <div className="h-3 w-16 bg-muted rounded" />
+                  <div className="h-4 w-20 bg-muted rounded" />
                 </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm truncate">{details.title}</p>
-                <p className="text-xs text-muted-foreground">{item.size}</p>
-                <p className="text-sm font-medium mt-1">
-                  {formatPrice(item.price * item.quantity)}
-                </p>
-              </div>
-            </div>
-          );
-        })}
+            ))
+          : items.map((item) => {
+              const details = productDetails.get(item.productId);
+              if (!details) return null;
+
+              return (
+                <div
+                  key={`${item.productId}-${item.size}`}
+                  className="flex gap-3"
+                >
+                  <div className="relative w-16 h-16 bg-muted rounded-lg overflow-hidden shrink-0">
+                    <Image
+                      src={details.image || "/placeholder.svg"}
+                      alt={details.title}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-foreground text-background rounded-full flex items-center justify-center text-xs font-medium">
+                      {item.quantity}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">
+                      {details.title}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{item.size}</p>
+                    <p className="text-sm font-medium mt-1">
+                      ₹{item.price * item.quantity}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
       </div>
 
       <Separator />
@@ -124,13 +182,13 @@ export function CheckoutSummary({
       <div className="space-y-3">
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Subtotal</span>
-          <span>{formatPrice(subtotal)}</span>
+          <span>₹{subtotal}</span>
         </div>
 
         {promoApplied && (
           <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
             <span>Discount (10%)</span>
-            <span>-{formatPrice(discount)}</span>
+            <span>-₹{discount.toFixed(2)}</span>
           </div>
         )}
 
@@ -141,20 +199,20 @@ export function CheckoutSummary({
               shipping === 0 && "text-green-600 dark:text-green-400"
             )}
           >
-            {shipping === 0 ? "FREE" : formatPrice(shipping)}
+            {shipping === 0 ? "FREE" : `₹${shipping}`}
           </span>
         </div>
 
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Estimated Tax</span>
-          <span>{formatPrice(tax)}</span>
+          <span className="text-muted-foreground">GST (18%)</span>
+          <span>₹{tax.toFixed(2)}</span>
         </div>
 
         <Separator />
 
         <div className="flex justify-between text-base font-semibold">
           <span>Total</span>
-          <span>{formatPrice(total)}</span>
+          <span>₹{total.toFixed(2)}</span>
         </div>
       </div>
 
@@ -170,7 +228,7 @@ export function CheckoutSummary({
             Processing...
           </>
         ) : (
-          `Pay ${formatPrice(total)}`
+          `Pay ₹${total.toFixed(2)}`
         )}
       </Button>
 

@@ -1,14 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Eye } from "lucide-react";
+import { ShoppingBag, Eye, Heart } from "lucide-react";
 import { cn, formatPrice } from "@/lib/utils";
 import type { Product } from "@/lib/products";
 import { useCartStore } from "@/lib/cart-store";
 import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
+import {
+  checkWishlistStatus,
+  toggleWishlist,
+} from "@/actions/user/wishlist-actions";
 
 interface ProductCardProps {
   product: Product;
@@ -16,6 +21,44 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: { product: any }) {
   const [isHovered, setIsHovered] = useState(false);
+  const { data: session } = authClient.useSession();
+  const [inWishlist, setInWishlist] = useState(false);
+
+  useEffect(() => {
+    if (session?.user?.id && product?.id) {
+      checkWishlistStatus(session.user.id, product.id).then((res) => {
+        if (res.success) setInWishlist(res.inWishlist || false);
+      });
+    }
+  }, [session?.user?.id, product?.id]);
+
+  const handleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!session?.user) {
+      toast.error("Please login to add to wishlist");
+      return;
+    }
+
+    const prev = inWishlist;
+    setInWishlist(!prev);
+
+    try {
+      const res = await toggleWishlist(session.user.id, product.id);
+      if (!res.success) {
+        setInWishlist(prev);
+        toast.error(res.error);
+      } else {
+        toast.success(
+          res.action === "added" ? "Added to wishlist" : "Removed from wishlist"
+        );
+      }
+    } catch (err) {
+      setInWishlist(prev);
+      toast.error("Something went wrong");
+    }
+  };
 
   // Use slug if available, otherwise fallback to id
   const identifier = product.slug || product.id;
@@ -97,10 +140,26 @@ export function ProductCard({ product }: { product: any }) {
         />
         <div
           className={cn(
-            "absolute top-4 right-4 w-6 h-6 border-r border-t border-background/80 transition-all duration-500 delay-75",
-            isHovered ? "opacity-100 scale-100" : "opacity-0 scale-75"
+            "absolute top-4 right-4 z-20 transition-all duration-300",
+            isHovered
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 -translate-y-2 md:opacity-100 md:translate-y-0"
           )}
-        />
+        >
+          <Button
+            size="icon"
+            variant="secondary"
+            className={cn(
+              "h-8 w-8 rounded-full shadow-md transition-colors",
+              inWishlist
+                ? "bg-red-500 text-white hover:bg-red-600"
+                : "bg-background/80 hover:bg-background"
+            )}
+            onClick={handleWishlist}
+          >
+            <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} />
+          </Button>
+        </div>
       </div>
       <Link href={`/shop/${identifier}`} className="block space-y-1 group">
         <h3 className="font-medium group-hover:text-primary transition-colors line-clamp-1">

@@ -26,11 +26,21 @@ model User {
   banReason     String?
   banExpires    DateTime?
   updatedAt     DateTime  @updatedAt
+  
+  // Shipping Address Fields (optional)
+  address       String?
+  apartment     String?
+  city          String?
+  state         String?
+  postalCode    String?
+  country       String?   @default("IN")
+  
   sessions      Session[]
   accounts      Account[]
   orders        Order[]
   wishlist      Wishlist[]
   galleryComments GalleryComment[]
+  galleryLikes  GalleryLike[]
   reviews       Review[]
 
   @@unique([email])
@@ -159,14 +169,27 @@ model CustomerGalleryPost {
   caption      String
   posterName   String?
   likes        Int      @default(0)
-  commentCount Int      @default(0) // Renamed from 'comments' to avoid confusion with relation
+  commentCount Int      @default(0)
   postComments GalleryComment[]
+  postLikes    GalleryLike[]
   instagramUrl String?
   status       String   @default("pending") // "pending", "approved", "rejected"
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   @@map("customer_gallery_post")
+}
+
+model GalleryLike {
+  id        String   @id @default(cuid())
+  postId    String
+  post      CustomerGalleryPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+  @@map("gallery_like")
 }
 
 model Review {

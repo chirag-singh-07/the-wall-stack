@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   User,
   Mail,
@@ -15,6 +16,9 @@ import {
   Zap,
   ArrowRight,
   Heart,
+  Package,
+  ShoppingBag,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,13 +32,18 @@ import { Footer } from "@/components/footer";
 import Image from "next/image";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
   const { data: session } = authClient.useSession();
-  const [stats, setStats] = useState({
-    orders: 0,
-    wishlist: 0,
-    memberSince: "2024",
+  const [dashboardData, setDashboardData] = useState<any>({
+    stats: {
+      orders: 0,
+      wishlist: 0,
+      memberSince: "2024",
+    },
+    recentOrders: [],
+    recentWishlist: [],
   });
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -56,13 +65,16 @@ export default function ProfilePage() {
       });
 
       getUserStats(session.user.id).then((res) => {
-        if (res.success && res.stats) {
-          setStats(res.stats);
+        if (res.success) {
+          setDashboardData({
+            stats: res.stats || dashboardData.stats,
+            recentOrders: res.recentOrders || [],
+            recentWishlist: res.recentWishlist || [],
+          });
         }
         setLoading(false);
       });
     } else if (!session && !loading) {
-      // Only stop loading if we're sure there's no session
       setLoading(false);
     }
   }, [session, loading]);
@@ -70,7 +82,6 @@ export default function ProfilePage() {
   const handleSave = async () => {
     if (!session?.user) return;
 
-    // Validation
     if (!formData.name.trim()) {
       setErrors({ name: "Name is required" });
       toast.error("Please fill in required fields");
@@ -107,9 +118,7 @@ export default function ProfilePage() {
   const getAvatarUrl = () => {
     if (session?.user?.image) return session.user.image;
     const name = session?.user?.name || "User";
-    return `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(
-      name
-    )}&backgroundColor=000000&textColor=ffffff`;
+    return "/avatars/boy.png";
   };
 
   if (loading)
@@ -187,12 +196,10 @@ export default function ProfilePage() {
               variants={itemVariants}
               className="border-[3px] border-foreground mt-8 relative bg-card overflow-hidden"
             >
-              {/* Decorative background text */}
               <div className="absolute top-0 right-0 text-[120px] font-black text-foreground/3 leading-none select-none pointer-events-none -mr-12 -mt-8 uppercase tracking-tighter">
                 PROFILE
               </div>
 
-              {/* Avatar & Action Section */}
               <div className="relative h-40 bg-muted/30 border-b-[3px] border-foreground">
                 <div className="absolute -bottom-16 left-8 z-20">
                   <div className="relative group">
@@ -207,9 +214,6 @@ export default function ProfilePage() {
                         className="object-cover"
                       />
                     </motion.div>
-                    <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-foreground text-background flex items-center justify-center border-2 border-background hover:scale-110 transition-transform cursor-pointer shadow-lg">
-                      <Camera className="w-5 h-5" />
-                    </button>
                   </div>
                 </div>
 
@@ -250,10 +254,8 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Profile Form Content */}
               <div className="pt-24 p-8 md:p-12">
                 <div className="grid md:grid-cols-2 gap-12">
-                  {/* Full Name */}
                   <div className="space-y-4">
                     <Label
                       htmlFor="name"
@@ -309,7 +311,6 @@ export default function ProfilePage() {
                     </AnimatePresence>
                   </div>
 
-                  {/* Email */}
                   <div className="space-y-4">
                     <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-muted-foreground flex items-center gap-2">
                       <Mail className="w-3 h-3" />
@@ -320,7 +321,6 @@ export default function ProfilePage() {
                     </p>
                   </div>
 
-                  {/* Phone */}
                   <div className="space-y-4">
                     <Label
                       htmlFor="phone"
@@ -365,7 +365,6 @@ export default function ProfilePage() {
                     </AnimatePresence>
                   </div>
 
-                  {/* User Role / ID (Non-editable) */}
                   <div className="space-y-4">
                     <Label className="text-[10px] uppercase tracking-[0.2em] font-black text-muted-foreground flex items-center gap-2">
                       <Zap className="w-3 h-3" />
@@ -389,14 +388,21 @@ export default function ProfilePage() {
               {[
                 {
                   label: "Acquisitions",
-                  value: stats.orders,
-                  icon: ArrowRight,
+                  value: dashboardData.stats.orders,
+                  icon: Package,
+                  href: "/profile/orders",
                 },
-                { label: "Curated Items", value: stats.wishlist, icon: Heart },
+                {
+                  label: "Curated Items",
+                  value: dashboardData.stats.wishlist,
+                  icon: Heart,
+                  href: "/profile/wishlist",
+                },
                 {
                   label: "Legacy Start",
-                  value: stats.memberSince,
+                  value: dashboardData.stats.memberSince,
                   icon: Calendar,
+                  href: null,
                 },
               ].map((stat, idx) => (
                 <motion.div
@@ -405,11 +411,17 @@ export default function ProfilePage() {
                   whileHover={{ y: -5, borderColor: "rgba(0,0,0,1)" }}
                   className="group border-2 border-foreground/10 p-6 bg-card transition-colors relative h-32 flex flex-col justify-between"
                 >
+                  {stat.href ? (
+                    <Link href={stat.href} className="absolute inset-0" />
+                  ) : null}
                   <div className="flex justify-between items-start">
                     <stat.icon className="w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity" />
                     <span className="text-xs uppercase tracking-[0.3em] font-black group-hover:text-foreground/40 transition-colors">
                       {stat.label}
                     </span>
+                    {stat.href && (
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    )}
                   </div>
                   <p className="text-4xl font-black uppercase tracking-tighter">
                     {stat.value}
@@ -418,6 +430,142 @@ export default function ProfilePage() {
                 </motion.div>
               ))}
             </div>
+
+            {/* Recent Acquisitions Section */}
+            {dashboardData.recentOrders &&
+              dashboardData.recentOrders.length > 0 && (
+                <motion.div variants={itemVariants} className="mt-16 space-y-8">
+                  <div className="flex items-center justify-between border-b-2 border-foreground/5 pb-4">
+                    <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3">
+                      <ShoppingBag className="w-5 h-5 opacity-40" />
+                      Recent Acquisitions
+                    </h3>
+                    <Link href="/profile/orders">
+                      <Button
+                        variant="link"
+                        className="text-xs uppercase tracking-widest font-bold"
+                      >
+                        View All History
+                      </Button>
+                    </Link>
+                  </div>
+
+                  <div className="grid gap-4">
+                    {dashboardData.recentOrders.map((order: any) => (
+                      <div
+                        key={order.id}
+                        className="border-2 border-foreground/10 p-6 flex items-center justify-between hover:border-foreground/30 transition-colors bg-card group relative"
+                      >
+                        <Link
+                          href={`/profile/orders`}
+                          className="absolute inset-0 z-10"
+                        />
+                        <div className="flex items-center gap-6">
+                          <div className="w-16 h-16 bg-muted border border-foreground/10 rounded-lg overflow-hidden relative">
+                            {order.previewItem?.image ? (
+                              <Image
+                                src={order.previewItem.image}
+                                alt={order.previewItem.title || "Order Item"}
+                                fill
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="flex items-center justify-center h-full bg-foreground/5">
+                                <Package className="w-6 h-6 opacity-20" />
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="font-black uppercase tracking-tight text-sm mb-1">
+                              {order.previewItem?.title ||
+                                `Order #${order.id.slice(0, 8)}`}
+                            </h4>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
+                              <span>
+                                {new Date(order.date).toLocaleDateString()}
+                              </span>
+                              <span className="w-1 h-1 rounded-full bg-foreground/20" />
+                              <span>
+                                {order.total.toLocaleString("en-IN", {
+                                  style: "currency",
+                                  currency: "INR",
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span
+                            className={cn(
+                              "px-3 py-1 text-[10px] font-black uppercase tracking-widest border",
+                              order.status === "completed"
+                                ? "bg-green-100 text-green-700 border-green-200"
+                                : order.status === "cancelled"
+                                ? "bg-red-100 text-red-700 border-red-200"
+                                : "bg-yellow-100 text-yellow-700 border-yellow-200"
+                            )}
+                          >
+                            {order.status}
+                          </span>
+                          <ExternalLink className="w-4 h-4 opacity-20 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+            {/* Curated Wishlist Section */}
+            {dashboardData.recentWishlist &&
+              dashboardData.recentWishlist.length > 0 && (
+                <motion.div variants={itemVariants} className="mt-16 space-y-8">
+                  <div className="flex items-center justify-between border-b-2 border-foreground/5 pb-4">
+                    <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3">
+                      <Heart className="w-5 h-5 opacity-40" />
+                      Curated Wishlist
+                    </h3>
+                    <Link href="/wishlist">
+                      <Button
+                        variant="link"
+                        className="text-xs uppercase tracking-widest font-bold"
+                      >
+                        Manage Collection
+                      </Button>
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {dashboardData.recentWishlist.map((item: any) => (
+                      <Link
+                        key={item.id}
+                        href={`/shop/${item.slug}`}
+                        className="group space-y-4"
+                      >
+                        <div className="aspect-[3/4] bg-muted relative overflow-hidden border-2 border-transparent group-hover:border-foreground transition-all">
+                          <Image
+                            src={item.image}
+                            alt={item.title}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-700"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="font-bold text-xs uppercase tracking-tight truncate group-hover:text-foreground/70 transition-colors">
+                            {item.title}
+                          </h4>
+                          <p className="text-[10px] font-black uppercase tracking-widest opacity-40">
+                            {item.price.toLocaleString("en-IN", {
+                              style: "currency",
+                              currency: "INR",
+                            })}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
           </motion.div>
         </div>
       </main>
