@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, Eye, Heart } from "lucide-react";
 import { cn, formatPrice } from "@/lib/utils";
-import type { Product } from "@/lib/products";
+import type { Product } from "@/lib/products-shared";
 import { useCartStore } from "@/lib/cart-store";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";

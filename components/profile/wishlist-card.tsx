@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/lib/cart-store";
 import { useUserStore } from "@/lib/user-store";
-import type { Product } from "@/lib/products";
+import type { Product } from "@/lib/products-shared";
 
 interface WishlistCardProps {
   product: Product;

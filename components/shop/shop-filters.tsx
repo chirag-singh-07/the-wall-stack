@@ -26,7 +26,7 @@ import {
   Grid3X3,
   LayoutGrid,
 } from "lucide-react";
-import { collections, priceRanges, sortOptions } from "@/lib/products";
+import { collections, priceRanges, sortOptions } from "@/lib/products-shared";
 import { cn } from "@/lib/utils";
 
 interface ShopFiltersProps {

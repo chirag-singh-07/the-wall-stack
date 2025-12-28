@@ -1,19 +1,22 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import Image from "next/image"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { ShoppingBag, ArrowRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-import type { Product } from "@/lib/products"
+import Link from "next/link";
+import Image from "next/image";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ShoppingBag, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { Product } from "@/lib/products-shared";
 
 interface RecommendedProductsProps {
-  products: Product[]
-  currentCategory: string
+  products: Product[];
+  currentCategory: string;
 }
 
-export function RecommendedProducts({ products, currentCategory }: RecommendedProductsProps) {
+export function RecommendedProducts({
+  products,
+  currentCategory,
+}: RecommendedProductsProps) {
   return (
     <section className="py-16 md:py-24 border-t">
       <div className="container px-4 md:px-8 mx-auto">
@@ -23,7 +26,9 @@ export function RecommendedProducts({ products, currentCategory }: RecommendedPr
             <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-medium">
               You May Also Like
             </span>
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Recommended Posters</h2>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
+              Recommended Posters
+            </h2>
           </div>
           <Link href="/shop">
             <Button variant="ghost" className="group">
@@ -46,7 +51,7 @@ export function RecommendedProducts({ products, currentCategory }: RecommendedPr
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function RecommendedProductCard({
@@ -54,11 +59,11 @@ function RecommendedProductCard({
   index,
   isFromSameCategory,
 }: {
-  product: Product
-  index: number
-  isFromSameCategory: boolean
+  product: Product;
+  index: number;
+  isFromSameCategory: boolean;
 }) {
-  const [isHovered, setIsHovered] = useState(false)
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <Link
@@ -73,7 +78,10 @@ function RecommendedProductCard({
           src={product.image || "/placeholder.svg"}
           alt={product.title}
           fill
-          className={cn("object-cover transition-all duration-700", isHovered ? "scale-110" : "scale-100")}
+          className={cn(
+            "object-cover transition-all duration-700",
+            isHovered ? "scale-110" : "scale-100"
+          )}
         />
 
         {/* Same category badge */}
@@ -87,7 +95,7 @@ function RecommendedProductCard({
         <div
           className={cn(
             "absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent transition-opacity duration-500",
-            isHovered ? "opacity-100" : "opacity-0",
+            isHovered ? "opacity-100" : "opacity-0"
           )}
         />
 
@@ -95,14 +103,14 @@ function RecommendedProductCard({
         <div
           className={cn(
             "absolute bottom-4 left-4 right-4 transition-all duration-300",
-            isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+            isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}
         >
           <Button
             size="sm"
             className="w-full"
             onClick={(e) => {
-              e.preventDefault()
+              e.preventDefault();
               // Add to cart logic
             }}
           >
@@ -115,21 +123,23 @@ function RecommendedProductCard({
         <div
           className={cn(
             "absolute top-3 left-3 w-6 h-6 border-l-2 border-t-2 border-background transition-all duration-500",
-            isHovered ? "opacity-100 scale-100" : "opacity-0 scale-75",
+            isHovered ? "opacity-100 scale-100" : "opacity-0 scale-75"
           )}
         />
         <div
           className={cn(
             "absolute top-3 right-3 w-6 h-6 border-r-2 border-t-2 border-background transition-all duration-500 delay-75",
-            isHovered ? "opacity-100 scale-100" : "opacity-0 scale-75",
+            isHovered ? "opacity-100 scale-100" : "opacity-0 scale-75"
           )}
         />
       </div>
 
       <div className="space-y-1">
-        <h3 className="font-medium group-hover:underline underline-offset-4 transition-all">{product.title}</h3>
+        <h3 className="font-medium group-hover:underline underline-offset-4 transition-all">
+          {product.title}
+        </h3>
         <p className="text-muted-foreground">${product.price}</p>
       </div>
     </Link>
-  )
+  );
 }

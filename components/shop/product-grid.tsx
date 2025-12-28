@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { ProductCard } from "@/components/product-card"
-import type { Product } from "@/lib/products"
-import { cn } from "@/lib/utils"
+import { ProductCard } from "@/components/product-card";
+import type { Product } from "@/lib/products-shared";
+import { cn } from "@/lib/utils";
 
 interface ProductGridProps {
-  products: Product[]
-  viewMode: "grid" | "large"
+  products: Product[];
+  viewMode: "grid" | "large";
 }
 
 export function ProductGrid({ products, viewMode }: ProductGridProps) {
@@ -14,7 +14,12 @@ export function ProductGrid({ products, viewMode }: ProductGridProps) {
     return (
       <div className="text-center py-16">
         <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-muted flex items-center justify-center">
-          <svg className="h-10 w-10 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="h-10 w-10 text-muted-foreground"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -28,7 +33,7 @@ export function ProductGrid({ products, viewMode }: ProductGridProps) {
           Try adjusting your search or filters to find what you're looking for.
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -37,7 +42,7 @@ export function ProductGrid({ products, viewMode }: ProductGridProps) {
         "grid gap-6 md:gap-8",
         viewMode === "grid"
           ? "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3",
+          : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
       )}
     >
       {products.map((product, index) => (
@@ -50,5 +55,5 @@ export function ProductGrid({ products, viewMode }: ProductGridProps) {
         </div>
       ))}
     </div>
-  )
+  );
 }
