@@ -1,64 +1,64 @@
-"use client"
+"use client";
 
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
-import { type Product, allProducts } from "./products"
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { type Product, allProducts } from "./products-shared";
 
 export interface Order {
-  id: string
-  date: string
-  status: "processing" | "shipped" | "delivered" | "cancelled"
+  id: string;
+  date: string;
+  status: "processing" | "shipped" | "delivered" | "cancelled";
   items: {
-    productId: string
-    title: string
-    image: string
-    size: string
-    quantity: number
-    price: number
-  }[]
-  total: number
-  shippingAddress: Address
+    productId: string;
+    title: string;
+    image: string;
+    size: string;
+    quantity: number;
+    price: number;
+  }[];
+  total: number;
+  shippingAddress: Address;
 }
 
 export interface Address {
-  id: string
-  label: string
-  firstName: string
-  lastName: string
-  street: string
-  city: string
-  state: string
-  zipCode: string
-  country: string
-  phone: string
-  isDefault: boolean
+  id: string;
+  label: string;
+  firstName: string;
+  lastName: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  phone: string;
+  isDefault: boolean;
 }
 
 export interface UserProfile {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  avatar?: string
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  avatar?: string;
 }
 
 interface UserStore {
-  isLoggedIn: boolean
-  profile: UserProfile | null
-  wishlist: string[]
-  addresses: Address[]
-  orders: Order[]
-  login: (profile: UserProfile) => void
-  logout: () => void
-  updateProfile: (profile: Partial<UserProfile>) => void
-  addToWishlist: (productId: string) => void
-  removeFromWishlist: (productId: string) => void
-  isInWishlist: (productId: string) => boolean
-  getWishlistProducts: () => Product[]
-  addAddress: (address: Omit<Address, "id">) => void
-  updateAddress: (id: string, address: Partial<Address>) => void
-  removeAddress: (id: string) => void
-  setDefaultAddress: (id: string) => void
+  isLoggedIn: boolean;
+  profile: UserProfile | null;
+  wishlist: string[];
+  addresses: Address[];
+  orders: Order[];
+  login: (profile: UserProfile) => void;
+  logout: () => void;
+  updateProfile: (profile: Partial<UserProfile>) => void;
+  addToWishlist: (productId: string) => void;
+  removeFromWishlist: (productId: string) => void;
+  isInWishlist: (productId: string) => boolean;
+  getWishlistProducts: () => Product[];
+  addAddress: (address: Omit<Address, "id">) => void;
+  updateAddress: (id: string, address: Partial<Address>) => void;
+  removeAddress: (id: string) => void;
+  setDefaultAddress: (id: string) => void;
 }
 
 // Sample orders for demo
@@ -129,7 +129,7 @@ const sampleOrders: Order[] = [
       isDefault: true,
     },
   },
-]
+];
 
 export const useUserStore = create<UserStore>()(
   persist(
@@ -182,7 +182,9 @@ export const useUserStore = create<UserStore>()(
 
       addToWishlist: (productId) =>
         set((state) => ({
-          wishlist: state.wishlist.includes(productId) ? state.wishlist : [...state.wishlist, productId],
+          wishlist: state.wishlist.includes(productId)
+            ? state.wishlist
+            : [...state.wishlist, productId],
         })),
 
       removeFromWishlist: (productId) =>
@@ -193,14 +195,16 @@ export const useUserStore = create<UserStore>()(
       isInWishlist: (productId) => get().wishlist.includes(productId),
 
       getWishlistProducts: () => {
-        const wishlistIds = get().wishlist
-        return allProducts.filter((p) => wishlistIds.includes(p.id))
+        const wishlistIds = get().wishlist;
+        return allProducts.filter((p) => wishlistIds.includes(p.id));
       },
 
       addAddress: (address) =>
         set((state) => ({
           addresses: [
-            ...state.addresses.map((a) => (address.isDefault ? { ...a, isDefault: false } : a)),
+            ...state.addresses.map((a) =>
+              address.isDefault ? { ...a, isDefault: false } : a
+            ),
             { ...address, id: `addr-${Date.now()}` },
           ],
         })),
@@ -208,9 +212,9 @@ export const useUserStore = create<UserStore>()(
       updateAddress: (id, updates) =>
         set((state) => ({
           addresses: state.addresses.map((a) => {
-            if (a.id === id) return { ...a, ...updates }
-            if (updates.isDefault) return { ...a, isDefault: false }
-            return a
+            if (a.id === id) return { ...a, ...updates };
+            if (updates.isDefault) return { ...a, isDefault: false };
+            return a;
           }),
         })),
 
@@ -229,6 +233,6 @@ export const useUserStore = create<UserStore>()(
     }),
     {
       name: "poster-user",
-    },
-  ),
-)
+    }
+  )
+);
