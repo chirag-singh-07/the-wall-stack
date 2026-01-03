@@ -371,7 +371,13 @@ export default function AdminLoginPage() {
 
           {/* Back Links */}
           <div className="space-y-3 pt-4 border-t border-border">
-            <div className="text-center">
+            <div className="text-center space-y-2">
+              <Link
+                href="/admin-forgot-password"
+                className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Forgot your password?
+              </Link>
               <Link
                 href="/"
                 className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
