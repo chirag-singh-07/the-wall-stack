@@ -175,7 +175,7 @@ export default function AboutPage() {
                 </Link>
                 <Link href="/custom-poster">
                   <Button
-                    variant="outline"
+                  variant="outline"
                     size="lg"
                     className="rounded-full px-8"
                   >
@@ -193,7 +193,7 @@ export default function AboutPage() {
               className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl"
             >
               <Image
-                src="/artist-working.jpg" // Placeholder for an artist or warehouse image
+                src="/default-images/good.jpg" // Placeholder for an artist or warehouse image
                 alt="Our innovation"
                 fill
                 className="object-cover"
@@ -209,8 +209,8 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-foreground text-background">
-        <div className="container px-4 text-center space-y-10">
+      <section className="py-24 bg-foreground text-background flex items-center w-full justify-center">
+        <div className="flex items-center flex-col px-4 text-center space-y-10">
           <motion.h2
             whileInView={{ scale: [0.95, 1], opacity: [0, 1] }}
             className="text-4xl md:text-7xl font-black tracking-tighter"
