@@ -116,6 +116,7 @@ export function Newsletter() {
                       className="h-20 pl-16 pr-6 bg-white border-black/5 rounded-[30px] font-black uppercase tracking-widest text-[11px] focus:ring-black/5 transition-all outline-none"
                       disabled={isSubmitting || isSuccess}
                       required
+                      suppressHydrationWarning
                     />
                   </div>
 
