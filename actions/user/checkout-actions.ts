@@ -36,6 +36,7 @@ export async function createOrder(data: CreateOrderInput) {
         userId: data.userId,
         status: "pending",
         paymentMethod: "COD",
+        paymentStatus: "unpaid",
         items: {
           create: await Promise.all(
             data.items.map(async (item) => {
@@ -110,5 +111,64 @@ export async function updateOrderStatus(orderId: string, status: string) {
   } catch (error) {
     console.error("Failed to update order status:", error);
     return { success: false, error: "Failed to update order status" };
+  }
+}
+
+export async function getOrderById(orderId: string) {
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        items: {
+          include: {
+            poster: true,
+            customPoster: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            phone: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      return { success: false, error: "Order not found" };
+    }
+
+    return { success: true, data: order };
+  } catch (error) {
+    console.error("Failed to fetch order details:", error);
+    return { success: false, error: "Failed to fetch order details" };
+  }
+}
+
+export async function updateOrderPaymentInfo(
+  orderId: string,
+  data: { paymentMethod?: string; paymentStatus?: string }
+) {
+  try {
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        paymentMethod: data.paymentMethod,
+        paymentStatus: data.paymentStatus,
+      },
+    });
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${orderId}`);
+    return { success: true, data: order };
+  } catch (error: any) {
+    console.error("Failed to update payment info:", error);
+    return {
+      success: false,
+      error: error?.message || "Failed to update payment info",
+    };
   }
 }

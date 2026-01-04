@@ -19,6 +19,7 @@ import {
   Image,
   FileText,
   Star,
+  Edit,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -35,6 +36,7 @@ const navItems = [
   { href: "/admin/reviews", label: "Reviews", icon: Star },
   { href: "/admin/gallery", label: "Gallery", icon: Image },
   { href: "/admin/cms", label: "Content", icon: FileText },
+  { href: "/admin/landing-photos", label: "Landing Photos", icon: Edit },
   { href: "/admin/sales", label: "Sales", icon: TrendingUp },
   { href: "/admin/profile", label: "Profile", icon: User },
 ];

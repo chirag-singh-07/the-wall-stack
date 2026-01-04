@@ -1,0 +1,23 @@
+name: Keep-Alive Job
+
+on:
+  schedule:
+    - cron: "*/10 * * * *" # Runs every 10 minutes
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Keep-Alive Script
+        run: node scripts/keep-alive-job.js
+        env:
+          TARGET_URL: "https://the-wall-stack.vercel.app"

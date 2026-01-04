@@ -75,7 +75,7 @@ export default function AdminOrdersPage() {
     <div className="min-h-screen">
       <AdminHeader
         title="Order Management"
-        description="View and manage customer COD orders"
+        // description="View and manage customer COD orders"
       />
 
       <div className="p-6">
@@ -197,6 +197,14 @@ export default function AdminOrdersPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() =>
+                                (window.location.href = `/admin/orders/${order.id}`)
+                              }
+                            >
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Details
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() =>
                                 handleStatusUpdate(order.id, "pending")

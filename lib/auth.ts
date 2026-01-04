@@ -29,5 +29,9 @@ export const auth = betterAuth({
   advanced: {
     generateId: false, // Use database auto-generated IDs
   },
-  trustedOrigins: ["http://localhost:3000"],
+  trustedOrigins: [
+    "http://localhost:3000",
+    "https://the-wall-stack.vercel.app",
+    "https://www.thewallstack.com",
+  ],
 });
