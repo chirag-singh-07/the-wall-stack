@@ -120,13 +120,20 @@ export default function AdminCustomOrdersPage() {
                 ) : (
                   orders.map((order) => (
                     <TableRow key={order.id}>
+                      <TableCell className="font-mono text-xs">
+                        {order.id.slice(-6).toUpperCase()}
+                      </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="font-bold uppercase tracking-tighter text-sm">
-                            {order.user?.name || "Anonymous"}
+                            {order.linkedOrder?.name ||
+                              order.user?.name ||
+                              "Anonymous"}
                           </span>
                           <span className="text-[10px] text-muted-foreground uppercase font-black">
-                            {order.user?.email || "No Email"}
+                            {order.linkedOrder?.email ||
+                              order.user?.email ||
+                              "No Email"}
                           </span>
                         </div>
                       </TableCell>
@@ -140,7 +147,7 @@ export default function AdminCustomOrdersPage() {
                               onClick={() => setSelectedOrder(order)}
                             >
                               <Eye className="mr-2 h-3.5 w-3.5" />
-                              Inspect
+                              View Art
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-xl bg-white border-black/10">
@@ -252,18 +259,19 @@ export default function AdminCustomOrdersPage() {
                         </Dialog>
                       </TableCell>
                       <TableCell>
-                        <div className="max-w-[150px] truncate font-black uppercase text-[10px] tracking-widest text-black/60">
-                          {order.design.text || "None"}
-                        </div>
-                      </TableCell>
-                      <TableCell>
                         <div className="font-medium">{order.design.size}</div>
                         <div className="text-sm">₹{order.price}</div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{order.status}</Badge>
+                        <Badge
+                          variant={order.linkedOrder ? "default" : "secondary"}
+                        >
+                          {order.linkedOrder
+                            ? `Ordered: ${order.linkedOrder.status}`
+                            : order.status}
+                        </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
                         {new Date(order.createdAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-right">
@@ -274,6 +282,15 @@ export default function AdminCustomOrdersPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                (window.location.href = `/admin/custom-orders/${order.id}`)
+                              }
+                            >
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Details
+                            </DropdownMenuItem>
                             <DropdownMenuLabel>Update Status</DropdownMenuLabel>
                             <DropdownMenuItem
                               onClick={() =>

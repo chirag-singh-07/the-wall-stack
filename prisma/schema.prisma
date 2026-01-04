@@ -42,6 +42,7 @@ model User {
   galleryComments GalleryComment[]
   galleryLikes  GalleryLike[]
   reviews       Review[]
+  customPosters CustomPoster[]
 
   @@unique([email])
   @@map("user")
@@ -225,6 +226,7 @@ model GalleryComment {
 model CustomPoster {
   id        String   @id @default(cuid())
   userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
   design    String   // JSON string containing design data
   price     Float
   orderItems OrderItem[]
